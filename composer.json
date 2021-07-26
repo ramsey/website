@@ -1,31 +1,51 @@
 {
-    "name": "mezzio/mezzio-skeleton",
-    "description": "Laminas mezzio skeleton. Begin developing PSR-15 middleware applications in seconds!",
+    "name": "ramsey/website",
     "type": "project",
-    "license": "BSD-3-Clause",
+    "description": "My personal website and blog",
     "keywords": [
-        "laminas",
-        "mezzio",
-        "skeleton",
-        "middleware",
-        "psr",
-        "psr-7",
-        "psr-11",
-        "psr-15"
+        "website",
+        "blog"
     ],
-    "homepage": "https://mezzio.dev",
-    "support": {
-        "docs": "https://docs.mezzio.dev/mezzio/",
-        "issues": "https://github.com/mezzio/mezzio-skeleton/issues",
-        "source": "https://github.com/mezzio/mezzio-skeleton",
-        "rss": "https://github.com/mezzio/mezzio-skeleton/releases.atom",
-        "chat": "https://laminas.dev/chat",
-        "forum": "https://discourse.laminas.dev"
+    "license": [
+        "MIT",
+        "CC-BY-4.0"
+    ],
+    "authors": [
+        {
+            "name": "Ben Ramsey",
+            "email": "ben@benramsey.com",
+            "homepage": "https://benramsey.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "laminas/laminas-component-installer": "^2.5.0",
+        "laminas/laminas-config-aggregator": "^1.5.0",
+        "laminas/laminas-diactoros": "^2.6.0",
+        "laminas/laminas-servicemanager": "^3.4",
+        "laminas/laminas-stdlib": "^3.3.1",
+        "mezzio/mezzio": "^3.5.0",
+        "mezzio/mezzio-helpers": "^5.6.0",
+        "mezzio/mezzio-laminasrouter": "^3.0.1",
+        "mezzio/mezzio-twigrenderer": "^2.6",
+        "ocramius/package-versions": "^2.3"
+    },
+    "require-dev": {
+        "filp/whoops": "^2.7.1",
+        "laminas/laminas-development-mode": "^3.3.0",
+        "mezzio/mezzio-tooling": "^1.4.0",
+        "phpspec/prophecy": "^1.10.3",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "ramsey/devtools": "^1.7"
     },
     "config": {
+        "optimize-autoloader": true,
         "sort-packages": true
     },
     "extra": {
+        "captainhook": {
+            "force-install": true
+        },
         "laminas": {
             "component-whitelist": [
                 "mezzio/mezzio",
@@ -35,30 +55,13 @@
                 "mezzio/mezzio-laminasrouter",
                 "mezzio/mezzio-twigrenderer"
             ]
+        },
+        "ramsey/conventional-commits": {
+            "configFile": "conventional-commits.json"
+        },
+        "ramsey/devtools": {
+            "command-prefix": "dev"
         }
-    },
-    "require": {
-        "php": "^7.3 || ~8.0.0",
-        "composer/package-versions-deprecated": "^1.10.99",
-        "laminas/laminas-component-installer": "^2.5.0",
-        "laminas/laminas-config-aggregator": "^1.5.0",
-        "laminas/laminas-diactoros": "^2.6.0",
-        "laminas/laminas-stdlib": "^3.3.1",
-        "laminas/laminas-zendframework-bridge": "^1.2.0",
-        "mezzio/mezzio": "^3.5.0",
-        "mezzio/mezzio-helpers": "^5.6.0",
-        "laminas/laminas-servicemanager": "^3.4",
-        "mezzio/mezzio-laminasrouter": "^3.0.1",
-        "mezzio/mezzio-twigrenderer": "^2.6"
-    },
-    "require-dev": {
-        "laminas/laminas-development-mode": "^3.3.0",
-        "mezzio/mezzio-tooling": "^1.4.0",
-        "phpspec/prophecy": "^1.10.3",
-        "phpspec/prophecy-phpunit": "^2.0",
-        "phpunit/phpunit": "^9.4.1",
-        "roave/security-advisories": "dev-master",
-        "filp/whoops": "^2.7.1"
     },
     "autoload": {
         "psr-4": {
@@ -67,26 +70,18 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "AppTest\\": "tests/AppTest/"
+            "AppTest\\": "tests/AppTest/",
+            "Ramsey\\Test\\Website\\": "tests/Website/"
         }
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "scripts": {
-        "post-create-project-cmd": [
-            "@development-enable"
-        ],
+        "clear-config-cache": "php bin/clear-config-cache.php",
         "development-disable": "laminas-development-mode disable",
         "development-enable": "laminas-development-mode enable",
         "development-status": "laminas-development-mode status",
         "mezzio": "mezzio --ansi",
-        "check": [
-            "@cs-check",
-            "@test"
-        ],
-        "clear-config-cache": "php bin/clear-config-cache.php",
-        "cs-check": "phpcs",
-        "cs-fix": "phpcbf",
-        "serve": "php -S 0.0.0.0:8080 -t public/",
-        "test": "phpunit --colors=always",
-        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
+        "serve": "php -S 0.0.0.0:8080 -t public/"
     }
 }

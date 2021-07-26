@@ -3,30 +3,29 @@
          xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
 
     <arg name="basepath" value="."/>
-    <arg name="cache" value=".phpcs-cache"/>
+    <arg name="cache" value="./build/cache/phpcs.cache"/>
     <arg name="colors"/>
     <arg name="extensions" value="php"/>
     <arg name="parallel" value="80"/>
-
-    <!-- Show progress -->
-    <arg value="p"/>
+    <arg value="sp"/>
 
     <!-- Paths to check -->
-    <file>config</file>
-    <file>src</file>
-    <file>tests</file>
-    <exclude-pattern>config/config.php</exclude-pattern>
-    <exclude-pattern>config/routes.php</exclude-pattern>
+    <file>./config</file>
+    <file>./src</file>
+    <file>./tests</file>
 
-    <!-- Include all rules from the Laminas Coding Standard -->
-    <rule ref="LaminasCodingStandard"/>
+    <exclude-pattern>./config/config.php</exclude-pattern>
+    <exclude-pattern>./config/routes.php</exclude-pattern>
+
+    <!-- Include all rules from the Ramsey Coding Standard -->
+    <rule ref="Ramsey"/>
 
     <rule ref="Squiz.Classes.ClassFileName.NoMatch">
-        <exclude-pattern>src/ConfigProvider.*.php</exclude-pattern>
+        <exclude-pattern>./src/ConfigProvider.*.php</exclude-pattern>
     </rule>
 
     <rule ref="PSR12.Files.FileHeader.IncorrectOrder">
-        <exclude-pattern>config/pipeline.php</exclude-pattern>
-        <exclude-pattern>src/MezzioInstaller/Resources/config/routes-*.php</exclude-pattern>
+        <exclude-pattern>./config/pipeline.php</exclude-pattern>
     </rule>
+
 </ruleset>

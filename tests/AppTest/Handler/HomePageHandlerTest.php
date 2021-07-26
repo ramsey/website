@@ -6,15 +6,14 @@ namespace AppTest\Handler;
 
 use App\Handler\HomePageHandler;
 use Laminas\Diactoros\Response\HtmlResponse;
-use Laminas\Diactoros\Response\JsonResponse;
 use Mezzio\Router\RouterInterface;
 use Mezzio\Template\TemplateRendererInterface;
-use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Ramsey\Test\Website\TestCase;
 
 use function get_class;
 
@@ -22,48 +21,40 @@ class HomePageHandlerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ContainerInterface|ObjectProphecy */
-    protected $container;
-
-    /** @var RouterInterface|ObjectProphecy */
-    protected $router;
+    protected ObjectProphecy $container;
+    protected ObjectProphecy $router;
 
     protected function setUp(): void
     {
         $this->container = $this->prophesize(ContainerInterface::class);
-        $this->router    = $this->prophesize(RouterInterface::class);
+        $this->router = $this->prophesize(RouterInterface::class);
     }
 
-    public function testReturnsJsonResponseWhenNoTemplateRendererProvided()
-    {
-        $homePage = new HomePageHandler(
-            get_class($this->container->reveal()),
-            $this->router->reveal(),
-            null
-        );
-        $response = $homePage->handle(
-            $this->prophesize(ServerRequestInterface::class)->reveal()
-        );
-
-        self::assertInstanceOf(JsonResponse::class, $response);
-    }
-
-    public function testReturnsHtmlResponseWhenTemplateRendererProvided()
+    public function testReturnsHtmlResponseWhenTemplateRendererProvided(): void
     {
         $renderer = $this->prophesize(TemplateRendererInterface::class);
+
+        // @phpstan-ignore-next-line
         $renderer
             ->render('app::home-page', Argument::type('array'))
             ->willReturn('');
 
+        /** @var RouterInterface $router */
+        $router = $this->router->reveal();
+
+        /** @var TemplateRendererInterface $rendererInstance */
+        $rendererInstance = $renderer->reveal();
+
         $homePage = new HomePageHandler(
             get_class($this->container->reveal()),
-            $this->router->reveal(),
-            $renderer->reveal()
+            $router,
+            $rendererInstance,
         );
 
-        $response = $homePage->handle(
-            $this->prophesize(ServerRequestInterface::class)->reveal()
-        );
+        /** @var ServerRequestInterface & ObjectProphecy $serverRequest */
+        $serverRequest = $this->prophesize(ServerRequestInterface::class)->reveal();
+
+        $response = $homePage->handle($serverRequest);
 
         self::assertInstanceOf(HtmlResponse::class, $response);
     }

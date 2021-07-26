@@ -6,9 +6,10 @@ namespace AppTest\Handler;
 
 use App\Handler\PingHandler;
 use Laminas\Diactoros\Response\JsonResponse;
-use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Http\Message\ServerRequestInterface;
+use Ramsey\Test\Website\TestCase;
 
 use function json_decode;
 
@@ -16,12 +17,13 @@ class PingHandlerTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testResponse()
+    public function testResponse(): void
     {
+        /** @var ServerRequestInterface & ObjectProphecy $serverRequest */
+        $serverRequest = $this->prophesize(ServerRequestInterface::class)->reveal();
+
         $pingHandler = new PingHandler();
-        $response    = $pingHandler->handle(
-            $this->prophesize(ServerRequestInterface::class)->reveal()
-        );
+        $response = $pingHandler->handle($serverRequest);
 
         $json = json_decode((string) $response->getBody());
 
