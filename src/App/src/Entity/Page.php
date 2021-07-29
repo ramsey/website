@@ -9,11 +9,14 @@ namespace App\Entity;
  */
 class Page
 {
+    private Attributes $attributes;
+
     public function __construct(
         private string $title,
         private string $content,
-        private Attributes $attributes,
+        ?Attributes $attributes = null,
     ) {
+        $this->attributes = $attributes ?? new Attributes([]);
     }
 
     public function getTitle(): string

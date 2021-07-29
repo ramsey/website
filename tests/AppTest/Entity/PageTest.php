@@ -10,41 +10,49 @@ use Ramsey\Test\Website\TestCase;
 
 class PageTest extends TestCase
 {
-    public function testGetTitle(): void
+    private string $title;
+    private string $content;
+
+    protected function setUp(): void
     {
-        $title = $this->faker()->sentence;
+        $this->title = $this->faker()->sentence;
 
         /** @var string $content */
         $content = $this->faker()->paragraphs(3, true);
+        $this->content = $content;
+    }
 
-        $page = new Page($title, $content, new Attributes([]));
+    public function testGetTitle(): void
+    {
+        $page = new Page($this->title, $this->content);
 
-        $this->assertSame($title, $page->getTitle());
+        $this->assertSame($this->title, $page->getTitle());
     }
 
     public function testGetContent(): void
     {
-        $title = $this->faker()->sentence;
+        $page = new Page($this->title, $this->content);
 
-        /** @var string $content */
-        $content = $this->faker()->paragraphs(3, true);
-
-        $page = new Page($title, $content, new Attributes([]));
-
-        $this->assertSame($content, $page->getContent());
+        $this->assertSame($this->content, $page->getContent());
     }
 
     public function testGetAttributes(): void
     {
-        $title = $this->faker()->sentence;
-
-        /** @var string $content */
-        $content = $this->faker()->paragraphs(3, true);
-
         $attributes = new Attributes([]);
 
-        $page = new Page($title, $content, $attributes);
+        $page = new Page($this->title, $this->content, $attributes);
 
+        $this->assertSame($attributes, $page->getAttributes());
+    }
+
+    public function testGetAttributesDefaultsToEmptyAttributes(): void
+    {
+        $page = new Page($this->title, $this->content);
+        $attributes = $page->getAttributes();
+
+        $this->assertInstanceOf(Attributes::class, $attributes);
+
+        // Ensure it returns the same instance created when calling it the first time.
         $this->assertSame($attributes, $page->getAttributes());
     }
 }
