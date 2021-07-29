@@ -31,6 +31,7 @@
         "ocramius/package-versions": "^2.3"
     },
     "require-dev": {
+        "fakerphp/faker": "^1.15",
         "filp/whoops": "^2.7.1",
         "laminas/laminas-development-mode": "^3.3.0",
         "mezzio/mezzio-tooling": "^1.4.0",
