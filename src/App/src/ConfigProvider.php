@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App;
 
+use League\CommonMark\Environment\EnvironmentInterface;
+use League\CommonMark\MarkdownConverterInterface;
+
 /**
  * The configuration provider for the App module
  *
@@ -48,7 +51,9 @@ class ConfigProvider
                 Handler\PingHandler::class => Handler\PingHandler::class,
             ],
             'factories' => [
+                EnvironmentInterface::class => Content\Markdown\CommonMarkEnvironmentFactory::class,
                 Handler\HomePageHandler::class => Handler\HomePageHandlerFactory::class,
+                MarkdownConverterInterface::class => Content\Markdown\MarkdownConverterFactory::class,
             ],
         ];
     }
