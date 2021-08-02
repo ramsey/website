@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Util\FinderFactory;
 use League\CommonMark\Environment\EnvironmentInterface;
 use League\CommonMark\MarkdownConverterInterface;
 
@@ -48,6 +49,7 @@ class ConfigProvider
     {
         return [
             'invokables' => [
+                FinderFactory::class => FinderFactory::class,
                 Handler\PingHandler::class => Handler\PingHandler::class,
             ],
             'factories' => [
