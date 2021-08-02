@@ -7,7 +7,7 @@ namespace App\Entity;
 /**
  * Website pages have titles, body content, and arbitrary attributes
  */
-class Page
+class Page implements Attributable
 {
     private Attributes $attributes;
 

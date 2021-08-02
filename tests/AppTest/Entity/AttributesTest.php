@@ -38,6 +38,14 @@ class AttributesTest extends TestCase
     }
 
     /**
+     * @dataProvider hasProvider
+     */
+    public function testHasArrayAccessVariant(string $name, bool $expected): void
+    {
+        $this->assertSame($expected, isset($this->attributes[$name]));
+    }
+
+    /**
      * @return array<array{0: string, 1: bool}>
      */
     public function hasProvider(): array
@@ -62,6 +70,14 @@ class AttributesTest extends TestCase
     }
 
     /**
+     * @dataProvider getWithExistingValuesProvider
+     */
+    public function testGetWithExistingValuesArrayAccessVariant(string $name): void
+    {
+        $this->assertSame($this->values[$name], $this->attributes[$name]);
+    }
+
+    /**
      * @return array<string[]>
      */
     public function getWithExistingValuesProvider(): array
@@ -80,6 +96,11 @@ class AttributesTest extends TestCase
         $this->assertNull($this->attributes->get('foo'));
     }
 
+    public function testGetWithNonexistentValuesArrayAccessVariant(): void
+    {
+        $this->assertNull($this->attributes['foo']);
+    }
+
     public function testGetWithDefaultValue(): void
     {
         $this->assertSame('Hello!', $this->attributes->get('foo', 'Hello!'));
@@ -90,5 +111,19 @@ class AttributesTest extends TestCase
         $this->attributes->set('foo', 'Goodbye!');
 
         $this->assertSame('Goodbye!', $this->attributes->get('foo'));
+    }
+
+    public function testSetArrayAccessVariant(): void
+    {
+        $this->attributes['foo'] = 'Goodbye!';
+
+        $this->assertSame('Goodbye!', $this->attributes['foo']);
+    }
+
+    public function testUnset(): void
+    {
+        unset($this->attributes['title']);
+
+        $this->assertFalse($this->attributes->has('title'));
     }
 }

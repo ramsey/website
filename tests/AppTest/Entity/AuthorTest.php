@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AppTest\Entity;
 
+use App\Entity\Attributes;
 use App\Entity\Author;
 use Laminas\Diactoros\Uri;
 use Ramsey\Test\Website\TestCase;
@@ -76,5 +77,20 @@ class AuthorTest extends TestCase
         $author = new Author(name: 'Jane Doe');
 
         $this->assertNull($author->getEmail());
+    }
+
+    public function testGetAttributesReturnsAttributesEvenWhenNoneArePassed(): void
+    {
+        $author = new Author(name: 'Jane Doe');
+
+        $this->assertInstanceOf(Attributes::class, $author->getAttributes());
+    }
+
+    public function testGetAttributesReturnsPassedAttributes(): void
+    {
+        $attributes = new Attributes(['foo' => 'bar']);
+        $author = new Author(name: 'Jane Doe', attributes: $attributes);
+
+        $this->assertSame($attributes, $author->getAttributes());
     }
 }

@@ -9,17 +9,17 @@ use DateTimeInterface;
 /**
  * Website posts are pages posted at specific times with authors
  */
-class Post extends Page
+class Post extends Page implements Attributable
 {
     public function __construct(
-        private string $title,
-        private string $content,
+        string $title,
+        string $content,
         private DateTimeInterface $publishDate,
         private ?AuthorCollection $authors = null,
-        private ?Attributes $attributes = null,
+        ?Attributes $attributes = null,
         private ?DateTimeInterface $lastUpdateDate = null,
     ) {
-        parent::__construct($this->title, $this->content, $this->attributes);
+        parent::__construct($title, $content, $attributes);
     }
 
     public function getPublishDate(): DateTimeInterface
