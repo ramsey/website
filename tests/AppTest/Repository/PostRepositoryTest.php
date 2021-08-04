@@ -19,7 +19,7 @@ class PostRepositoryTest extends TestCase
         $finder = $this->mockery(Finder::class);
         $finder->expects()->files()->andReturnSelf();
         $finder->expects()->in('/path/to/files')->andReturnSelf();
-        $finder->expects()->name('2021-07-*-a-nonexistent-test-post.md')->andReturnSelf();
+        $finder->expects()->name('/^2021-07-\d{2}-a-nonexistent-test-post\.(md|html|markdown)$/')->andReturnSelf();
         $finder->expects()->count()->andReturn(0);
         $finder->expects()->getIterator()->andReturn(new ArrayIterator([]));
 
@@ -38,7 +38,7 @@ class PostRepositoryTest extends TestCase
         $finder = $this->mockery(Finder::class);
         $finder->expects()->files()->andReturnSelf();
         $finder->expects()->in('/path/to/files')->andReturnSelf();
-        $finder->expects()->name('2021-07-*-a-test-post.md')->andReturnSelf();
+        $finder->expects()->name('/^2021-07-\d{2}-a-test-post\.(md|html|markdown)$/')->andReturnSelf();
         $finder->expects()->count()->andReturn(2);
 
         $finderFactory = $this->mockery(FinderFactory::class);

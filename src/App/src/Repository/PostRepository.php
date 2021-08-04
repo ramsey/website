@@ -18,6 +18,9 @@ use function sprintf;
 
 class PostRepository
 {
+    private const FILENAME_PATTERN = "/^%d-%'.02d-\d{2}-%s\.(md|html|markdown)$/";
+    private const FILE_DATE_PATTERN = '/.*(\d{4}-\d{2}-\d{2}).*/';
+
     public function __construct(
         private FinderFactory $finderFactory,
         private string $postsPath,
@@ -30,7 +33,7 @@ class PostRepository
         $files = ($this->finderFactory)()
             ->files()
             ->in($this->postsPath)
-            ->name(sprintf("%d-%'.02d-*-%s.md", $year, $month, $slug));
+            ->name(sprintf(self::FILENAME_PATTERN, $year, $month, $slug));
 
         if ($files->count() > 1) {
             throw new MultipleMatches(sprintf(
@@ -64,7 +67,7 @@ class PostRepository
         /** @var string $publishDate */
         $publishDate = $frontMatter['publishDate'] ?? '';
 
-        if ($publishDate === '' && preg_match('/^(\d{4}-\d{2}-\d{2})-.*/', $file->getFilename(), $matches)) {
+        if ($publishDate === '' && preg_match(self::FILE_DATE_PATTERN, $file->getFilename(), $matches)) {
             $publishDate = $matches[1] ?? '';
         }
 

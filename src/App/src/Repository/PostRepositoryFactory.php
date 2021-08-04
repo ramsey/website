@@ -16,7 +16,7 @@ class PostRepositoryFactory
         $finderFactory = $container->get(FinderFactory::class);
 
         /** @var string $postsPath */
-        $postsPath = $container->get('config')['postsPath'] ?? '';
+        $postsPath = $container->get('config')['content']['paths']['postsPath'] ?? '';
 
         /** @var MarkdownConverterInterface $markdownConverter */
         $markdownConverter = $container->get(MarkdownConverterInterface::class);
