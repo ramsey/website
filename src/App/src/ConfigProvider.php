@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App;
 
+use App\Repository\AuthorRepository;
+use App\Repository\AuthorRepositoryFactory;
 use App\Util\FinderFactory;
 use League\CommonMark\Environment\EnvironmentInterface;
 use League\CommonMark\MarkdownConverterInterface;
@@ -53,6 +55,7 @@ class ConfigProvider
                 Handler\PingHandler::class => Handler\PingHandler::class,
             ],
             'factories' => [
+                AuthorRepository::class => AuthorRepositoryFactory::class,
                 EnvironmentInterface::class => Content\Markdown\CommonMarkEnvironmentFactory::class,
                 Handler\HomePageHandler::class => Handler\HomePageHandlerFactory::class,
                 MarkdownConverterInterface::class => Content\Markdown\MarkdownConverterFactory::class,

@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Laminas\Diactoros\UriFactory as LaminasUriFactory;
+use Psr\Http\Message\UriFactoryInterface;
+use Symfony\Component\Yaml\Parser as YamlParser;
+
 return [
     // Provides application-wide services.
     // We recommend using fully-qualified class names whenever possible as
@@ -17,6 +21,8 @@ return [
         // class name.
         'invokables' => [
             // Fully\Qualified\InterfaceName::class => Fully\Qualified\ClassName::class,
+            UriFactoryInterface::class => LaminasUriFactory::class,
+            YamlParser::class => YamlParser::class,
         ],
         // Use 'factories' for services provided by callbacks/factory classes.
         'factories' => [

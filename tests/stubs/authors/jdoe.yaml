@@ -1,0 +1,10 @@
+name: Jane Doe
+imageUrl: https://example.com/jane.jpg
+biography: >-
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus gravida magna
+  metus, sit amet condimentum purus molestie ac. Aliquam euismod velit non lacus
+  iaculis, at commodo dolor viverra.
+url: https://example.com/jane
+email: jdoe@example.com
+foo: bar
+baz: quux
