@@ -86,11 +86,11 @@ class AuthorRepositoryTest extends TestCase
             . 'viverra.',
             $author->getBiography(),
         );
-        $this->assertFalse($author->getAttributes()->has('name'));
-        $this->assertFalse($author->getAttributes()->has('email'));
-        $this->assertFalse($author->getAttributes()->has('url'));
-        $this->assertFalse($author->getAttributes()->has('imageUrl'));
-        $this->assertFalse($author->getAttributes()->has('biography'));
+        $this->assertFalse($author->getAttributes()->containsKey('name'));
+        $this->assertFalse($author->getAttributes()->containsKey('email'));
+        $this->assertFalse($author->getAttributes()->containsKey('url'));
+        $this->assertFalse($author->getAttributes()->containsKey('imageUrl'));
+        $this->assertFalse($author->getAttributes()->containsKey('biography'));
         $this->assertSame('bar', $author->getAttributes()->get('foo'));
         $this->assertSame('quux', $author->getAttributes()->get('baz'));
     }
