@@ -9098,16 +9098,16 @@
         },
         {
             "name": "ramsey/coding-standard",
-            "version": "2.0.2",
+            "version": "2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/coding-standard.git",
-                "reference": "11646fd02529d770894981353b583e8829ad8ed3"
+                "reference": "4d2d6e9ee4b5dedba25a81d0961a6b8db11f9073"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/coding-standard/zipball/11646fd02529d770894981353b583e8829ad8ed3",
-                "reference": "11646fd02529d770894981353b583e8829ad8ed3",
+                "url": "https://api.github.com/repos/ramsey/coding-standard/zipball/4d2d6e9ee4b5dedba25a81d0961a6b8db11f9073",
+                "reference": "4d2d6e9ee4b5dedba25a81d0961a6b8db11f9073",
                 "shasum": ""
             },
             "require": {
@@ -9155,7 +9155,7 @@
             ],
             "support": {
                 "issues": "https://github.com/ramsey/coding-standard/issues",
-                "source": "https://github.com/ramsey/coding-standard/tree/2.0.2"
+                "source": "https://github.com/ramsey/coding-standard/tree/2.0.3"
             },
             "funding": [
                 {
@@ -9163,7 +9163,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-07-08T01:06:30+00:00"
+            "time": "2021-08-05T18:01:45+00:00"
         },
         {
             "name": "ramsey/composer-repl",
