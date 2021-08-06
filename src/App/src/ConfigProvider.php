@@ -6,6 +6,8 @@ namespace App;
 
 use App\Repository\AuthorRepository;
 use App\Repository\AuthorRepositoryFactory;
+use App\Repository\PageRepository;
+use App\Repository\PageRepositoryFactory;
 use App\Repository\PostRepository;
 use App\Repository\PostRepositoryFactory;
 use App\Util\FinderFactory;
@@ -61,6 +63,7 @@ class ConfigProvider
                 EnvironmentInterface::class => Content\Markdown\CommonMarkEnvironmentFactory::class,
                 Handler\HomePageHandler::class => Handler\HomePageHandlerFactory::class,
                 MarkdownConverterInterface::class => Content\Markdown\MarkdownConverterFactory::class,
+                PageRepository::class => PageRepositoryFactory::class,
                 PostRepository::class => PostRepositoryFactory::class,
             ],
         ];
