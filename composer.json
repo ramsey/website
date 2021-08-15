@@ -29,6 +29,7 @@
         "mezzio/mezzio-helpers": "^5.6.0",
         "mezzio/mezzio-laminasrouter": "^3.0.1",
         "mezzio/mezzio-twigrenderer": "^2.6",
+        "middlewares/content-length": "^2.0",
         "middlewares/lowercase": "^1.0",
         "middlewares/trailing-slash": "^2.0",
         "ocramius/package-versions": "^2.3",
