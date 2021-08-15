@@ -13,6 +13,7 @@ use App\Repository\PostRepositoryFactory;
 use App\Util\FinderFactory;
 use League\CommonMark\Environment\EnvironmentInterface;
 use League\CommonMark\MarkdownConverterInterface;
+use Middlewares\Lowercase;
 use Middlewares\TrailingSlash;
 
 /**
@@ -63,6 +64,7 @@ class ConfigProvider
                 AuthorRepository::class => AuthorRepositoryFactory::class,
                 EnvironmentInterface::class => Content\Markdown\CommonMarkEnvironmentFactory::class,
                 Handler\HomePageHandler::class => Handler\HomePageHandlerFactory::class,
+                Lowercase::class => Middleware\LowercaseFactory::class,
                 MarkdownConverterInterface::class => Content\Markdown\MarkdownConverterFactory::class,
                 PageRepository::class => PageRepositoryFactory::class,
                 PostRepository::class => PostRepositoryFactory::class,

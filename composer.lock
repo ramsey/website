@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9879ba4e5db2aeca781c1a0bbb4e2af4",
+    "content-hash": "765a97673ce17de1b0a4cae25678ab89",
     "packages": [
         {
             "name": "brick/varexporter",
@@ -2389,6 +2389,57 @@
                 }
             ],
             "time": "2021-05-09T16:03:16+00:00"
+        },
+        {
+            "name": "middlewares/lowercase",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/middlewares/lowercase.git",
+                "reference": "29c0e2e053a37997d4cbfe6d72453408beb469dc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/middlewares/lowercase/zipball/29c0e2e053a37997d4cbfe6d72453408beb469dc",
+                "reference": "29c0e2e053a37997d4cbfe6d72453408beb469dc",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2 || ^8.0",
+                "psr/http-server-middleware": "^1.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.0",
+                "laminas/laminas-diactoros": "^2.3",
+                "middlewares/utils": "^3.0",
+                "oscarotero/php-cs-fixer-config": "^1.0",
+                "phpunit/phpunit": "^8|^9",
+                "squizlabs/php_codesniffer": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Middlewares\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A lowercase repository for PSR-15 middleware packages",
+            "homepage": "https://github.com/middlewares/lowercase",
+            "keywords": [
+                "http",
+                "middleware",
+                "psr-15",
+                "psr-7",
+                "server"
+            ],
+            "support": {
+                "issues": "https://github.com/middlewares/lowercase/issues",
+                "source": "https://github.com/middlewares/lowercase/tree/v1.0.0"
+            },
+            "time": "2021-04-08T19:25:32+00:00"
         },
         {
             "name": "middlewares/trailing-slash",
