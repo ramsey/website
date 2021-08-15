@@ -63,6 +63,7 @@ class ConfigProvider
             'factories' => [
                 AuthorRepository::class => AuthorRepositoryFactory::class,
                 EnvironmentInterface::class => Content\Markdown\CommonMarkEnvironmentFactory::class,
+                Handler\BlogHandler::class => Handler\BlogHandlerFactory::class,
                 Handler\HomePageHandler::class => Handler\HomePageHandlerFactory::class,
                 Lowercase::class => Middleware\LowercaseFactory::class,
                 MarkdownConverterInterface::class => Content\Markdown\MarkdownConverterFactory::class,
