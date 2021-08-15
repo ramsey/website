@@ -13,6 +13,7 @@ use App\Repository\PostRepositoryFactory;
 use App\Util\FinderFactory;
 use League\CommonMark\Environment\EnvironmentInterface;
 use League\CommonMark\MarkdownConverterInterface;
+use Middlewares\TrailingSlash;
 
 /**
  * The configuration provider for the App module
@@ -65,6 +66,7 @@ class ConfigProvider
                 MarkdownConverterInterface::class => Content\Markdown\MarkdownConverterFactory::class,
                 PageRepository::class => PageRepositoryFactory::class,
                 PostRepository::class => PostRepositoryFactory::class,
+                TrailingSlash::class => Middleware\TrailingSlashFactory::class,
             ],
         ];
     }
