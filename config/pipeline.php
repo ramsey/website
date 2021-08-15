@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Middleware\NormalizeBlogUrl;
 use Laminas\Stratigility\Middleware\ErrorHandler;
 use Mezzio\Application;
 use Mezzio\Handler\NotFoundHandler;
@@ -51,6 +52,7 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     $app->pipe(RouteMiddleware::class);
     $app->pipe(TrailingSlash::class);
     $app->pipe(Lowercase::class);
+    $app->pipe('/blog', NormalizeBlogUrl::class);
 
     // The following handle routing failures for common conditions:
     // - HEAD request but no routes answer that method
