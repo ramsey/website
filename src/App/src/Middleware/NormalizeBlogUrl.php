@@ -16,14 +16,16 @@ class NormalizeBlogUrl implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        /** @var int|string $month */
         $month = $request->getAttribute('month');
+
         $uri = $request->getUri();
 
         if ((int) $month < 10 && !str_starts_with((string) $month, '0')) {
             $path = '/blog/'
-                . $request->getAttribute('year')
+                . (string) $request->getAttribute('year')
                 . '/0' . (int) $month . '/'
-                . $request->getAttribute('slug') . '/';
+                . (string) $request->getAttribute('slug') . '/';
 
             return new RedirectResponse($uri->withPath($path), 301);
         }
