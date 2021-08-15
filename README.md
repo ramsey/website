@@ -26,6 +26,12 @@ To run this project locally for development:
 composer run --timeout=0 serve
 ```
 
+## Coordinated Disclosure
+
+Keeping user information safe and secure is a top priority, and we welcome the
+contribution of external security researchers. If you believe you've found a
+security issue in software that is maintained in this repository, please read
+[SECURITY.md](SECURITY.md) for instructions on submitting a vulnerability report.
 
 ## Copyright and License
 
