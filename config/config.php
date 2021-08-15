@@ -13,18 +13,18 @@ $cacheConfig = [
 ];
 
 $aggregator = new ConfigAggregator([
-    \Mezzio\Twig\ConfigProvider::class,
-    \Mezzio\Helper\ConfigProvider::class,
-    \Mezzio\Router\LaminasRouter\ConfigProvider::class,
-    \Laminas\Router\ConfigProvider::class,
-    \Laminas\HttpHandlerRunner\ConfigProvider::class,
-    \Laminas\Validator\ConfigProvider::class,
+    Mezzio\Twig\ConfigProvider::class,
+    Mezzio\Helper\ConfigProvider::class,
+    Mezzio\Router\LaminasRouter\ConfigProvider::class,
+    Laminas\Router\ConfigProvider::class,
+    Laminas\HttpHandlerRunner\ConfigProvider::class,
+    Laminas\Validator\ConfigProvider::class,
 
     // Include cache configuration
     new ArrayProvider($cacheConfig),
-    \Mezzio\ConfigProvider::class,
-    \Mezzio\Router\ConfigProvider::class,
-    \Laminas\Diactoros\ConfigProvider::class,
+    Mezzio\ConfigProvider::class,
+    Mezzio\Router\ConfigProvider::class,
+    Laminas\Diactoros\ConfigProvider::class,
 
     // Default App module config
     App\ConfigProvider::class,

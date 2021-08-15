@@ -19,10 +19,6 @@ use Middlewares\Lowercase;
 use Middlewares\TrailingSlash;
 use Psr\Container\ContainerInterface;
 
-/**
- * Setup middleware pipeline:
- */
-
 return function (Application $app, MiddlewareFactory $factory, ContainerInterface $container): void {
     // The error handler should be the first (most outer) middleware to catch
     // all Exceptions.
