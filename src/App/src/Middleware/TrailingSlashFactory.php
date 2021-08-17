@@ -29,6 +29,6 @@ class TrailingSlashFactory
 {
     public function __invoke(): TrailingSlash
     {
-        return (new TrailingSlash(true))->redirect(new ResponseFactory());
+        return (new TrailingSlash())->redirect(new ResponseFactory());
     }
 }
