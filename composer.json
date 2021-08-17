@@ -92,6 +92,6 @@
         "development-enable": "laminas-development-mode enable",
         "development-status": "laminas-development-mode status",
         "mezzio": "mezzio --ansi",
-        "serve": "php -S 0.0.0.0:8080 -t public/"
+        "serve": "php -S 0.0.0.0:9000 -t public/"
     }
 }
