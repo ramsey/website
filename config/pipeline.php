@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Middleware\NormalizeBlogUrl;
 use Laminas\Stratigility\Middleware\ErrorHandler;
 use Mezzio\Application;
 use Mezzio\Handler\NotFoundHandler;
@@ -46,9 +45,6 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     // Register the routing middleware in the middleware pipeline.
     // This middleware registers the Mezzio\Router\RouteResult request attribute.
     $app->pipe(RouteMiddleware::class);
-    $app->pipe(TrailingSlash::class);
-    $app->pipe(Lowercase::class);
-    $app->pipe('/blog', NormalizeBlogUrl::class);
 
     // The following handle routing failures for common conditions:
     // - HEAD request but no routes answer that method
@@ -69,6 +65,8 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     // - route-based authentication
     // - route-based validation
     // - etc.
+    $app->pipe(TrailingSlash::class);
+    $app->pipe(Lowercase::class);
     $app->pipe(ContentLength::class);
 
     // Register the dispatch middleware in the middleware pipeline
