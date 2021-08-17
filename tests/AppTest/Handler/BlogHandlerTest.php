@@ -7,9 +7,12 @@ namespace AppTest\Handler;
 use App\Entity\Post;
 use App\Handler\BlogHandler;
 use App\Repository\PostRepository;
-use App\Response\NotFoundResponse;
+use App\Response\HtmlResponseFactory;
 use DateTimeImmutable;
 use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
+use Laminas\Diactoros\Uri;
+use Mezzio\Router\RouterInterface;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Ramsey\Test\Website\TestCase;
@@ -30,26 +33,29 @@ class BlogHandlerTest extends TestCase
         );
 
         $postRepository = $this->mockery(PostRepository::class);
-        $postRepository->expects()->find(2021, 7, $slug)->andReturn($post);
+        $postRepository
+            ->expects()
+            ->findByAttributes(['year' => 2021, 'slug' => $slug])
+            ->andReturn($post);
 
         $templateRenderer = $this->mockery(TemplateRendererInterface::class);
         $templateRenderer
             ->expects()
-            ->render(
-                'app::blog',
-                [
-                    'title' => $post->getTitle(),
-                    'content' => $post->getContent(),
-                ],
-            )
+            ->render('app::blog', [
+                'title' => $post->getTitle(),
+                'content' => $post->getContent(),
+            ])
             ->andReturn('foo');
 
         $request = $this->mockery(ServerRequestInterface::class);
-        $request->expects()->getAttribute('month')->andReturn('07');
+        $request->expects()->getAttribute('month')->andReturnNull();
         $request->expects()->getAttribute('year')->andReturn('2021');
         $request->expects()->getAttribute('slug')->andReturn($slug);
 
-        $blogHandler = new BlogHandler($postRepository, $templateRenderer);
+        $responseFactory = new HtmlResponseFactory($templateRenderer);
+        $router = $this->mockery(RouterInterface::class);
+
+        $blogHandler = new BlogHandler($postRepository, $templateRenderer, $responseFactory, $router);
         $response = $blogHandler->handle($request);
 
         $this->assertInstanceOf(HtmlResponse::class, $response);
@@ -61,7 +67,47 @@ class BlogHandlerTest extends TestCase
         $slug = $this->faker()->slug;
 
         $postRepository = $this->mockery(PostRepository::class);
-        $postRepository->expects()->find(2021, 7, $slug)->andReturnNull();
+        $postRepository
+            ->expects()
+            ->findByAttributes(['year' => 2021, 'slug' => $slug])
+            ->andReturnNull();
+
+        $templateRenderer = $this->mockery(TemplateRendererInterface::class);
+        $templateRenderer->expects()->render('error::404')->andReturn('not found');
+
+        $request = $this->mockery(ServerRequestInterface::class);
+        $request->expects()->getAttribute('month')->andReturnNull();
+        $request->expects()->getAttribute('year')->andReturn('2021');
+        $request->expects()->getAttribute('slug')->andReturn($slug);
+
+        $responseFactory = new HtmlResponseFactory($templateRenderer);
+        $router = $this->mockery(RouterInterface::class);
+
+        $blogHandler = new BlogHandler($postRepository, $templateRenderer, $responseFactory, $router);
+        $response = $blogHandler->handle($request);
+
+        $this->assertInstanceOf(HtmlResponse::class, $response);
+        $this->assertSame(404, $response->getStatusCode());
+    }
+
+    public function testHandleWithMonthRedirects(): void
+    {
+        $slug = $this->faker()->slug;
+
+        /** @var string $content */
+        $content = $this->faker()->paragraphs(3, true);
+
+        $post = new Post(
+            title: $this->faker()->sentence,
+            content: $content,
+            publishDate: new DateTimeImmutable(),
+        );
+
+        $postRepository = $this->mockery(PostRepository::class);
+        $postRepository
+            ->expects()
+            ->findByAttributes(['year' => 2021, 'month' => 7, 'slug' => $slug])
+            ->andReturn($post);
 
         $templateRenderer = $this->mockery(TemplateRendererInterface::class);
 
@@ -69,11 +115,22 @@ class BlogHandlerTest extends TestCase
         $request->expects()->getAttribute('month')->andReturn('07');
         $request->expects()->getAttribute('year')->andReturn('2021');
         $request->expects()->getAttribute('slug')->andReturn($slug);
+        $request->expects()->getUri()->andReturn(new Uri('https://example.com/foo'));
 
-        $blogHandler = new BlogHandler($postRepository, $templateRenderer);
+        $responseFactory = new HtmlResponseFactory($templateRenderer);
+
+        $router = $this->mockery(RouterInterface::class);
+        $router
+            ->expects()
+            ->generateUri('blog.post', ['year' => 2021, 'month' => 7, 'slug' => $slug])
+            ->andReturn('/blog/2021/' . $slug);
+
+        $blogHandler = new BlogHandler($postRepository, $templateRenderer, $responseFactory, $router);
         $response = $blogHandler->handle($request);
 
-        $this->assertInstanceOf(NotFoundResponse::class, $response);
-        $this->assertSame(404, $response->getStatusCode());
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame(301, $response->getStatusCode());
+        $this->assertCount(1, $response->getHeader('Location'));
+        $this->assertSame('https://example.com/blog/2021/' . $slug, $response->getHeader('Location')[0]);
     }
 }

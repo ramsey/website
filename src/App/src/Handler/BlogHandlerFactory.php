@@ -23,6 +23,8 @@ declare(strict_types=1);
 namespace App\Handler;
 
 use App\Repository\PostRepository;
+use App\Response\HtmlResponseFactory;
+use Mezzio\Router\RouterInterface;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Container\ContainerInterface;
 
@@ -36,6 +38,12 @@ class BlogHandlerFactory
         /** @var TemplateRendererInterface $template */
         $template = $container->get(TemplateRendererInterface::class);
 
-        return new BlogHandler($postRepository, $template);
+        /** @var HtmlResponseFactory $responseFactory */
+        $responseFactory = $container->get(HtmlResponseFactory::class);
+
+        /** @var RouterInterface $router */
+        $router = $container->get(RouterInterface::class);
+
+        return new BlogHandler($postRepository, $template, $responseFactory, $router);
     }
 }

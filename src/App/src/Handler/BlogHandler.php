@@ -23,8 +23,9 @@ declare(strict_types=1);
 namespace App\Handler;
 
 use App\Repository\PostRepository;
-use App\Response\NotFoundResponse;
-use Laminas\Diactoros\Response\HtmlResponse;
+use App\Response\HtmlResponseFactory;
+use Fig\Http\Message\StatusCodeInterface;
+use Mezzio\Router\RouterInterface;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -35,22 +36,40 @@ class BlogHandler implements RequestHandlerInterface
     public function __construct(
         private PostRepository $repository,
         private TemplateRendererInterface $renderer,
+        private HtmlResponseFactory $responseFactory,
+        private RouterInterface $router,
     ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $blogPost = $this->repository->find(
-            (int) $request->getAttribute('year'),
-            (int) $request->getAttribute('month'),
-            (string) $request->getAttribute('slug'),
-        );
+        $attributes = [
+            'year' => (int) $request->getAttribute('year'),
+            'slug' => (string) $request->getAttribute('slug'),
+        ];
 
-        if ($blogPost === null) {
-            return new NotFoundResponse();
+        $month = $request->getAttribute('month');
+
+        if ($month !== null) {
+            $attributes['month'] = (int) $month;
         }
 
-        return new HtmlResponse($this->renderer->render(
+        $blogPost = $this->repository->findByAttributes($attributes);
+
+        if ($blogPost === null) {
+            return $this->responseFactory->notFound();
+        }
+
+        // If month is part of the URL, respond with a permanent redirect
+        // to the new URL format: /blog/YYYY/slug
+        if ($month !== null) {
+            return $this->responseFactory->redirect(
+                uri: $request->getUri()->withPath($this->router->generateUri('blog.post', $attributes)),
+                status: StatusCodeInterface::STATUS_MOVED_PERMANENTLY,
+            );
+        }
+
+        return $this->responseFactory->response($this->renderer->render(
             'app::blog',
             [
                 'title' => $blogPost->getTitle(),
