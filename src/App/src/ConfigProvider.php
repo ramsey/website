@@ -28,6 +28,8 @@ use App\Repository\PageRepository;
 use App\Repository\PageRepositoryFactory;
 use App\Repository\PostRepository;
 use App\Repository\PostRepositoryFactory;
+use App\Response\HtmlResponseFactory;
+use App\Response\HtmlResponseFactoryFactory;
 use App\Util\FinderFactory;
 use League\CommonMark\Environment\EnvironmentInterface;
 use League\CommonMark\MarkdownConverterInterface;
@@ -83,6 +85,7 @@ class ConfigProvider
                 EnvironmentInterface::class => Content\Markdown\CommonMarkEnvironmentFactory::class,
                 Handler\BlogHandler::class => Handler\BlogHandlerFactory::class,
                 Handler\HomePageHandler::class => Handler\HomePageHandlerFactory::class,
+                HtmlResponseFactory::class => HtmlResponseFactoryFactory::class,
                 Lowercase::class => Middleware\LowercaseFactory::class,
                 MarkdownConverterInterface::class => Content\Markdown\MarkdownConverterFactory::class,
                 PageRepository::class => PageRepositoryFactory::class,
