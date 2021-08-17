@@ -36,7 +36,6 @@ use function sprintf;
 
 class PostRepository
 {
-    private const FILENAME_PATTERN = "/^%d-%'.02d-\d{2}-%s\.(md|html|markdown)$/";
     private const FILE_DATE_PATTERN = '/.*(\d{4}-\d{2}-\d{2}).*/';
 
     public function __construct(
@@ -46,18 +45,64 @@ class PostRepository
     ) {
     }
 
-    public function find(int $year, int $month, string $slug): ?Post
+    /**
+     * @param array{year?: int, month?: int, slug?: string} $attributes
+     */
+    public function findByAttributes(array $attributes): ?Post
+    {
+        if (isset($attributes['year']) && isset($attributes['month']) && isset($attributes['slug'])) {
+            return $this->findByYearMonthSlug(
+                $attributes['year'],
+                $attributes['month'],
+                $attributes['slug'],
+            );
+        }
+
+        if (isset($attributes['year']) && isset($attributes['slug'])) {
+            return $this->findByYearSlug(
+                $attributes['year'],
+                $attributes['slug'],
+            );
+        }
+
+        return null;
+    }
+
+    private function findByYearMonthSlug(int $year, int $month, string $slug): ?Post
     {
         $files = ($this->finderFactory)()
             ->files()
             ->in($this->postsPath)
-            ->name(sprintf(self::FILENAME_PATTERN, $year, $month, $slug));
+            ->name(sprintf("/^%d-%'.02d-\d{2}-%s\.(md|html|markdown)$/", $year, $month, $slug));
 
         if ($files->count() > 1) {
             throw new MultipleMatches(sprintf(
                 'More than one post matches for year: %d, month: %d, slug: %s',
                 $year,
                 $month,
+                $slug,
+            ));
+        }
+
+        /** @var SplFileInfo $file */
+        foreach ($files as $file) {
+            return $this->convertToPost($file);
+        }
+
+        return null;
+    }
+
+    private function findByYearSlug(int $year, string $slug): ?Post
+    {
+        $files = ($this->finderFactory)()
+            ->files()
+            ->in($this->postsPath)
+            ->name(sprintf('/^%d-\d{2}-\d{2}-%s\.(md|html|markdown)$/', $year, $slug));
+
+        if ($files->count() > 1) {
+            throw new MultipleMatches(sprintf(
+                'More than one post matches for year: %d, slug: %s',
+                $year,
                 $slug,
             ));
         }

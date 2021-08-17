@@ -14,14 +14,30 @@ use Symfony\Component\Finder\Finder;
 
 class PostRepositoryTest extends TestCase
 {
-    public function testFindReturnsNullWhenNoPostsFound(): void
+    /**
+     * @param array{year?: int, month?: int, slug?: string} $attributes
+     *
+     * @dataProvider findByAttributesPostsNotFoundProvider
+     */
+    public function testFindByAttributesReturnsNullWhenNoPostsFound(array $attributes): void
     {
         $finder = $this->mockery(Finder::class);
         $finder->expects()->files()->andReturnSelf();
         $finder->expects()->in('/path/to/files')->andReturnSelf();
-        $finder->expects()->name('/^2021-07-\d{2}-a-nonexistent-test-post\.(md|html|markdown)$/')->andReturnSelf();
         $finder->expects()->count()->andReturn(0);
         $finder->expects()->getIterator()->andReturn(new ArrayIterator([]));
+
+        if (isset($attributes['month'])) {
+            $finder
+                ->expects()
+                ->name('/^2021-07-\d{2}-a-nonexistent-test-post\.(md|html|markdown)$/')
+                ->andReturnSelf();
+        } else {
+            $finder
+                ->expects()
+                ->name('/^2021-\d{2}-\d{2}-a-nonexistent-test-post\.(md|html|markdown)$/')
+                ->andReturnSelf();
+        }
 
         $finderFactory = $this->mockery(FinderFactory::class);
         $finderFactory->shouldReceive('__invoke')->andReturn($finder);
@@ -30,15 +46,19 @@ class PostRepositoryTest extends TestCase
 
         $repository = new PostRepository($finderFactory, '/path/to/files', $converter);
 
-        $this->assertNull($repository->find(2021, 7, 'a-nonexistent-test-post'));
+        $this->assertNull($repository->findByAttributes($attributes));
     }
 
-    public function testFindThrowsExceptionWhenMoreThanOnePostFound(): void
+    /**
+     * @param array{year?: int, month?: int, slug?: string} $attributes
+     *
+     * @dataProvider findByAttributesGeneralProvider
+     */
+    public function testFindByAttributesThrowsExceptionWhenMoreThanOnePostFound(array $attributes): void
     {
         $finder = $this->mockery(Finder::class);
         $finder->expects()->files()->andReturnSelf();
         $finder->expects()->in('/path/to/files')->andReturnSelf();
-        $finder->expects()->name('/^2021-07-\d{2}-a-test-post\.(md|html|markdown)$/')->andReturnSelf();
         $finder->expects()->count()->andReturn(2);
 
         $finderFactory = $this->mockery(FinderFactory::class);
@@ -49,12 +69,32 @@ class PostRepositoryTest extends TestCase
         $repository = new PostRepository($finderFactory, '/path/to/files', $converter);
 
         $this->expectException(MultipleMatches::class);
-        $this->expectExceptionMessage('More than one post matches for year: 2021, month: 7, slug: a-test-post');
 
-        $repository->find(2021, 7, 'a-test-post');
+        if (isset($attributes['month'])) {
+            $finder
+                ->expects()
+                ->name('/^2021-07-\d{2}-a-test-post\.(md|html|markdown)$/')
+                ->andReturnSelf();
+
+            $this->expectExceptionMessage('More than one post matches for year: 2021, month: 7, slug: a-test-post');
+        } else {
+            $finder
+                ->expects()
+                ->name('/^2021-\d{2}-\d{2}-a-test-post\.(md|html|markdown)$/')
+                ->andReturnSelf();
+
+            $this->expectExceptionMessage('More than one post matches for year: 2021, slug: a-test-post');
+        }
+
+        $repository->findByAttributes($attributes);
     }
 
-    public function testFindReturnsPost(): void
+    /**
+     * @param array{year?: int, month?: int, slug?: string} $attributes
+     *
+     * @dataProvider findByAttributesGeneralProvider
+     */
+    public function testFindByAttributesReturnsPost(array $attributes): void
     {
         $container = require __DIR__ . '/../../../config/container.php';
 
@@ -66,7 +106,7 @@ class PostRepositoryTest extends TestCase
 
         $repository = new PostRepository($finderFactory, __DIR__ . '/../../stubs/posts', $converter);
 
-        $post = $repository->find(2021, 7, 'a-test-post');
+        $post = $repository->findByAttributes($attributes);
 
         $this->assertNotNull($post);
         $this->assertSame('Lorem ipsum dolor', $post->getTitle());
@@ -74,7 +114,12 @@ class PostRepositoryTest extends TestCase
         $this->assertSame(['foo', 'bar', 'baz'], $post->getAttributes()->get('tags'));
     }
 
-    public function testFindReturnsPostUsingFileNameDateAsPublishDate(): void
+    /**
+     * @param array{year?: int, month?: int, slug?: string} $attributes
+     *
+     * @dataProvider findByAttributesNoPublishDateProvider
+     */
+    public function testFindByAttributesReturnsPostUsingFileNameDateAsPublishDate(array $attributes): void
     {
         $container = require __DIR__ . '/../../../config/container.php';
 
@@ -86,10 +131,76 @@ class PostRepositoryTest extends TestCase
 
         $repository = new PostRepository($finderFactory, __DIR__ . '/../../stubs/posts', $converter);
 
-        $post = $repository->find(2021, 7, 'no-publish-date');
+        $post = $repository->findByAttributes($attributes);
 
         $this->assertNotNull($post);
         $this->assertSame('Lorem ipsum dolor', $post->getTitle());
         $this->assertSame('2021-07-29 00:00:00', $post->getPublishDate()->format('Y-m-d H:i:s'));
+    }
+
+    /**
+     * @return array<array{attributes: array{year?: int, month?: int, slug?: string}}>
+     */
+    public function findByAttributesPostsNotFoundProvider(): array
+    {
+        return [
+            [
+                'attributes' => [
+                    'year' => 2021,
+                    'month' => 7,
+                    'slug' => 'a-nonexistent-test-post',
+                ],
+            ],
+            [
+                'attributes' => [
+                    'year' => 2021,
+                    'slug' => 'a-nonexistent-test-post',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{attributes: array{year?: int, month?: int, slug?: string}}>
+     */
+    public function findByAttributesGeneralProvider(): array
+    {
+        return [
+            [
+                'attributes' => [
+                    'year' => 2021,
+                    'month' => 7,
+                    'slug' => 'a-test-post',
+                ],
+            ],
+            [
+                'attributes' => [
+                    'year' => 2021,
+                    'slug' => 'a-test-post',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<array{attributes: array{year?: int, month?: int, slug?: string}}>
+     */
+    public function findByAttributesNoPublishDateProvider(): array
+    {
+        return [
+            [
+                'attributes' => [
+                    'year' => 2021,
+                    'month' => 7,
+                    'slug' => 'no-publish-date',
+                ],
+            ],
+            [
+                'attributes' => [
+                    'year' => 2021,
+                    'slug' => 'no-publish-date',
+                ],
+            ],
+        ];
     }
 }
