@@ -26,8 +26,8 @@
         "laminas/laminas-stdlib": "^3.3.1",
         "league/commonmark": "^2.0",
         "mezzio/mezzio": "^3.5.0",
+        "mezzio/mezzio-fastroute": "^3.2",
         "mezzio/mezzio-helpers": "^5.6.0",
-        "mezzio/mezzio-laminasrouter": "^3.0.1",
         "mezzio/mezzio-twigrenderer": "^2.6",
         "middlewares/content-length": "^2.0",
         "middlewares/lowercase": "^1.0",
@@ -61,7 +61,7 @@
                 "mezzio/mezzio-helpers",
                 "mezzio/mezzio-router",
                 "laminas/laminas-httphandlerrunner",
-                "mezzio/mezzio-laminasrouter",
+                "mezzio/mezzio-fastroute",
                 "mezzio/mezzio-twigrenderer"
             ]
         },

@@ -7,17 +7,17 @@ use Mezzio\MiddlewareFactory;
 use Psr\Container\ContainerInterface;
 
 /**
- * laminas-router route configuration
+ * FastRoute route configuration
  *
- * @see https://docs.laminas.dev/laminas-router/
+ * @see https://github.com/nikic/FastRoute
  *
  * Setup routes with a single request method:
  *
  * $app->get('/', App\Handler\HomePageHandler::class, 'home');
  * $app->post('/album', App\Handler\AlbumCreateHandler::class, 'album.create');
- * $app->put('/album/:id', App\Handler\AlbumUpdateHandler::class, 'album.put');
- * $app->patch('/album/:id', App\Handler\AlbumUpdateHandler::class, 'album.patch');
- * $app->delete('/album/:id', App\Handler\AlbumDeleteHandler::class, 'album.delete');
+ * $app->put('/album/{id:\d+}', App\Handler\AlbumUpdateHandler::class, 'album.put');
+ * $app->patch('/album/{id:\d+}', App\Handler\AlbumUpdateHandler::class, 'album.patch');
+ * $app->delete('/album/{id:\d+}', App\Handler\AlbumDeleteHandler::class, 'album.delete');
  *
  * Or with multiple request methods:
  *
@@ -40,5 +40,6 @@ use Psr\Container\ContainerInterface;
 return static function (Application $app, MiddlewareFactory $factory, ContainerInterface $container): void {
     $app->get('/', App\Handler\HomePageHandler::class, 'home');
     $app->get('/api/ping', App\Handler\PingHandler::class, 'api.ping');
-    $app->get('/blog/:year/:month/:slug/', App\Handler\BlogHandler::class, 'blog.post');
+    $app->get('/blog/{year:\d{4}}/{month:\d{2}}/{slug}', App\Handler\BlogHandler::class, 'blog.post.month');
+    $app->get('/blog/{year:\d{4}}/{slug}', App\Handler\BlogHandler::class, 'blog.post');
 };
