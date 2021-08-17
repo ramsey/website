@@ -14,6 +14,18 @@ use Symfony\Component\Finder\Finder;
 
 class PostRepositoryTest extends TestCase
 {
+    public function testFindByAttributesReturnsNull(): void
+    {
+        $finderFactory = $this->mockery(FinderFactory::class);
+        $converter = $this->mockery(MarkdownConverterInterface::class);
+
+        $repository = new PostRepository($finderFactory, '/path/to/files', $converter);
+
+        $post = $repository->findByAttributes(['year' => 2021]);
+
+        $this->assertNull($post);
+    }
+
     /**
      * @param array{year?: int, month?: int, slug?: string} $attributes
      *
