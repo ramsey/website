@@ -22,13 +22,17 @@ declare(strict_types=1);
 
 namespace App\Middleware;
 
-use Laminas\Diactoros\ResponseFactory;
 use Middlewares\TrailingSlash;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 class TrailingSlashFactory
 {
-    public function __invoke(): TrailingSlash
+    public function __invoke(ContainerInterface $container): TrailingSlash
     {
-        return (new TrailingSlash())->redirect(new ResponseFactory());
+        /** @var ResponseFactoryInterface $responseFactory */
+        $responseFactory = $container->get(ResponseFactoryInterface::class);
+
+        return (new TrailingSlash())->redirect($responseFactory);
     }
 }

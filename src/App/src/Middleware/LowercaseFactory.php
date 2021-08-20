@@ -22,13 +22,17 @@ declare(strict_types=1);
 
 namespace App\Middleware;
 
-use Laminas\Diactoros\ResponseFactory;
 use Middlewares\Lowercase;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 class LowercaseFactory
 {
-    public function __invoke(): Lowercase
+    public function __invoke(ContainerInterface $container): Lowercase
     {
-        return (new Lowercase())->redirect(new ResponseFactory());
+        /** @var ResponseFactoryInterface $responseFactory */
+        $responseFactory = $container->get(ResponseFactoryInterface::class);
+
+        return (new Lowercase())->redirect($responseFactory);
     }
 }

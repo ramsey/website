@@ -12,8 +12,10 @@ class LowercaseFactoryTest extends TestCase
 {
     public function testInvoke(): void
     {
+        $container = require __DIR__ . '/../../../config/container.php';
+
         $factory = new LowercaseFactory();
-        $middleware = $factory();
+        $middleware = $factory($container);
 
         $this->assertInstanceOf(Lowercase::class, $middleware);
     }
