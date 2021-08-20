@@ -82,6 +82,7 @@ class ConfigProvider
             'factories' => [
                 AuthorRepository::class => AuthorRepositoryFactory::class,
                 EnvironmentInterface::class => Content\Markdown\CommonMarkEnvironmentFactory::class,
+                Handler\Blog\ListHandler::class => Handler\Blog\ListHandlerFactory::class,
                 Handler\Blog\PostHandler::class => Handler\Blog\PostHandlerFactory::class,
                 Handler\HomeHandler::class => Handler\HomeHandlerFactory::class,
                 Handler\PageHandler::class => Handler\PageHandlerFactory::class,
