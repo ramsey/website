@@ -8,8 +8,13 @@ declare(strict_types=1);
 
 return [
     'content' => [
+        'defaultAuthors' => [
+            'ramsey',
+        ],
         'paths' => [
-            'postsPath' => __DIR__ . '/../../resources/content/blog',
+            'pagesPath' => __DIR__ . '/../../resources/content/pages',
+            'postsPath' => __DIR__ . '/../../resources/content/posts',
+            'authorsPath' => __DIR__ . '/../../resources/content/authors',
         ],
     ],
     'commonmark' => [
