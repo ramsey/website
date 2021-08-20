@@ -1,3 +1,11 @@
-<h1>{{ title }}</h1>
+{% extends '@layout/default.html.twig' %}
 
-{{ content|raw }}
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+    <h1>{{ title }}</h1>
+
+    {{ content|raw }}
+
+{% endblock %}
