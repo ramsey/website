@@ -16,7 +16,16 @@ use function trim;
 
 class PageRepositoryTest extends TestCase
 {
-    public function testFindReturnsNullWhenNoPagesFound(): void
+    public function testFindByAttributesReturnsNullWhenSlugNotProvided(): void
+    {
+        $finderFactory = $this->mockery(FinderFactory::class);
+        $converter = $this->mockery(MarkdownConverterInterface::class);
+        $repository = new PageRepository($finderFactory, '/path/to/files', $converter);
+
+        $this->assertNull($repository->findByAttributes([]));
+    }
+
+    public function testFindByAttributesReturnsNullWhenNoPagesFound(): void
     {
         $finder = $this->mockery(Finder::class);
         $finder->expects()->files()->andReturnSelf();
@@ -32,10 +41,10 @@ class PageRepositoryTest extends TestCase
 
         $repository = new PageRepository($finderFactory, '/path/to/files', $converter);
 
-        $this->assertNull($repository->find('a-nonexistent-page'));
+        $this->assertNull($repository->findByAttributes(['slug' => 'a-nonexistent-page']));
     }
 
-    public function testFindThrowsExceptionWhenMoreThanOnePageFound(): void
+    public function testFindByAttributesThrowsExceptionWhenMoreThanOnePageFound(): void
     {
         $finder = $this->mockery(Finder::class);
         $finder->expects()->files()->andReturnSelf();
@@ -53,10 +62,10 @@ class PageRepositoryTest extends TestCase
         $this->expectException(MultipleMatches::class);
         $this->expectExceptionMessage('More than one page matches a-test-post');
 
-        $repository->find('a-test-post');
+        $repository->findByAttributes(['slug' => 'a-test-post']);
     }
 
-    public function testFindReturnsPage(): void
+    public function testFindByAttributesReturnsPage(): void
     {
         $container = require __DIR__ . '/../../../config/container.php';
 
@@ -68,7 +77,7 @@ class PageRepositoryTest extends TestCase
 
         $repository = new PageRepository($finderFactory, __DIR__ . '/../../stubs/pages', $converter);
 
-        $page = $repository->find('about-me');
+        $page = $repository->findByAttributes(['slug' => 'about-me']);
 
         $this->assertNotNull($page);
         $this->assertSame('About Me', $page->getTitle());
@@ -77,5 +86,42 @@ class PageRepositoryTest extends TestCase
         $this->assertSame('/about-me/', $page->getAttributes()->get('permalink'));
         $this->assertTrue($page->getAttributes()->containsKey('keywords'));
         $this->assertSame(['foo', 'bar', 'baz'], $page->getAttributes()->get('keywords'));
+    }
+
+    public function testFindByAttributesReturnsPageWithSlashesAtBeginningAndEnd(): void
+    {
+        $container = require __DIR__ . '/../../../config/container.php';
+
+        /** @var FinderFactory $finderFactory */
+        $finderFactory = $container->get(FinderFactory::class);
+
+        /** @var MarkdownConverterInterface $converter */
+        $converter = $container->get(MarkdownConverterInterface::class);
+
+        $repository = new PageRepository($finderFactory, __DIR__ . '/../../stubs/pages', $converter);
+
+        $page = $repository->findByAttributes(['slug' => '/about-me/']);
+
+        $this->assertNotNull($page);
+        $this->assertSame('About Me', $page->getTitle());
+    }
+
+    public function testFindByAttributesReturnsPageFromSubdirectory(): void
+    {
+        $container = require __DIR__ . '/../../../config/container.php';
+
+        /** @var FinderFactory $finderFactory */
+        $finderFactory = $container->get(FinderFactory::class);
+
+        /** @var MarkdownConverterInterface $converter */
+        $converter = $container->get(MarkdownConverterInterface::class);
+
+        $repository = new PageRepository($finderFactory, __DIR__ . '/../../stubs/pages', $converter);
+
+        $page = $repository->findByAttributes(['slug' => 'projects/some-project']);
+
+        $this->assertNotNull($page);
+        $this->assertSame('Some Project', $page->getTitle());
+        $this->assertSame('<h1>Hello!</h1>', trim($page->getContent()));
     }
 }

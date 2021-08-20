@@ -31,6 +31,11 @@ use League\CommonMark\MarkdownConverterInterface;
 use Symfony\Component\Finder\SplFileInfo;
 
 use function sprintf;
+use function str_contains;
+use function str_replace;
+use function strrpos;
+use function substr;
+use function trim;
 
 class PageRepository
 {
@@ -43,12 +48,33 @@ class PageRepository
     ) {
     }
 
-    public function find(string $slug): ?Page
+    /**
+     * @param array{slug?: string} $attributes
+     */
+    public function findByAttributes(array $attributes): ?Page
     {
+        if (isset($attributes['slug'])) {
+            return $this->findBySlug($attributes['slug']);
+        }
+
+        return null;
+    }
+
+    private function findBySlug(string $slug): ?Page
+    {
+        $slug = trim($slug, '/');
+        $pathPortion = '';
+
+        if (str_contains($slug, '/')) {
+            $lastSlash = strrpos($slug, '/') ?: null;
+            $pathPortion = substr($slug, 0, $lastSlash);
+            $slug = $lastSlash === null ? $slug : substr($slug, $lastSlash + 1);
+        }
+
         $files = ($this->finderFactory)()
             ->files()
-            ->in($this->pagesPath)
-            ->name(sprintf(self::FILENAME_PATTERN, $slug));
+            ->in($this->pagesPath . ($pathPortion ? '/' . $pathPortion : ''))
+            ->name(sprintf(self::FILENAME_PATTERN, str_replace('/', '\\/', $slug)));
 
         if ($files->count() > 1) {
             throw new MultipleMatches(sprintf('More than one page matches %s', $slug));
