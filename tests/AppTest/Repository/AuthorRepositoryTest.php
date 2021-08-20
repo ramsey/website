@@ -35,6 +35,17 @@ class AuthorRepositoryTest extends TestCase
         $this->assertNull($repository->findByAttributes(['username' => 'foobar']));
     }
 
+    public function testFindByAttributesReturnsNullWhenNoAuthorsPassed(): void
+    {
+        $finderFactory = $this->mockery(FinderFactory::class);
+        $yamlParser = $this->mockery(Parser::class);
+        $uriFactory = $this->mockery(UriFactoryInterface::class);
+
+        $repository = new AuthorRepository($finderFactory, '/path/to/files', $yamlParser, $uriFactory);
+
+        $this->assertNull($repository->findByAttributes([]));
+    }
+
     public function testFindByAttributesThrowsExceptionWhenMoreThanOneAuthorFound(): void
     {
         $finder = $this->mockery(Finder::class);
