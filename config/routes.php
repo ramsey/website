@@ -38,8 +38,6 @@ use Psr\Container\ContainerInterface;
  */
 
 return static function (Application $app, MiddlewareFactory $factory, ContainerInterface $container): void {
-    $app->get('/', App\Handler\HomePageHandler::class, 'home');
-    $app->get('/api/ping', App\Handler\PingHandler::class, 'api.ping');
-    $app->get('/blog/{year:\d{4}}/{month:\d{2}}/{slug}', App\Handler\BlogHandler::class, 'blog.post.month');
+    $app->get('/blog/{year:\d{4}}/{month:\d{2}}/{slug}', App\Handler\BlogHandler::class, 'blog.post.old');
     $app->get('/blog/{year:\d{4}}/{slug}', App\Handler\BlogHandler::class, 'blog.post');
 };

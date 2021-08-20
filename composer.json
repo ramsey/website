@@ -44,8 +44,6 @@
         "filp/whoops": "^2.7.1",
         "laminas/laminas-development-mode": "^3.3.0",
         "mezzio/mezzio-tooling": "^1.4.0",
-        "phpspec/prophecy": "^1.10.3",
-        "phpspec/prophecy-phpunit": "^2.0",
         "ramsey/devtools": "^1.7"
     },
     "config": {
