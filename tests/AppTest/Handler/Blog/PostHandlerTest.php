@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace AppTest\Handler;
+namespace AppTest\Handler\Blog;
 
 use App\Entity\Post;
-use App\Handler\BlogHandler;
+use App\Handler\Blog\PostHandler;
 use App\Repository\PostRepository;
 use App\Response\HtmlResponseFactory;
 use DateTimeImmutable;
@@ -17,7 +17,7 @@ use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Ramsey\Test\Website\TestCase;
 
-class BlogHandlerTest extends TestCase
+class PostHandlerTest extends TestCase
 {
     public function testHandle(): void
     {
@@ -41,7 +41,7 @@ class BlogHandlerTest extends TestCase
         $templateRenderer = $this->mockery(TemplateRendererInterface::class);
         $templateRenderer
             ->expects()
-            ->render('app::blog', [
+            ->render('app::blog/post', [
                 'title' => $post->getTitle(),
                 'content' => $post->getContent(),
             ])
@@ -55,7 +55,7 @@ class BlogHandlerTest extends TestCase
         $responseFactory = new HtmlResponseFactory($templateRenderer);
         $router = $this->mockery(RouterInterface::class);
 
-        $blogHandler = new BlogHandler($postRepository, $templateRenderer, $responseFactory, $router);
+        $blogHandler = new PostHandler($postRepository, $templateRenderer, $responseFactory, $router);
         $response = $blogHandler->handle($request);
 
         $this->assertInstanceOf(HtmlResponse::class, $response);
@@ -83,7 +83,7 @@ class BlogHandlerTest extends TestCase
         $responseFactory = new HtmlResponseFactory($templateRenderer);
         $router = $this->mockery(RouterInterface::class);
 
-        $blogHandler = new BlogHandler($postRepository, $templateRenderer, $responseFactory, $router);
+        $blogHandler = new PostHandler($postRepository, $templateRenderer, $responseFactory, $router);
         $response = $blogHandler->handle($request);
 
         $this->assertInstanceOf(HtmlResponse::class, $response);
@@ -125,7 +125,7 @@ class BlogHandlerTest extends TestCase
             ->generateUri('blog.post', ['year' => 2021, 'month' => 7, 'slug' => $slug])
             ->andReturn('/blog/2021/' . $slug);
 
-        $blogHandler = new BlogHandler($postRepository, $templateRenderer, $responseFactory, $router);
+        $blogHandler = new PostHandler($postRepository, $templateRenderer, $responseFactory, $router);
         $response = $blogHandler->handle($request);
 
         $this->assertInstanceOf(RedirectResponse::class, $response);

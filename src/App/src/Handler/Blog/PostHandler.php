@@ -20,7 +20,7 @@
 
 declare(strict_types=1);
 
-namespace App\Handler;
+namespace App\Handler\Blog;
 
 use App\Repository\PostRepository;
 use App\Response\HtmlResponseFactory;
@@ -31,7 +31,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class BlogHandler implements RequestHandlerInterface
+class PostHandler implements RequestHandlerInterface
 {
     public function __construct(
         private PostRepository $repository,
@@ -70,7 +70,7 @@ class BlogHandler implements RequestHandlerInterface
         }
 
         return $this->responseFactory->response($this->renderer->render(
-            'app::blog',
+            'app::blog/post',
             [
                 'title' => $blogPost->getTitle(),
                 'content' => $blogPost->getContent(),
