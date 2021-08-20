@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace AppTest\Repository;
 
+use App\Repository\AuthorRepository;
+use App\Repository\Exception\AuthorNotFound;
 use App\Repository\Exception\MultipleMatches;
 use App\Repository\PostRepository;
 use App\Util\FinderFactory;
 use ArrayIterator;
 use League\CommonMark\MarkdownConverterInterface;
+use Psr\Http\Message\UriFactoryInterface;
 use Ramsey\Test\Website\TestCase;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Yaml\Parser;
 
 class PostRepositoryTest extends TestCase
 {
@@ -18,8 +22,9 @@ class PostRepositoryTest extends TestCase
     {
         $finderFactory = $this->mockery(FinderFactory::class);
         $converter = $this->mockery(MarkdownConverterInterface::class);
+        $authorRepository = $this->mockery(AuthorRepository::class);
 
-        $repository = new PostRepository($finderFactory, '/path/to/files', $converter);
+        $repository = new PostRepository($finderFactory, '/path/to/files', $converter, $authorRepository);
 
         $post = $repository->findByAttributes(['year' => 2021]);
 
@@ -55,8 +60,9 @@ class PostRepositoryTest extends TestCase
         $finderFactory->shouldReceive('__invoke')->andReturn($finder);
 
         $converter = $this->mockery(MarkdownConverterInterface::class);
+        $authorRepository = $this->mockery(AuthorRepository::class);
 
-        $repository = new PostRepository($finderFactory, '/path/to/files', $converter);
+        $repository = new PostRepository($finderFactory, '/path/to/files', $converter, $authorRepository);
 
         $this->assertNull($repository->findByAttributes($attributes));
     }
@@ -77,8 +83,9 @@ class PostRepositoryTest extends TestCase
         $finderFactory->shouldReceive('__invoke')->andReturn($finder);
 
         $converter = $this->mockery(MarkdownConverterInterface::class);
+        $authorRepository = $this->mockery(AuthorRepository::class);
 
-        $repository = new PostRepository($finderFactory, '/path/to/files', $converter);
+        $repository = new PostRepository($finderFactory, '/path/to/files', $converter, $authorRepository);
 
         $this->expectException(MultipleMatches::class);
 
@@ -110,13 +117,25 @@ class PostRepositoryTest extends TestCase
     {
         $container = require __DIR__ . '/../../../config/container.php';
 
-        /** @var FinderFactory $finderFactory */
         $finderFactory = $container->get(FinderFactory::class);
-
-        /** @var MarkdownConverterInterface $converter */
         $converter = $container->get(MarkdownConverterInterface::class);
+        $yamlParser = $container->get(Parser::class);
+        $uriFactory = $container->get(UriFactoryInterface::class);
 
-        $repository = new PostRepository($finderFactory, __DIR__ . '/../../stubs/posts', $converter);
+        $authorRepository = new AuthorRepository(
+            $finderFactory,
+            __DIR__ . '/../../stubs/authors',
+            $yamlParser,
+            $uriFactory,
+        );
+
+        $repository = new PostRepository(
+            $finderFactory,
+            __DIR__ . '/../../stubs/posts',
+            $converter,
+            $authorRepository,
+            ['jsmith'],
+        );
 
         $post = $repository->findByAttributes($attributes);
 
@@ -124,6 +143,7 @@ class PostRepositoryTest extends TestCase
         $this->assertSame('Lorem ipsum dolor', $post->getTitle());
         $this->assertSame('2021-07-30 23:58:41', $post->getPublishDate()->format('Y-m-d H:i:s'));
         $this->assertSame(['foo', 'bar', 'baz'], $post->getAttributes()->get('tags'));
+        $this->assertCount(2, $post->getAuthors());
     }
 
     /**
@@ -135,19 +155,84 @@ class PostRepositoryTest extends TestCase
     {
         $container = require __DIR__ . '/../../../config/container.php';
 
-        /** @var FinderFactory $finderFactory */
         $finderFactory = $container->get(FinderFactory::class);
-
-        /** @var MarkdownConverterInterface $converter */
         $converter = $container->get(MarkdownConverterInterface::class);
+        $authorRepository = $this->mockery(AuthorRepository::class);
 
-        $repository = new PostRepository($finderFactory, __DIR__ . '/../../stubs/posts', $converter);
+        $repository = new PostRepository($finderFactory, __DIR__ . '/../../stubs/posts', $converter, $authorRepository);
 
         $post = $repository->findByAttributes($attributes);
 
         $this->assertNotNull($post);
         $this->assertSame('Lorem ipsum dolor', $post->getTitle());
         $this->assertSame('2021-07-29 00:00:00', $post->getPublishDate()->format('Y-m-d H:i:s'));
+    }
+
+    public function testFindByAttributesReturnsPostWithDefaultAuthor(): void
+    {
+        $container = require __DIR__ . '/../../../config/container.php';
+
+        $finderFactory = $container->get(FinderFactory::class);
+        $converter = $container->get(MarkdownConverterInterface::class);
+        $yamlParser = $container->get(Parser::class);
+        $uriFactory = $container->get(UriFactoryInterface::class);
+
+        $authorRepository = new AuthorRepository(
+            $finderFactory,
+            __DIR__ . '/../../stubs/authors',
+            $yamlParser,
+            $uriFactory,
+        );
+
+        $repository = new PostRepository(
+            $finderFactory,
+            __DIR__ . '/../../stubs/posts',
+            $converter,
+            $authorRepository,
+            ['jsmith'],
+        );
+
+        $post = $repository->findByAttributes([
+            'year' => 2021,
+            'slug' => 'no-publish-date',
+        ]);
+
+        $this->assertNotNull($post);
+        $this->assertSame('Lorem ipsum dolor', $post->getTitle());
+        $this->assertCount(1, $post->getAuthors());
+    }
+
+    public function testFindByAttributesThrowsExceptionWhenAuthorNotFound(): void
+    {
+        $container = require __DIR__ . '/../../../config/container.php';
+
+        $finderFactory = $container->get(FinderFactory::class);
+        $converter = $container->get(MarkdownConverterInterface::class);
+        $yamlParser = $container->get(Parser::class);
+        $uriFactory = $container->get(UriFactoryInterface::class);
+
+        $authorRepository = new AuthorRepository(
+            $finderFactory,
+            __DIR__ . '/../../stubs/authors',
+            $yamlParser,
+            $uriFactory,
+        );
+
+        $repository = new PostRepository(
+            $finderFactory,
+            __DIR__ . '/../../stubs/posts',
+            $converter,
+            $authorRepository,
+            ['foobar'],
+        );
+
+        $this->expectException(AuthorNotFound::class);
+        $this->expectExceptionMessage("Unable to find author 'foobar'.");
+
+        $repository->findByAttributes([
+            'year' => 2021,
+            'slug' => 'no-publish-date',
+        ]);
     }
 
     /**

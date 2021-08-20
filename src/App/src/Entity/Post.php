@@ -29,15 +29,19 @@ use DateTimeInterface;
  */
 class Post extends Page implements Attributable
 {
+    private AuthorCollection $authors;
+
     public function __construct(
         string $title,
         string $content,
         private DateTimeInterface $publishDate,
-        private ?AuthorCollection $authors = null,
+        ?AuthorCollection $authors = null,
         ?Attributes $attributes = null,
         private ?DateTimeInterface $lastUpdateDate = null,
     ) {
         parent::__construct($title, $content, $attributes);
+
+        $this->authors = $authors ?? new AuthorCollection();
     }
 
     public function getPublishDate(): DateTimeInterface
@@ -45,7 +49,7 @@ class Post extends Page implements Attributable
         return $this->publishDate;
     }
 
-    public function getAuthors(): ?AuthorCollection
+    public function getAuthors(): AuthorCollection
     {
         return $this->authors;
     }

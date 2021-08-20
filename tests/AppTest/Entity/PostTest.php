@@ -69,11 +69,11 @@ class PostTest extends TestCase
         $this->assertSame($this->publishDate, $post->getPublishDate());
     }
 
-    public function testGetAuthorsIsNullWhenNotProvided(): void
+    public function testGetAuthorsIsEmptyWhenNotProvided(): void
     {
         $post = new Post($this->title, $this->content, $this->publishDate);
 
-        $this->assertNull($post->getAuthors());
+        $this->assertEmpty($post->getAuthors());
     }
 
     public function testGetAuthorsReturnsProvidedAuthorCollection(): void

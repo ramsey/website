@@ -23,7 +23,9 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Attributes;
+use App\Entity\AuthorCollection;
 use App\Entity\Post;
+use App\Repository\Exception\AuthorNotFound;
 use App\Repository\Exception\MultipleMatches;
 use App\Util\FinderFactory;
 use DateTimeImmutable;
@@ -31,6 +33,7 @@ use League\CommonMark\Extension\FrontMatter\Output\RenderedContentWithFrontMatte
 use League\CommonMark\MarkdownConverterInterface;
 use Symfony\Component\Finder\SplFileInfo;
 
+use function count;
 use function preg_match;
 use function sprintf;
 
@@ -38,10 +41,15 @@ class PostRepository
 {
     private const FILE_DATE_PATTERN = '/.*(\d{4}-\d{2}-\d{2}).*/';
 
+    /**
+     * @param string[] $defaultAuthors
+     */
     public function __construct(
         private FinderFactory $finderFactory,
         private string $postsPath,
         private MarkdownConverterInterface $markdownConverter,
+        private AuthorRepository $authorRepository,
+        private array $defaultAuthors = [],
     ) {
     }
 
@@ -137,11 +145,39 @@ class PostRepository
         /** @var string $title */
         $title = $frontMatter['title'] ?? 'Untitled';
 
+        /** @var string[] $authorUsernames */
+        $authorUsernames = $frontMatter['authors'] ?? [];
+
         return new Post(
             title: $title,
             content: $markdownContents->getContent(),
             publishDate: new DateTimeImmutable($publishDate),
+            authors: $this->getAuthors($authorUsernames),
             attributes: $attributes,
         );
+    }
+
+    /**
+     * @param string[] $authorUsernames
+     */
+    private function getAuthors(array $authorUsernames): AuthorCollection
+    {
+        if (count($authorUsernames) === 0) {
+            $authorUsernames = $this->defaultAuthors;
+        }
+
+        $authorCollection = new AuthorCollection();
+
+        foreach ($authorUsernames as $username) {
+            $author = $this->authorRepository->findByAttributes(['username' => $username]);
+
+            if ($author === null) {
+                throw new AuthorNotFound("Unable to find author '$username'.");
+            }
+
+            $authorCollection[] = $author;
+        }
+
+        return $authorCollection;
     }
 }

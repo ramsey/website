@@ -39,6 +39,18 @@ class PostRepositoryFactory
         /** @var MarkdownConverterInterface $markdownConverter */
         $markdownConverter = $container->get(MarkdownConverterInterface::class);
 
-        return new PostRepository($finderFactory, $postsPath, $markdownConverter);
+        /** @var AuthorRepository $authorRepository */
+        $authorRepository = $container->get(AuthorRepository::class);
+
+        /** @var string[] $defaultAuthors */
+        $defaultAuthors = $container->get('config')['content']['defaultAuthors'] ?? [];
+
+        return new PostRepository(
+            finderFactory: $finderFactory,
+            postsPath: $postsPath,
+            markdownConverter: $markdownConverter,
+            authorRepository: $authorRepository,
+            defaultAuthors: $defaultAuthors,
+        );
     }
 }

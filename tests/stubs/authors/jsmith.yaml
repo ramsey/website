@@ -1,0 +1,10 @@
+name: John Smith
+imageUrl: https://example.com/john.jpg
+biography: >-
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus gravida magna
+  metus, sit amet condimentum purus molestie ac. Aliquam euismod velit non lacus
+  iaculis, at commodo dolor viverra.
+url: https://example.com/john
+email: jsmith@example.com
+foo: bar
+baz: quux
