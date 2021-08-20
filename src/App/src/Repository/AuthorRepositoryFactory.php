@@ -43,6 +43,11 @@ class AuthorRepositoryFactory
         /** @var UriFactoryInterface $uriFactory */
         $uriFactory = $container->get(UriFactoryInterface::class);
 
-        return new AuthorRepository($finderFactory, $authorsPath, $yamlParser, $uriFactory);
+        return new AuthorRepository(
+            finderFactory: $finderFactory,
+            authorsPath: $authorsPath,
+            yamlParser: $yamlParser,
+            uriFactory: $uriFactory,
+        );
     }
 }

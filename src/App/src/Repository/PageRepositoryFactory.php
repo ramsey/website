@@ -33,12 +33,16 @@ class PageRepositoryFactory
         /** @var FinderFactory $finderFactory */
         $finderFactory = $container->get(FinderFactory::class);
 
-        /** @var string $postsPath */
-        $postsPath = $container->get('config')['content']['paths']['pagesPath'] ?? '';
+        /** @var string $pagesPath */
+        $pagesPath = $container->get('config')['content']['paths']['pagesPath'] ?? '';
 
         /** @var MarkdownConverterInterface $markdownConverter */
         $markdownConverter = $container->get(MarkdownConverterInterface::class);
 
-        return new PageRepository($finderFactory, $postsPath, $markdownConverter);
+        return new PageRepository(
+            finderFactory: $finderFactory,
+            pagesPath: $pagesPath,
+            markdownConverter: $markdownConverter,
+        );
     }
 }
