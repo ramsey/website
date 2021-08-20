@@ -15,7 +15,7 @@ use Symfony\Component\Yaml\Parser;
 
 class AuthorRepositoryTest extends TestCase
 {
-    public function testFindReturnsNullWhenNoAuthorsFound(): void
+    public function testFindByAttributesReturnsNullWhenNoAuthorsFound(): void
     {
         $finder = $this->mockery(Finder::class);
         $finder->expects()->files()->andReturnSelf();
@@ -32,10 +32,10 @@ class AuthorRepositoryTest extends TestCase
 
         $repository = new AuthorRepository($finderFactory, '/path/to/files', $yamlParser, $uriFactory);
 
-        $this->assertNull($repository->find('foobar'));
+        $this->assertNull($repository->findByAttributes(['username' => 'foobar']));
     }
 
-    public function testFindThrowsExceptionWhenMoreThanOneAuthorFound(): void
+    public function testFindByAttributesThrowsExceptionWhenMoreThanOneAuthorFound(): void
     {
         $finder = $this->mockery(Finder::class);
         $finder->expects()->files()->andReturnSelf();
@@ -54,10 +54,10 @@ class AuthorRepositoryTest extends TestCase
         $this->expectException(MultipleMatches::class);
         $this->expectExceptionMessage('More than one author matches foobar.*');
 
-        $repository->find('foobar.*');
+        $repository->findByAttributes(['username' => 'foobar.*']);
     }
 
-    public function testFindReturnsAuthor(): void
+    public function testFindByAttributesReturnsAuthor(): void
     {
         $container = require __DIR__ . '/../../../config/container.php';
 
@@ -72,7 +72,7 @@ class AuthorRepositoryTest extends TestCase
 
         $repository = new AuthorRepository($finderFactory, __DIR__ . '/../../stubs/authors', $yamlParser, $uriFactory);
 
-        $author = $repository->find('jdoe');
+        $author = $repository->findByAttributes(['username' => 'jdoe']);
 
         $this->assertNotNull($author);
         $this->assertSame('Jane Doe', $author->getName());

@@ -44,7 +44,19 @@ class AuthorRepository
     ) {
     }
 
-    public function find(string $authorUsername): ?Author
+    /**
+     * @param array{username?: string} $attributes
+     */
+    public function findByAttributes(array $attributes): ?Author
+    {
+        if (isset($attributes['username'])) {
+            return $this->findByUsername($attributes['username']);
+        }
+
+        return null;
+    }
+
+    private function findByUsername(string $authorUsername): ?Author
     {
         $files = ($this->finderFactory)()
             ->files()
