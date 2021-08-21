@@ -1,4 +1,5 @@
 /.allowed-licenses          export-ignore
+/.dockerignore              export-ignore
 /.editorconfig              export-ignore
 /.gitattributes             export-ignore
 /.github/                   export-ignore
@@ -11,12 +12,12 @@
 /CODE_OF_CONDUCT.md         export-ignore
 /CONTRIBUTING.md            export-ignore
 /conventional-commits.json  export-ignore
+/Dockerfile                 export-ignore
 /docs/                      export-ignore
 /phpcs.xml.dist             export-ignore
 /phpstan.neon.dist          export-ignore
 /phpunit.xml.dist           export-ignore
 /psalm-baseline.xml         export-ignore
 /psalm.xml                  export-ignore
-/resources/                 export-ignore
 /SECURITY.md                export-ignore
 /tests/                     export-ignore

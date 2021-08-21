@@ -20,11 +20,17 @@ uphold this code.
 
 ## Development
 
-To run this project locally for development:
+To run this project locally for development (requires
+[Docker](https://docs.docker.com/get-docker/)):
 
 ```shell
-composer run --timeout=0 serve
+composer serve-docker
 ```
+
+Then, go to <http://localhost:9000>.
+
+The first time you run `serve-docker`, it might take a while, since it will need
+to build the image.
 
 ## Coordinated Disclosure
 

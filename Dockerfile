@@ -37,9 +37,7 @@ RUN apt-get update -qq \
 
 # Copy the app to the container, clean up any local dev files, and install dependencies.
 COPY . /app/
-RUN rm -rf /app/vendor /app/build \
-    && rm -f /app/config/autoload/development.local.php /app/config/development.config.php \
-    && mkdir -p /app/build/cache /app/build/logs \
+RUN mkdir -p /app/build/cache /app/build/logs \
     && composer install --no-dev --optimize-autoloader --prefer-dist --no-progress --quiet
 
 ENTRYPOINT ["caddy", "run", "--config", "/app/resources/docker/Caddyfile"]
