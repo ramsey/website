@@ -38,7 +38,7 @@ RUN apt-get update -qq \
 # Copy the app to the container, clean up any local dev files, and install dependencies.
 COPY . /app/
 RUN rm -rf /app/vendor /app/build \
-    && rm /app/config/autoload/development.local.php /app/config/development.config.php \
+    && rm -f /app/config/autoload/development.local.php /app/config/development.config.php \
     && mkdir -p /app/build/cache /app/build/logs \
     && composer install --no-dev --optimize-autoloader --prefer-dist --no-progress --quiet
 
