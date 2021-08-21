@@ -90,6 +90,14 @@
         "development-enable": "laminas-development-mode enable",
         "development-status": "laminas-development-mode status",
         "mezzio": "mezzio --ansi",
-        "serve": "php -S 0.0.0.0:9000 -t public/"
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -S 0.0.0.0:9000 -t public/"
+        ],
+        "serve-docker": [
+            "Composer\\Config::disableProcessTimeout",
+            "docker build -t benramsey/ramsey-website .",
+            "docker run --rm -it -p 9000:8080 -v \"$PWD\":/app benramsey/ramsey-website"
+        ]
     }
 }
