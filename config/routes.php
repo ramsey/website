@@ -39,7 +39,7 @@ use Psr\Container\ContainerInterface;
 
 return static function (Application $app, MiddlewareFactory $factory, ContainerInterface $container): void {
     $app->get('/', App\Handler\HomeHandler::class, 'home');
-    $app->get('/blog/feed', App\Handler\Blog\FeedHandler::class, 'blog.feed');
+    $app->get('/blog/feed.xml', App\Handler\Blog\FeedHandler::class, 'blog.feed');
     $app->get('/blog[/{year:\d{4}}[/{month:\d{2}}]]', App\Handler\Blog\ListHandler::class, 'blog.list');
     $app->get('/blog/{year:\d{4}}/{month:\d{2}}/{slug}', App\Handler\Blog\PostHandler::class, 'blog.post.old');
     $app->get('/blog/{year:\d{4}}/{slug}', App\Handler\Blog\PostHandler::class, 'blog.post');
