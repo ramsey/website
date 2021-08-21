@@ -23,40 +23,20 @@ declare(strict_types=1);
 namespace App\Response;
 
 use Fig\Http\Message\StatusCodeInterface;
-use Laminas\Diactoros\Response\HtmlResponse;
-use Mezzio\Template\TemplateRendererInterface;
+use Laminas\Diactoros\Response\RedirectResponse;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UriInterface;
 
-class HtmlResponseFactory
+trait RedirectionSupport
 {
-    use RedirectionSupport;
-
-    public function __construct(
-        private TemplateRendererInterface $template,
-    ) {
-    }
-
     /**
      * @param array<string, string|string[]> $headers
      */
-    public function response(
-        StreamInterface | string $content,
-        int $status = StatusCodeInterface::STATUS_OK,
+    public function redirect(
+        UriInterface | string $uri,
+        int $status = StatusCodeInterface::STATUS_FOUND,
         array $headers = []
     ): ResponseInterface {
-        return new HtmlResponse(html: $content, status: $status, headers: $headers);
-    }
-
-    /**
-     * @param array<string, string|string[]> $headers
-     */
-    public function notFound(array $headers = []): ResponseInterface
-    {
-        return $this->response(
-            content: $this->template->render('error::404'),
-            status: StatusCodeInterface::STATUS_NOT_FOUND,
-            headers: $headers,
-        );
+        return new RedirectResponse(uri: $uri, status: $status, headers: $headers);
     }
 }

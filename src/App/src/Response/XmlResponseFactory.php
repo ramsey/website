@@ -23,40 +23,21 @@ declare(strict_types=1);
 namespace App\Response;
 
 use Fig\Http\Message\StatusCodeInterface;
-use Laminas\Diactoros\Response\HtmlResponse;
-use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class HtmlResponseFactory
+class XmlResponseFactory
 {
     use RedirectionSupport;
-
-    public function __construct(
-        private TemplateRendererInterface $template,
-    ) {
-    }
 
     /**
      * @param array<string, string|string[]> $headers
      */
-    public function response(
+    public function atomResponse(
         StreamInterface | string $content,
         int $status = StatusCodeInterface::STATUS_OK,
         array $headers = []
     ): ResponseInterface {
-        return new HtmlResponse(html: $content, status: $status, headers: $headers);
-    }
-
-    /**
-     * @param array<string, string|string[]> $headers
-     */
-    public function notFound(array $headers = []): ResponseInterface
-    {
-        return $this->response(
-            content: $this->template->render('error::404'),
-            status: StatusCodeInterface::STATUS_NOT_FOUND,
-            headers: $headers,
-        );
+        return new AtomResponse(xml: $content, status: $status, headers: $headers);
     }
 }

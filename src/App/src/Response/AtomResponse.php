@@ -23,40 +23,26 @@ declare(strict_types=1);
 namespace App\Response;
 
 use Fig\Http\Message\StatusCodeInterface;
-use Laminas\Diactoros\Response\HtmlResponse;
-use Mezzio\Template\TemplateRendererInterface;
-use Psr\Http\Message\ResponseInterface;
+use Laminas\Diactoros\Response\InjectContentTypeTrait;
+use Laminas\Diactoros\Response\XmlResponse;
 use Psr\Http\Message\StreamInterface;
 
-class HtmlResponseFactory
+class AtomResponse extends XmlResponse
 {
-    use RedirectionSupport;
+    use InjectContentTypeTrait;
 
+    /**
+     * @param array<string, string|string[]> $headers
+     */
     public function __construct(
-        private TemplateRendererInterface $template,
-    ) {
-    }
-
-    /**
-     * @param array<string, string|string[]> $headers
-     */
-    public function response(
-        StreamInterface | string $content,
+        StreamInterface | string $xml,
         int $status = StatusCodeInterface::STATUS_OK,
-        array $headers = []
-    ): ResponseInterface {
-        return new HtmlResponse(html: $content, status: $status, headers: $headers);
-    }
-
-    /**
-     * @param array<string, string|string[]> $headers
-     */
-    public function notFound(array $headers = []): ResponseInterface
-    {
-        return $this->response(
-            content: $this->template->render('error::404'),
-            status: StatusCodeInterface::STATUS_NOT_FOUND,
-            headers: $headers,
+        array $headers = [],
+    ) {
+        parent::__construct(
+            $xml,
+            $status,
+            $this->injectContentType('application/atom+xml; charset=utf-8', $headers),
         );
     }
 }

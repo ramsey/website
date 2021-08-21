@@ -30,6 +30,7 @@ use App\Repository\PostRepository;
 use App\Repository\PostRepositoryFactory;
 use App\Response\HtmlResponseFactory;
 use App\Response\HtmlResponseFactoryFactory;
+use App\Response\XmlResponseFactory;
 use App\Util\FinderFactory;
 use League\CommonMark\Environment\EnvironmentInterface;
 use League\CommonMark\MarkdownConverterInterface;
@@ -78,10 +79,12 @@ class ConfigProvider
         return [
             'invokables' => [
                 FinderFactory::class => FinderFactory::class,
+                XmlResponseFactory::class => XmlResponseFactory::class,
             ],
             'factories' => [
                 AuthorRepository::class => AuthorRepositoryFactory::class,
                 EnvironmentInterface::class => Content\Markdown\CommonMarkEnvironmentFactory::class,
+                Handler\Blog\FeedHandler::class => Handler\Blog\FeedHandlerFactory::class,
                 Handler\Blog\ListHandler::class => Handler\Blog\ListHandlerFactory::class,
                 Handler\Blog\PostHandler::class => Handler\Blog\PostHandlerFactory::class,
                 Handler\HomeHandler::class => Handler\HomeHandlerFactory::class,
