@@ -1,7 +1,7 @@
 {
-    supervisor {
-        php-fpm
-    }
+	supervisor {
+		php-fpm
+	}
 }
 
 :8080
@@ -11,17 +11,17 @@ encode zstd gzip
 file_server
 
 header {
-    # Disable FLoC tracking
-    Permissions-Policy interest-cohort=()
+	# Disable FLoC tracking
+	Permissions-Policy interest-cohort=()
 
-    # Enable HSTS with preloading; https://hstspreload.org
-    Strict-Transport-Security max-age=10; includeSubDomains; preload
+	# Enable HSTS with preloading; https://hstspreload.org
+	Strict-Transport-Security max-age=10; includeSubDomains; preload
 
-    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
-    Referrer-Policy strict-origin-when-cross-origin
+	# https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
+	Referrer-Policy strict-origin-when-cross-origin
 }
 
 log {
-    output stdout
-    format console
+	output stdout
+	format console
 }
