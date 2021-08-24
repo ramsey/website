@@ -5,6 +5,7 @@
 .gitattributes
 .github/
 .gitignore
+.idea/
 bin/
 build/
 captainhook.json

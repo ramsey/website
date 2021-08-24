@@ -96,8 +96,8 @@
         ],
         "serve-docker": [
             "Composer\\Config::disableProcessTimeout",
-            "docker build -t benramsey/ramsey-website .",
-            "docker run --rm -it -p 9000:8080 -v \"$PWD\":/app benramsey/ramsey-website"
+            "docker build -t benramsey/website .",
+            "docker run --rm -it -p 9000:8080 -v \"$PWD\":/app benramsey/website"
         ]
     }
 }
