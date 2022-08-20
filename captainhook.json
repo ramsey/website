@@ -57,6 +57,10 @@
                     {
                         "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileStaged\\OfType",
                         "args": ["php"]
+                    },
+                    {
+                        "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileStaged\\InDirectory",
+                        "args": ["src/", "tests/"]
                     }
                 ]
             }
