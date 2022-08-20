@@ -287,6 +287,9 @@
             "config/routes/ux_live_component.yaml"
         ]
     },
+    "symfony/ux-turbo": {
+        "version": "v2.3.0"
+    },
     "symfony/ux-twig-component": {
         "version": "v2.3.0"
     },
