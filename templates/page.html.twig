@@ -1,0 +1,15 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block body %}
+    <main class="relative mt-2 py-16 bg-white overflow-hidden">
+
+        {% block content %}
+            <div class="relative px-4 sm:px-6 lg:px-8">
+                <div class="mt-6 prose prose-indigo prose-lg text-gray-500 mx-auto">
+                    {{ content }}
+                </div>
+            </div>
+        {% endblock %}
+
+    </main>
+{% endblock %}
