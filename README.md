@@ -35,13 +35,21 @@ By participating in this project and its community, you are expected to
 uphold this code.
 
 
-## Installation
+## Development
 
-Install this package as a dependency using [Composer](https://getcomposer.org).
+To run this project locally for development:
 
 ``` bash
-composer require ramsey/website
+git clone https://github.com/ramsey/website.git
+cd website/
+composer install && yarn install
+composer dev:serve:watch
 ```
+
+Then, go to <https://127.0.0.1:9000>.
+
+To stop the server, run `symfony server:stop`. To view the server logs while
+the server is running, run `symfony server:log`.
 
 <!--
 ## Usage
