@@ -97,7 +97,7 @@ jobs:
           sarif_file: "var/log/psalm.sarif"
 
   code-coverage:
-    name: "Code coverage"
+    name: "Unit tests and coverage"
     needs: ["coding-standards", "static-analysis"]
     runs-on: "ubuntu-latest"
     steps:
@@ -120,50 +120,3 @@ jobs:
 
       - name: "Publish coverage report to Codecov"
         uses: "codecov/codecov-action@v2.1.0"
-
-  unit-tests:
-    name: "Unit tests"
-    needs: ["code-coverage", "security-analysis"]
-    runs-on: ${{ matrix.operating-system }}
-
-    strategy:
-      fail-fast: false
-      matrix:
-        php-version:
-          - "7.4"
-          - "8.0"
-          - "8.1"
-        operating-system:
-          - "macos-latest"
-          - "ubuntu-latest"
-          - "windows-latest"
-        dependencies:
-          - "lowest"
-          - "highest"
-
-    steps:
-      - name: "Configure Git (for Windows)"
-        if: ${{ matrix.operating-system == 'windows-latest' }}
-        shell: "bash"
-        run: |
-          git config --system core.autocrlf false
-          git config --system core.eol lf
-
-      - name: "Checkout repository"
-        uses: "actions/checkout@v2"
-
-      - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
-        with:
-          php-version: "${{ matrix.php-version }}"
-          coverage: "none"
-
-      - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@v2"
-        with:
-          dependency-versions: "${{ matrix.dependencies }}"
-          composer-options: "${{ matrix.composer-options }}"
-
-      - name: "Run unit tests (PHPUnit)"
-        shell: "bash"
-        run: "composer dev:test:unit"
