@@ -14,7 +14,11 @@ class PageController extends AbstractController
     public function main(): Response
     {
         return $this->render('page.html.twig', [
-            'content' => 'Hello!',
+            'content' => <<<'EOD'
+                ## Hello, World!
+
+                This is a "markdown" document. Check out https://benramsey.com.
+                EOD,
         ]);
     }
 }

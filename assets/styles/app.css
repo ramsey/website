@@ -4,5 +4,20 @@
 
 [x-cloak] { display: none !important; }
 
-body {
+.heading-permalink {
+    text-decoration: none;
+    color:transparent;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+.heading-permalink:hover,
+h1:hover .heading-permalink,
+h2:hover .heading-permalink,
+h3:hover .heading-permalink,
+h4:hover .heading-permalink,
+h5:hover .heading-permalink {
+    text-decoration: none;
+    @apply text-indigo-600;
 }
