@@ -118,7 +118,7 @@ jobs:
         uses: "bahmutov/npm-install@v1.6.0"
 
       - name: "Build assets"
-        run: "yarn build"
+        run: "yarn encore production"
 
       - name: "Run unit tests (PHPUnit)"
         shell: "bash"
