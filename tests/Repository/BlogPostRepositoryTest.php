@@ -418,4 +418,52 @@ class BlogPostRepositoryTest extends TestCase
             'slug' => 'blog-post',
         ]);
     }
+
+    public function testAlternateNamesForPublishedAndLastUpdated(): void
+    {
+        $blogPostData = <<<'EOD'
+            ---
+            date: Wed, 15 Sep 2021 14:23:36 +0000
+            updated: Tue, 01 Mar 2022 23:18:09 +0000
+            ---
+
+            EOD;
+
+        $blogFinder = $this->mockery(Finder::class);
+        $blogFinderFactory = $this->mockery(FinderFactory::class);
+        $converter = new CommonMarkConverter();
+        $converter->getEnvironment()->addExtension(new FrontMatterExtension());
+        $parser = new Parser();
+        $uriFactory = new Psr17Factory();
+        $authorRepo = new AuthorRepository('/path/to/authors/data', $blogFinderFactory, $parser, $uriFactory);
+        $blogPostFile = $this->mockery(SplFileInfo::class);
+
+        $repository = new BlogPostRepository(
+            '/path/to/blog/data',
+            [],
+            $authorRepo,
+            $blogFinderFactory,
+            $converter,
+        );
+
+        $blogFinderFactory->expects()->createFinder()->andReturns($blogFinder);
+        $blogFinder->expects()->files()->andReturnSelf();
+        $blogFinder->expects()->in('/path/to/blog/data')->andReturnSelf();
+        $blogFinder->expects()->name('/^2022-\d{2}-\d{2}-blog-post\.(md|html|markdown)$/')->andReturnSelf();
+        $blogFinder->expects()->count()->andReturns(0);
+        $blogFinder->expects()->getIterator()->andReturns(new ArrayIterator([$blogPostFile]));
+
+        $blogPostFile->expects()->getContents()->andReturns($blogPostData);
+
+        $blogPost = $repository->findByAttributes([
+            'year' => 2022,
+            'slug' => 'blog-post',
+        ]);
+
+        $this->assertInstanceOf(BlogPost::class, $blogPost);
+        $this->assertInstanceOf(DateTimeImmutable::class, $blogPost->published);
+        $this->assertSame('2021-09-15T14:23:36+00:00', $blogPost->published->format('c'));
+        $this->assertInstanceOf(DateTimeImmutable::class, $blogPost->lastUpdated);
+        $this->assertSame('2022-03-01T23:18:09+00:00', $blogPost->lastUpdated->format('c'));
+    }
 }

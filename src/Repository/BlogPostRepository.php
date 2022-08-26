@@ -23,7 +23,7 @@ use function strtotime;
 use function time;
 
 /**
- * @psalm-type BlogPostFrontMatter = array{title?: string, authors?: string[], published?: int | string, lastUpdated?: int | string}
+ * @psalm-type BlogPostFrontMatter = array{title?: string, authors?: string[], published?: int | string, date?: int | string, lastUpdated?: int | string, updated?: int | string}
  */
 final class BlogPostRepository
 {
@@ -135,7 +135,8 @@ final class BlogPostRepository
             $frontMatter = $markdown->getFrontMatter() ?: [];
         }
 
-        $published = $frontMatter['published'] ?? -1;
+        // If "published" exists, use it; otherwise, check for "date."
+        $published = $frontMatter['published'] ?? $frontMatter['date'] ?? -1;
         if ($published === -1) {
             preg_match(self::FILE_DATE_PATTERN, $file->getFilename(), $matches);
             $published = isset($matches[1]) ? (int) strtotime($matches[1]) : time();
@@ -145,7 +146,8 @@ final class BlogPostRepository
             $published = "@$published";
         }
 
-        $lastUpdated = $frontMatter['lastUpdated'] ?? null;
+        // If "lastUpdated" exists, use it; otherwise, check for "updated."
+        $lastUpdated = $frontMatter['lastUpdated'] ?? $frontMatter['updated'] ?? null;
 
         if (is_int($lastUpdated)) {
             $lastUpdated = "@$lastUpdated";
