@@ -86,7 +86,16 @@
                 "conditions": [
                     {
                         "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileChanged\\Any",
-                        "args": [["composer.json", "composer.lock"]]
+                        "args": [["composer.json", "composer.lock", "symfony.lock"]]
+                    }
+                ]
+            },
+            {
+                "action": "yarn install",
+                "conditions": [
+                    {
+                        "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileChanged\\Any",
+                        "args": [["package.json", "yarn.lock"]]
                     }
                 ]
             }
@@ -100,7 +109,16 @@
                 "conditions": [
                     {
                         "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileChanged\\Any",
-                        "args": [["composer.json", "composer.lock"]]
+                        "args": [["composer.json", "composer.lock", "symfony.lock"]]
+                    }
+                ]
+            },
+            {
+                "action": "yarn install",
+                "conditions": [
+                    {
+                        "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileChanged\\Any",
+                        "args": [["package.json", "yarn.lock"]]
                     }
                 ]
             }
