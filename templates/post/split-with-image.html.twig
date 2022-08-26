@@ -1,0 +1,38 @@
+{% extends 'layout/base.html.twig' %}
+
+{% block body %}
+    <div class="relative bg-white">
+        {% if post.metadata.image.url is defined %}
+            <div class="lg:absolute lg:inset-0">
+                <div class="lg:sticky lg:inset-y-0 lg:left-0 lg:w-1/2 lg:h-screen">
+                    <img class="h-56 w-full object-cover lg:absolute lg:h-full" src="{{ post.metadata.image.url }}" alt="{% if post.metadata.image.alt is defined %}{{ post.metadata.image.alt }}{% endif %}">
+                </div>
+            </div>
+        {% endif %}
+        <div class="relative pt-12 pb-16 px-4 sm:pt-16 sm:px-6 lg:px-8 lg:max-w-7xl 2xl:max-w-full lg:mx-auto lg:grid lg:grid-cols-2">
+            <div class="lg:col-start-2 lg:pl-8">
+                <article class="h-entry text-base max-w-prose mx-auto lg:max-w-lg lg:ml-auto lg:mr-0 2xl:mr-auto 2xl:max-w-2xl">
+
+                    {% if post.metadata.categories is defined %}
+                        <span class="leading-6 text-indigo-600 font-semibold">{{ post.metadata.categories|capitalize }}</span>
+                    {% endif %}
+
+                    {% if post.title is defined %}
+                        <h1 class="p-name mt-2 text-3xl leading-8 font-bold tracking-tight text-gray-900 sm:text-4xl">
+                            <a class="u-url u-uid" rel="self" href="#">{{ post.title }}</a>
+                        </h1>
+                    {% endif %}
+
+                    <div class="mt-1 place-content-start place-items-start flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
+                        {{ include('post/meta.html.twig') }}
+                    </div>
+
+                    <div id="app-main-content" class="e-content mt-5 prose prose-indigo text-gray-500">
+                        {{ post.content|raw }}
+                    </div>
+
+                </article>
+            </div>
+        </div>
+    </div>
+{% endblock %}

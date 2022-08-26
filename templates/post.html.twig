@@ -6,23 +6,19 @@
     <article class="h-entry relative px-4 sm:px-6 lg:px-8">
 
         <div class="text-lg max-w-prose mx-auto">
-            {% if post.metadata.category is defined %}
-                <span class="block text-lg text-center text-indigo-600 font-semibold">{{ post.metadata.category|capitalize }}</span>
+            {% if post.metadata.categories is defined %}
+                <span class="block text-lg text-center text-indigo-600 font-semibold">{{ post.metadata.categories|capitalize }}</span>
             {% endif %}
             <h1 class="p-name mt-2 block text-3xl text-center leading-8 font-bold tracking-tight text-gray-900 sm:text-4xl sm:tracking-tight">
                 <a class="u-url u-uid" rel="self" href="#">{{ post.title }}</a>
             </h1>
 
-            {{ include('post/meta.html.twig') }}
-
-            {% if post.metadata.lead is defined %}
-                <p class="p-summary mt-8 text-xl text-gray-500 leading-8">
-                    {{ post.metadata.lead }}
-                </p>
-            {% endif %}
+            <div class="mt-1 place-content-center place-items-center flex flex-col sm:flex-row sm:flex-wrap sm:space-x-6">
+                {{ include('post/meta.html.twig') }}
+            </div>
         </div>
 
-        <div class="e-content mt-6 prose prose-indigo prose-lg text-gray-500 mx-auto">
+        <div id="app-main-content" class="e-content mt-6 prose prose-indigo prose-lg text-gray-500 mx-auto">
             {{ post.content|raw }}
         </div>
 

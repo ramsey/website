@@ -32,7 +32,12 @@ class BlogController extends AbstractController
             'slug' => $slug,
         ]);
 
-        return $this->render('post.html.twig', [
+        $layout = 'post.html.twig';
+        if (isset($blogPost->metadata['image'])) {
+            $layout = 'post/split-with-image.html.twig';
+        }
+
+        return $this->render($layout, [
             'post' => $blogPost,
         ]);
     }
