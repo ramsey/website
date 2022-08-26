@@ -27,16 +27,16 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Checkout repository"
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v3.0.2"
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
+        uses: "shivammathur/setup-php@2.21.1"
         with:
           php-version: "latest"
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@v2"
+        uses: "ramsey/composer-install@2.1.0"
 
       - name: "Check syntax (php-parallel-lint)"
         shell: "bash"
@@ -51,16 +51,16 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Checkout repository"
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v3.0.2"
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
+        uses: "shivammathur/setup-php@2.21.1"
         with:
           php-version: "latest"
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@v2"
+        uses: "ramsey/composer-install@2.1.0"
 
       - name: "Statically analyze code (PHPStan)"
         shell: "bash"
@@ -76,16 +76,16 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Checkout repository"
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v3.0.2"
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
+        uses: "shivammathur/setup-php@2.21.1"
         with:
           php-version: "latest"
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@v2"
+        uses: "ramsey/composer-install@2.1.0"
 
       - name: "Analyze security of code (Psalm)"
         shell: "bash"
@@ -102,17 +102,17 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - name: "Checkout repository"
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v3.0.2"
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
+        uses: "shivammathur/setup-php@2.21.1"
         with:
           php-version: "latest"
           coverage: "pcov"
           ini-values: "memory_limit=-1"
 
       - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@v2"
+        uses: "ramsey/composer-install@2.1.0"
 
       - name: "Install dependencies (Yarn)"
         uses: "bahmutov/npm-install@v1.6.0"
