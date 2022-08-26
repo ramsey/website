@@ -5,6 +5,16 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
 
+  app.common_mark:
+    table_of_contents:
+      position: 'placeholder'
+      placeholder: '[TOC]'
+
+  app.content.defaultAuthors: [ramsey]
+  app.content.paths.authorsPath: '%kernel.project_dir%/data/content/authors/'
+  app.content.paths.blogPostsPath: '%kernel.project_dir%/data/content/blog/'
+  app.content.paths.pagesPath: '%kernel.project_dir%/data/content/pages/'
+
 services:
   # default configuration for services in *this* file
   _defaults:
@@ -23,26 +33,10 @@ services:
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones
 
-  League\CommonMark\Extension\Attributes\AttributesExtension:
-    tags: ['twig.markdown.league_extension']
+  App\Service\CommonMark:
+    arguments:
+      $configuration: '%app.common_mark%'
 
-  League\CommonMark\Extension\Autolink\AutolinkExtension:
-    tags: ['twig.markdown.league_extension']
+  League\CommonMark\ConverterInterface: '@App\Service\CommonMark'
 
-  League\CommonMark\Extension\DescriptionList\DescriptionListExtension:
-    tags: ['twig.markdown.league_extension']
-
-  League\CommonMark\Extension\Footnote\FootnoteExtension:
-    tags: ['twig.markdown.league_extension']
-
-  League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension:
-    tags: ['twig.markdown.league_extension']
-
-  League\CommonMark\Extension\SmartPunct\SmartPunctExtension:
-    tags: ['twig.markdown.league_extension']
-
-  League\CommonMark\Extension\Strikethrough\StrikethroughExtension:
-    tags: ['twig.markdown.league_extension']
-
-  League\CommonMark\Extension\Table\TableExtension:
-    tags: ['twig.markdown.league_extension']
+  Symfony\Component\Yaml\Parser: ~

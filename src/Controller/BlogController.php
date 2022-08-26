@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Repository\BlogPostRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class BlogController extends AbstractController
 {
+    public function __construct(
+        private readonly BlogPostRepository $blogPostRepository,
+    ) {
+    }
+
     #[Route('/blog')]
     public function list(): Response
     {
@@ -21,6 +27,13 @@ class BlogController extends AbstractController
     #[Route('/blog/{year}/{slug}')]
     public function entry(string $slug, int $year): Response
     {
-        return $this->render('post.html.twig');
+        $blogPost = $this->blogPostRepository->findByAttributes([
+            'year' => $year,
+            'slug' => $slug,
+        ]);
+
+        return $this->render('post.html.twig', [
+            'post' => $blogPost,
+        ]);
     }
 }
