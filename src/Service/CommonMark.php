@@ -10,6 +10,8 @@ use League\CommonMark\Extension\Attributes\AttributesExtension;
 use League\CommonMark\Extension\Autolink\AutolinkExtension;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\DescriptionList\DescriptionListExtension;
+use League\CommonMark\Extension\Embed\EmbedAdapterInterface;
+use League\CommonMark\Extension\Embed\EmbedExtension;
 use League\CommonMark\Extension\Footnote\FootnoteExtension;
 use League\CommonMark\Extension\FrontMatter\FrontMatterExtension;
 use League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension;
@@ -26,15 +28,18 @@ class CommonMark implements ConverterInterface
     private readonly ConverterInterface $converter;
 
     /**
-     * @param array<string, mixed> $configuration
+     * @param array{embed?: array{adapter?: EmbedAdapterInterface}} $configuration
      */
-    public function __construct(array $configuration = [])
+    public function __construct(array $configuration, EmbedAdapterInterface $embedAdapter)
     {
+        $configuration['embed']['adapter'] = $embedAdapter;
+
         $environment = (new Environment($configuration))
             ->addExtension(new AttributesExtension())
             ->addExtension(new AutolinkExtension())
             ->addExtension(new CommonMarkCoreExtension())
             ->addExtension(new DescriptionListExtension())
+            ->addExtension(new EmbedExtension())
             ->addExtension(new FootnoteExtension())
             ->addExtension(new FrontMatterExtension())
             ->addExtension(new HeadingPermalinkExtension())

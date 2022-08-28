@@ -6,6 +6,7 @@ namespace App\Tests\Service;
 
 use App\Service\CommonMark;
 use App\Tests\TestCase;
+use League\CommonMark\Extension\Embed\Bridge\OscaroteroEmbedAdapter;
 use League\CommonMark\Extension\FrontMatter\Output\RenderedContentWithFrontMatter;
 
 class CommonMarkTest extends TestCase
@@ -14,7 +15,7 @@ class CommonMarkTest extends TestCase
     {
         $content = '**Foo**';
 
-        $commonMark = new CommonMark();
+        $commonMark = new CommonMark([], new OscaroteroEmbedAdapter());
         $renderedContent = $commonMark->convert($content);
 
         $this->assertNotInstanceOf(RenderedContentWithFrontMatter::class, $renderedContent);
@@ -29,7 +30,7 @@ class CommonMarkTest extends TestCase
             **Foo**
             EOD;
 
-        $commonMark = new CommonMark();
+        $commonMark = new CommonMark([], new OscaroteroEmbedAdapter());
         $renderedContent = $commonMark->convert($content);
 
         $this->assertInstanceOf(RenderedContentWithFrontMatter::class, $renderedContent);
@@ -40,7 +41,7 @@ class CommonMarkTest extends TestCase
         $content = '**Foo**';
         $expected = "<p><strong>Foo</strong></p>\n";
 
-        $commonMark = new CommonMark();
+        $commonMark = new CommonMark([], new OscaroteroEmbedAdapter());
         $renderedContent = $commonMark->convert($content);
 
         $this->assertSame($expected, $renderedContent->getContent());
@@ -51,7 +52,7 @@ class CommonMarkTest extends TestCase
         $content = '**Foo**';
         $expected = "<p>**Foo**</p>\n";
 
-        $commonMark = new CommonMark(['commonmark' => ['enable_strong' => false]]);
+        $commonMark = new CommonMark(['commonmark' => ['enable_strong' => false]], new OscaroteroEmbedAdapter());
         $renderedContent = $commonMark->convert($content);
 
         $this->assertSame($expected, $renderedContent->getContent());

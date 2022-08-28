@@ -9,6 +9,9 @@ parameters:
     table_of_contents:
       position: 'placeholder'
       placeholder: '[TOC]'
+    embed:
+      allowed_domains: ['youtube.com', 'twitter.com', 'github.com']
+      fallback: 'link'
 
   app.content.defaultAuthors: [ramsey]
   app.content.paths.authorsPath: '%kernel.project_dir%/data/content/authors/'
@@ -38,5 +41,9 @@ services:
       $configuration: '%app.common_mark%'
 
   League\CommonMark\ConverterInterface: '@App\Service\CommonMark'
+
+  League\CommonMark\Extension\Embed\Bridge\OscaroteroEmbedAdapter: ~
+
+  League\CommonMark\Extension\Embed\EmbedAdapterInterface: '@League\CommonMark\Extension\Embed\Bridge\OscaroteroEmbedAdapter'
 
   Symfony\Component\Yaml\Parser: ~
