@@ -4,7 +4,27 @@
 
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="all, index, follow">
+        <meta name="google-site-verification" content="ADiTLLNinMFHLIxbBwKhh85oh5bsrj3EToHFAYaA864">
+
         <title>{% block title %}Welcome!{% endblock %}</title>
+
+        {% block description %}{% endblock %}
+
+        {% block author %}
+            <meta name="author" content="Ben Ramsey">
+        {% endblock %}
+
+        {% block copyright %}
+            <meta name="copyright" content="Ben Ramsey">
+            <link rel="license" type="application/rdf+xml" href="https://creativecommons.org/licenses/by/4.0/rdf" title="Creative Commons Attribution 4.0 International License">
+        {% endblock %}
+
+        {% block canonical %}
+            <link rel="canonical" href="{{ app.request.schemeAndHttpHost }}{{ app.request.requestUri }}">
+        {% endblock %}
+
+        {% block shorturl %}{% endblock %}
 
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}

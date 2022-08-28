@@ -9,7 +9,11 @@
         <span>
             {% for author in post.authors %}
                 {% if loop.length > 1 and loop.last %}and{% endif %}
-                <a class="p-author h-card" href="{{ author.url }}" rel="author">{{ author.name }}</a>{% if loop.length > 2 and not loop.last %}, {% endif %}
+                {% if author.url is defined and author.url != '' %}
+                    <a class="p-author h-card" href="{{ author.url }}" rel="author">{{ author.name }}</a>{% if loop.length > 2 and not loop.last %}, {% endif %}
+                {% else %}
+                    <span class="p-author h-card">{{ author.name }}</span>{% if loop.length > 2 and not loop.last %}, {% endif %}
+                {% endif %}
             {% endfor %}
         </span>
     </div>

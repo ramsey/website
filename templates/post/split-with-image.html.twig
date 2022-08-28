@@ -1,11 +1,35 @@
-{% extends 'layout/base.html.twig' %}
+{% extends 'post.html.twig' %}
 
-{% block body %}
+{%- block title -%}
+    {{ post.title }}, by {% for author in post.authors %}{% if loop.length > 1 and loop.last %} and {% endif %}{{ author.name }}{% if loop.length > 2 and not loop.last %}, {% endif %}{% endfor %}
+{%- endblock -%}
+
+{% block author %}
+    {% for author in post.authors %}
+        <meta name="author" content="{{ author.name }}">
+    {% endfor %}
+{% endblock %}
+
+{%- block shorturl -%}
+    {% if post.metadata.shorturl is defined %}
+        <!-- https://code.google.com/archive/p/shortlink/wikis/Specification.wiki -->
+        <!-- https://github.com/kellan/revcanonical -->
+        <link rev="canonical" rel="short shorter shortlink shorturl" href="{{ post.metadata.shorturl }}">
+    {% endif %}
+{%- endblock -%}
+
+{% block content %}
     <div class="relative bg-white">
         {% if post.metadata.image.url is defined %}
             <div class="lg:absolute lg:inset-0">
                 <div class="lg:sticky lg:inset-y-0 lg:left-0 lg:w-1/2 lg:h-screen">
-                    <img class="h-56 w-full object-cover lg:absolute lg:h-full" src="{{ post.metadata.image.url }}" alt="{% if post.metadata.image.alt is defined %}{{ post.metadata.image.alt }}{% endif %}">
+                    {% if post.metadata.image.link is defined %}
+                        <a href="{{ post.metadata.image.link }}"{% if post.metadata.image.citation is defined %} title="{{ post.metadata.image.citation }}"{% endif %}>
+                            <img class="h-56 w-full object-cover lg:absolute lg:h-full" src="{{ post.metadata.image.url }}" alt="{% if post.metadata.image.alt is defined %}{{ post.metadata.image.alt }}{% endif %}">
+                        </a>
+                    {% else %}
+                        <img class="h-56 w-full object-cover lg:absolute lg:h-full" src="{{ post.metadata.image.url }}" alt="{% if post.metadata.image.alt is defined %}{{ post.metadata.image.alt }}{% endif %}">
+                    {% endif %}
                 </div>
             </div>
         {% endif %}
@@ -19,7 +43,9 @@
 
                     {% if post.title is defined %}
                         <h1 class="p-name mt-2 text-3xl leading-8 font-bold tracking-tight text-gray-900 sm:text-4xl">
-                            <a class="u-url u-uid" rel="self" href="#">{{ post.title }}</a>
+                            <a class="u-url u-uid" rel="bookmark" href="{{ path('blog_post', {year: post.published.format('Y'), slug: post.slug}) }}">
+                                {{ post.title }}
+                            </a>
                         </h1>
                     {% endif %}
 
