@@ -2,7 +2,8 @@
 module.exports = {
     content: [
         "./assets/**/*.js",
-        "./templates/**/*.html.twig"
+        "./templates/**/*.html.twig",
+        "./data/**/*.{html,md,markdown}"
     ],
     theme: {
         extend: {},
