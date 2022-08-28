@@ -19,12 +19,14 @@ class BlogController extends AbstractController
     #[Route('/blog')]
     public function list(): Response
     {
-        return $this->render('page.html.twig', [
-            'content' => 'List of blog posts',
+        $blogPosts = $this->blogPostRepository->findAll();
+
+        return $this->render('post/list.html.twig', [
+            'posts' => $blogPosts,
         ]);
     }
 
-    #[Route('/blog/{year}/{slug}')]
+    #[Route('/blog/{year}/{slug}', name: 'blog_post')]
     public function entry(string $slug, int $year): Response
     {
         $blogPost = $this->blogPostRepository->findByAttributes([

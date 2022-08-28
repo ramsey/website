@@ -15,6 +15,7 @@ final class BlogPost
         public readonly string $title,
         public readonly string $content,
         public readonly DateTimeInterface $published,
+        public readonly string $slug,
         public readonly AuthorCollection $authors = new AuthorCollection([]),
         public readonly Metadata $metadata = new Metadata([]),
         public readonly ?DateTimeInterface $lastUpdated = null,

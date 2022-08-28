@@ -20,8 +20,8 @@ class BlogPostCollectionTest extends TestCase
 
     public function testCollection(): void
     {
-        $collection = new BlogPostCollection([new BlogPost('Title', 'Content', new DateTimeImmutable())]);
-        $collection[] = new BlogPost('Title', 'Content', new DateTimeImmutable());
+        $collection = new BlogPostCollection([new BlogPost('Title', 'Content', new DateTimeImmutable(), 'blog-slug')]);
+        $collection[] = new BlogPost('Title', 'Content', new DateTimeImmutable(), 'blog-slug');
 
         $this->assertCount(2, $collection);
     }

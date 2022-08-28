@@ -6,6 +6,7 @@ namespace App\Tests\Repository;
 
 use App\Entity\AuthorCollection;
 use App\Entity\BlogPost;
+use App\Entity\BlogPostCollection;
 use App\Entity\Metadata;
 use App\Repository\AuthorNotFoundException;
 use App\Repository\AuthorRepository;
@@ -15,6 +16,7 @@ use App\Service\FinderFactory;
 use App\Tests\TestCase;
 use ArrayIterator;
 use DateTimeImmutable;
+use DomainException;
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Extension\FrontMatter\FrontMatterExtension;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -22,10 +24,100 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Parser;
 
-use function date;
-
 class BlogPostRepositoryTest extends TestCase
 {
+    public function testFindAllReturnsEmptyCollectionWhenNoPostsFound(): void
+    {
+        $finder = $this->mockery(Finder::class);
+        $finderFactory = $this->mockery(FinderFactory::class);
+        $converter = new CommonMarkConverter();
+        $parser = new Parser();
+        $uriFactory = new Psr17Factory();
+        $authorRepo = new AuthorRepository('/path/to/authors/data', $finderFactory, $parser, $uriFactory);
+
+        $repository = new BlogPostRepository(
+            '/path/to/blog/data',
+            [],
+            $authorRepo,
+            $finderFactory,
+            $converter,
+        );
+
+        $finderFactory->expects()->createFinder()->andReturns($finder);
+        $finder->expects()->files()->andReturnSelf();
+        $finder->expects()->in('/path/to/blog/data')->andReturnSelf();
+        $finder->expects()->sortByName(true)->andReturnSelf();
+        $finder->expects()->reverseSorting()->andReturnSelf();
+        $finder->expects()->getIterator()->andReturns(new ArrayIterator([]));
+
+        $collection = $repository->findAll();
+
+        $this->assertInstanceOf(BlogPostCollection::class, $collection);
+        $this->assertCount(0, $collection);
+    }
+
+    public function testFindAllReturnsBlogPosts(): void
+    {
+        $authorData = <<<'EOD'
+            name: Frodo Baggins
+            EOD;
+
+        $blogPostData = <<<'EOD'
+            ---
+            title: Some Blog Post
+            published: Wed, 15 Sep 2021 14:23:36 +0000
+            lastUpdated: Tue, 01 Mar 2022 23:18:09 +0000
+            authors: [frodo]
+            ---
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            EOD;
+
+        $finder = $this->mockery(Finder::class);
+        $finderFactory = $this->mockery(FinderFactory::class);
+        $authorFinder = $this->mockery(Finder::class);
+        $authorFinderFactory = $this->mockery(FinderFactory::class);
+        $converter = new CommonMarkConverter();
+        $converter->getEnvironment()->addExtension(new FrontMatterExtension());
+        $parser = new Parser();
+        $uriFactory = new Psr17Factory();
+        $authorRepo = new AuthorRepository('/path/to/authors/data', $authorFinderFactory, $parser, $uriFactory);
+        $file = $this->mockery(SplFileInfo::class);
+        $authorFile = $this->mockery(SplFileInfo::class);
+
+        $repository = new BlogPostRepository(
+            '/path/to/blog/data',
+            [],
+            $authorRepo,
+            $finderFactory,
+            $converter,
+        );
+
+        $finderFactory->expects()->createFinder()->andReturns($finder);
+        $finder->expects()->files()->andReturnSelf();
+        $finder->expects()->in('/path/to/blog/data')->andReturnSelf();
+        $finder->expects()->sortByName(true)->andReturnSelf();
+        $finder->expects()->reverseSorting()->andReturnSelf();
+        $finder->expects()->getIterator()->andReturns(new ArrayIterator([$file, $file, $file]));
+
+        $authorFinderFactory->expects()->createFinder()->times(3)->andReturns($authorFinder);
+        $authorFinder->expects()->files()->times(3)->andReturnSelf();
+        $authorFinder->expects()->in('/path/to/authors/data')->times(3)->andReturnSelf();
+        $authorFinder->expects()->name('/^frodo\.(yaml|yml)$/')->times(3)->andReturnSelf();
+        $authorFinder->expects()->count()->times(3)->andReturns(1);
+        $authorFinder->expects()->getIterator()->times(3)->andReturns(new ArrayIterator([$authorFile]));
+
+        $file->expects()->getContents()->times(3)->andReturns($blogPostData);
+        $file->expects()->getFilename()->times(3)->andReturns('2000-01-01-a-blog-post.html');
+        $authorFile->expects()->getContents()->times(3)->andReturns($authorData);
+
+        $collection = $repository->findAll();
+
+        $this->assertInstanceOf(BlogPostCollection::class, $collection);
+        $this->assertCount(3, $collection);
+        $this->assertSame('Some Blog Post', $collection[1]?->title);
+        $this->assertSame('Frodo Baggins', $collection[2]?->authors[0]?->name);
+    }
+
     public function testFindByAttributesReturnsNullWhenRecognizedAttributesAreNotPassed(): void
     {
         $finderFactory = $this->mockery(FinderFactory::class);
@@ -200,24 +292,25 @@ class BlogPostRepositoryTest extends TestCase
         $finderFactory->expects()->createFinder()->andReturns($finder);
         $finder->expects()->files()->andReturnSelf();
         $finder->expects()->in('/path/to/blog/data')->andReturnSelf();
-        $finder->expects()->name('/^2022-08-\d{2}-blog-post\.(md|html|markdown)$/')->andReturnSelf();
+        $finder->expects()->name('/^2022-08-\d{2}-my-article\.(md|html|markdown)$/')->andReturnSelf();
         $finder->expects()->count()->andReturns(0);
         $finder->expects()->getIterator()->andReturns(new ArrayIterator([$file]));
 
         $file->expects()->getContents()->andReturns('');
-        $file->expects()->getFilename()->andReturns('blog-post');
+        $file->expects()->getFilename()->twice()->andReturns('2022-08-21-my-article.markdown');
 
         $blogPost = $repository->findByAttributes([
             'year' => 2022,
             'month' => 8,
-            'slug' => 'blog-post',
+            'slug' => 'my-article',
         ]);
 
         $this->assertInstanceOf(BlogPost::class, $blogPost);
         $this->assertSame('Untitled', $blogPost->title);
         $this->assertSame('', $blogPost->content);
         $this->assertInstanceOf(DateTimeImmutable::class, $blogPost->published);
-        $this->assertSame(date('Y-m-d'), $blogPost->published->format('Y-m-d'));
+        $this->assertSame('2022-08-21', $blogPost->published->format('Y-m-d'));
+        $this->assertSame('my-article', $blogPost->slug);
         $this->assertInstanceOf(AuthorCollection::class, $blogPost->authors);
         $this->assertCount(0, $blogPost->authors);
         $this->assertInstanceOf(Metadata::class, $blogPost->metadata);
@@ -274,6 +367,7 @@ class BlogPostRepositoryTest extends TestCase
         $blogFinder->expects()->getIterator()->andReturns(new ArrayIterator([$blogPostFile]));
 
         $blogPostFile->expects()->getContents()->andReturns($blogPostData);
+        $blogPostFile->expects()->getFilename()->andReturns('2022-03-01-another-blog-post.md');
 
         $authorFinderFactory->expects()->createFinder()->twice()->andReturns($authorFinder);
         $authorFinder->expects()->files()->twice()->andReturnSelf();
@@ -299,6 +393,7 @@ class BlogPostRepositoryTest extends TestCase
         $this->assertSame("<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>\n", $blogPost->content);
         $this->assertInstanceOf(DateTimeImmutable::class, $blogPost->published);
         $this->assertSame('2021-09-15T14:23:36+00:00', $blogPost->published->format('c'));
+        $this->assertSame('another-blog-post', $blogPost->slug);
         $this->assertInstanceOf(AuthorCollection::class, $blogPost->authors);
         $this->assertCount(2, $blogPost->authors);
         $this->assertSame('Frodo Baggins', $blogPost->authors[0]?->name);
@@ -343,7 +438,7 @@ class BlogPostRepositoryTest extends TestCase
         $blogFinder->expects()->getIterator()->andReturns(new ArrayIterator([$blogPostFile]));
 
         $blogPostFile->expects()->getContents()->andReturns($blogPostData);
-        $blogPostFile->expects()->getFilename()->andReturns('2020-03-01-blog-post');
+        $blogPostFile->expects()->getFilename()->twice()->andReturns('2020-03-01-blog-post.md');
 
         $blogPost = $repository->findByAttributes([
             'year' => 2020,
@@ -355,6 +450,7 @@ class BlogPostRepositoryTest extends TestCase
         $this->assertSame('', $blogPost->content);
         $this->assertInstanceOf(DateTimeImmutable::class, $blogPost->published);
         $this->assertSame('2020-03-01T00:00:00+00:00', $blogPost->published->format('c'));
+        $this->assertSame('blog-post', $blogPost->slug);
         $this->assertInstanceOf(AuthorCollection::class, $blogPost->authors);
         $this->assertCount(0, $blogPost->authors);
         $this->assertInstanceOf(Metadata::class, $blogPost->metadata);
@@ -402,6 +498,7 @@ class BlogPostRepositoryTest extends TestCase
         $blogFinder->expects()->getIterator()->andReturns(new ArrayIterator([$blogPostFile]));
 
         $blogPostFile->expects()->getContents()->andReturns($blogPostData);
+        $blogPostFile->expects()->getFilename()->andReturns('2022-01-01-blog-post.md');
 
         $authorFinderFactory->expects()->createFinder()->andReturns($authorFinder);
         $authorFinder->expects()->files()->andReturnSelf();
@@ -454,6 +551,7 @@ class BlogPostRepositoryTest extends TestCase
         $blogFinder->expects()->getIterator()->andReturns(new ArrayIterator([$blogPostFile]));
 
         $blogPostFile->expects()->getContents()->andReturns($blogPostData);
+        $blogPostFile->expects()->getFilename()->andReturns('2022-01-01-blog-post.md');
 
         $blogPost = $repository->findByAttributes([
             'year' => 2022,
@@ -465,5 +563,42 @@ class BlogPostRepositoryTest extends TestCase
         $this->assertSame('2021-09-15T14:23:36+00:00', $blogPost->published->format('c'));
         $this->assertInstanceOf(DateTimeImmutable::class, $blogPost->lastUpdated);
         $this->assertSame('2022-03-01T23:18:09+00:00', $blogPost->lastUpdated->format('c'));
+    }
+
+    public function testThrowsExceptionWhenUnableToParseSlugFromFilename(): void
+    {
+        $finder = $this->mockery(Finder::class);
+        $finderFactory = $this->mockery(FinderFactory::class);
+        $converter = new CommonMarkConverter();
+        $parser = new Parser();
+        $uriFactory = new Psr17Factory();
+        $authorRepo = new AuthorRepository('/path/to/authors/data', $finderFactory, $parser, $uriFactory);
+        $file = $this->mockery(SplFileInfo::class);
+
+        $repository = new BlogPostRepository(
+            '/path/to/blog/data',
+            [],
+            $authorRepo,
+            $finderFactory,
+            $converter,
+        );
+
+        $finderFactory->expects()->createFinder()->andReturns($finder);
+        $finder->expects()->files()->andReturnSelf();
+        $finder->expects()->in('/path/to/blog/data')->andReturnSelf();
+        $finder->expects()->name('/^2022-08-\d{2}-my-article\.(md|html|markdown)$/')->andReturnSelf();
+        $finder->expects()->count()->andReturns(0);
+        $finder->expects()->getIterator()->andReturns(new ArrayIterator([$file]));
+
+        $file->expects()->getFilename()->twice()->andReturns('2022-08-21.markdown');
+
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessage('Unable to parse slug from file name "2022-08-21.markdown"');
+
+        $repository->findByAttributes([
+            'year' => 2022,
+            'month' => 8,
+            'slug' => 'my-article',
+        ]);
     }
 }

@@ -30,7 +30,7 @@ composer install && yarn install
 composer dev:serve:watch
 ```
 
-Then, go to <https://127.0.0.1:9000>.
+Then, go to <https://localhost:8000>.
 
 To stop the server, run `symfony server:stop`. To view the server logs while
 the server is running, run `symfony server:log`.

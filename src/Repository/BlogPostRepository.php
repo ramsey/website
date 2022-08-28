@@ -6,9 +6,11 @@ namespace App\Repository;
 
 use App\Entity\AuthorCollection;
 use App\Entity\BlogPost;
+use App\Entity\BlogPostCollection;
 use App\Entity\Metadata;
 use App\Service\FinderFactory;
 use DateTimeImmutable;
+use DomainException;
 use Exception;
 use League\CommonMark\ConverterInterface;
 use League\CommonMark\Extension\FrontMatter\Output\RenderedContentWithFrontMatter;
@@ -28,6 +30,7 @@ use function time;
 final class BlogPostRepository
 {
     private const FILE_DATE_PATTERN = '/.*(\d{4}-\d{2}-\d{2}).*/';
+    private const FILE_SLUG_PATTERN = '/^\d{4}-\d{2}-\d{2}-(.*)\.(md|html|markdown)$/';
     private const FILE_YEAR_SLUG_PATTERN = '/^%d-\d{2}-\d{2}-%s\.(md|html|markdown)$/';
     private const FILE_YEAR_MONTH_SLUG_PATTERN = "/^%d-%'.02d-\d{2}-%s\.(md|html|markdown)$/";
 
@@ -41,6 +44,26 @@ final class BlogPostRepository
         private readonly FinderFactory $finderFactory,
         private readonly ConverterInterface $converter,
     ) {
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function findAll(): BlogPostCollection
+    {
+        $collection = new BlogPostCollection();
+
+        $files = $this->finderFactory->createFinder()
+            ->files()
+            ->in($this->blogPostsPath)
+            ->sortByName(true)
+            ->reverseSorting();
+
+        foreach ($files as $file) {
+            $collection[] = $this->convertToBlogPost($file);
+        }
+
+        return $collection;
     }
 
     /**
@@ -125,6 +148,15 @@ final class BlogPostRepository
      */
     private function convertToBlogPost(SplFileInfo $file): BlogPost
     {
+        if (!preg_match(self::FILE_SLUG_PATTERN, $file->getFilename(), $matches)) {
+            throw new DomainException(sprintf(
+                'Unable to parse slug from file name "%s"',
+                $file->getFilename(),
+            ));
+        }
+
+        $slug = $matches[1];
+
         $markdown = $this->converter->convert($file->getContents());
 
         /** @var BlogPostFrontMatter $frontMatter */
@@ -157,6 +189,7 @@ final class BlogPostRepository
             title: $frontMatter['title'] ?? 'Untitled',
             content: $markdown->getContent(),
             published: new DateTimeImmutable($published),
+            slug: $slug,
             authors: $this->getAuthors($frontMatter['authors'] ?? []),
             metadata: new Metadata($frontMatter),
             lastUpdated: $lastUpdated ? new DateTimeImmutable($lastUpdated) : null,

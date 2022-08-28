@@ -21,11 +21,11 @@ class BlogControllerTest extends WebTestCase
         $client = static::createClient();
         $crawler = $client->request('GET', '/blog');
 
+        $bodyText = $crawler->text();
+
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString(
-            'List of blog posts',
-            $crawler->text(),
-        );
+        $this->assertStringContainsString('Yak Shaving Is the Entire Job Description', $bodyText);
+        $this->assertStringContainsString('PHPCommunity.org', $bodyText);
     }
 
     public function testBlogPostRedirectsTrailingSlash(): void
@@ -43,5 +43,21 @@ class BlogControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'PHPCommunity.org');
+    }
+
+    public function testBlogPostSplitWithImageTemplate(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/blog/2016/phptek-tips');
+
+        $html = $crawler->html();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('h1', '7 Tips for php[tek]');
+
+        $this->assertStringContainsString(
+            'https://files.benramsey.com/ws/blog/2016-05-22-phptek-tips/banner-1500x630.jpg',
+            $html,
+        );
     }
 }

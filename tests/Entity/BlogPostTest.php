@@ -21,6 +21,7 @@ class BlogPostTest extends TestCase
             title: 'A Blog Post',
             content: 'Content of a blog post.',
             published: $date,
+            slug: 'blog-slug',
         );
 
         $this->assertSame('A Blog Post', $post->title);
@@ -43,6 +44,7 @@ class BlogPostTest extends TestCase
             'A Blog Post',
             'Content of a blog post.',
             new DateTimeImmutable(),
+            'blog-slug',
             authors: $authors,
         );
 
@@ -59,6 +61,7 @@ class BlogPostTest extends TestCase
             'A Blog Post',
             'Content of a blog post.',
             new DateTimeImmutable(),
+            'blog-slug',
             metadata: $metadata,
         );
 
@@ -73,6 +76,7 @@ class BlogPostTest extends TestCase
             'A Blog Post',
             'Content of a blog post.',
             new DateTimeImmutable(),
+            'blog-slug',
             lastUpdated: $lastUpdated,
         );
 

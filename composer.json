@@ -178,7 +178,7 @@
         "dev:lint:syntax": "parallel-lint --colors src/ tests/",
         "dev:serve:watch": [
             "Composer\\Config::disableProcessTimeout",
-            "symfony server:start --daemon --port=9000",
+            "symfony server:start --daemon --port=8000",
             "yarn watch"
         ],
         "dev:test": [
