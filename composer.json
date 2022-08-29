@@ -189,7 +189,7 @@
         ],
         "dev:test:coverage:ci": "phpunit --colors=always --coverage-text --coverage-clover var/coverage/clover.xml --coverage-cobertura var/coverage/cobertura.xml --coverage-crap4j var/coverage/crap4j.xml --coverage-xml var/coverage/coverage-xml --log-junit var/junit.xml",
         "dev:test:coverage:html": "phpunit --colors=always --coverage-html var/coverage/coverage-html/",
-        "dev:test:unit": "phpunit --colors=always",
+        "dev:test:unit": "phpunit --colors=always --coverage-text",
         "test": "@dev:test"
     },
     "scripts-descriptions": {
