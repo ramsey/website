@@ -22,7 +22,7 @@ h5:hover .heading-permalink {
     visibility: visible;
 }
 
-#app-main-content p:first-child {
+#app-main-content > p:first-child {
     @apply mt-8 text-xl text-gray-500 leading-8;
 }
 
