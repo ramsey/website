@@ -16,7 +16,7 @@ class BlogController extends AbstractController
     ) {
     }
 
-    #[Route('/blog')]
+    #[Route('/blog', name: 'blog_list')]
     public function list(): Response
     {
         $blogPosts = $this->blogPostRepository->findAll();
@@ -27,7 +27,7 @@ class BlogController extends AbstractController
     }
 
     #[Route('/blog/{year}/{slug}', name: 'blog_post')]
-    public function entry(string $slug, int $year): Response
+    public function post(string $slug, int $year): Response
     {
         $blogPost = $this->blogPostRepository->findByAttributes([
             'year' => $year,

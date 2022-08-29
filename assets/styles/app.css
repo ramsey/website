@@ -25,3 +25,7 @@ h5:hover .heading-permalink {
 #app-main-content p:first-child {
     @apply mt-8 text-xl text-gray-500 leading-8;
 }
+
+.prose-indigo a:hover {
+    @apply text-indigo-500;
+}
