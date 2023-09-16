@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3f092d15bae3bd5fc717354759150e71",
+    "content-hash": "23b16f6504127e03bbbf3a28906ee0a7",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -2077,6 +2077,78 @@
                 }
             ],
             "time": "2023-04-21T14:41:17+00:00"
+        },
+        {
+            "name": "symfony/asset-mapper",
+            "version": "v6.3.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/asset-mapper.git",
+                "reference": "9e719a274f159fc79316986fc967b9ce9de0d3c2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/asset-mapper/zipball/9e719a274f159fc79316986fc967b9ce9de0d3c2",
+                "reference": "9e719a274f159fc79316986fc967b9ce9de0d3c2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/filesystem": "^5.4|^6.0",
+                "symfony/http-client": "^5.4|^6.0"
+            },
+            "require-dev": {
+                "symfony/asset": "^5.4|^6.0",
+                "symfony/browser-kit": "^5.4|^6.0",
+                "symfony/console": "^5.4|^6.0",
+                "symfony/finder": "^5.4|^6.0",
+                "symfony/framework-bundle": "^6.3",
+                "symfony/http-foundation": "^5.4|^6.0",
+                "symfony/http-kernel": "^5.4|^6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\AssetMapper\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Maps directories of assets & makes them available in a public directory with versioned filenames.",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/asset-mapper/tree/v6.3.4"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2023-08-23T20:11:00+00:00"
         },
         {
             "name": "symfony/cache",
@@ -7020,6 +7092,60 @@
                 }
             ],
             "time": "2023-07-31T07:08:24+00:00"
+        },
+        {
+            "name": "symfonycasts/sass-bundle",
+            "version": "v0.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/SymfonyCasts/sass-bundle.git",
+                "reference": "2dc21abe7e03def023e35d0fa9091a042999240f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/SymfonyCasts/sass-bundle/zipball/2dc21abe7e03def023e35d0fa9091a042999240f",
+                "reference": "2dc21abe7e03def023e35d0fa9091a042999240f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/asset-mapper": "^6.3",
+                "symfony/console": "^5.4|^6.3",
+                "symfony/http-client": "^5.4|^6.3",
+                "symfony/process": "^5.4|^6.3"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "1.11.x-dev",
+                "symfony/filesystem": "^6.3",
+                "symfony/framework-bundle": "^6.3",
+                "symfony/phpunit-bridge": "^6.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfonycasts\\SassBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mathéo Daninos",
+                    "homepage": "https://github.com/WebMamba"
+                }
+            ],
+            "description": "Delightful Sass Support for Symfony + AssetMapper",
+            "keywords": [
+                "asset-mapper",
+                "sass"
+            ],
+            "support": {
+                "issues": "https://github.com/SymfonyCasts/sass-bundle/issues",
+                "source": "https://github.com/SymfonyCasts/sass-bundle/tree/v0.2.2"
+            },
+            "time": "2023-09-13T14:43:23+00:00"
         },
         {
             "name": "twig/extra-bundle",
