@@ -1,0 +1,148 @@
+@media screen {
+  body.br.home {
+    padding-top: 110px;
+    width: 100%;
+
+    div#container {
+      margin: auto;
+      width: 75%;
+    }
+
+    header {
+      hgroup {
+        text-transform: uppercase;
+
+        h1 {
+          -webkit-text-stroke: 2px var(--color-text);
+          display: block;
+          font-family: "Archivo Black", sans-serif;
+          font-size: 10em;
+          font-weight: 400;
+          letter-spacing: -0.05em;
+          line-height: 0.706em;
+          margin: 0;
+          text-align: center;
+          // transform-origin: left top;
+          transform: scaleX(1.06);
+          width: 100%;
+
+          .ben {
+            .b, .e, .n {
+              display: inline-block;
+              transform: scale(-1, 1);
+            }
+
+            .b {
+              -webkit-text-fill-color: transparent;
+            }
+
+            .n {
+              -webkit-text-stroke-color: var(--color-accent);
+              -webkit-text-fill-color: var(--color-accent);
+            }
+          }
+
+          .ramsey {
+            .r {
+              -webkit-text-fill-color: transparent;
+            }
+          }
+        }
+
+        p {
+          line-height: 1.45em;
+
+          span.descriptor {
+            display: block;
+            font-family: Sarabun, sans-serif;
+            font-size: 2em;
+            font-style: italic;
+            font-weight: 500;
+            margin: 0;
+            padding: 0;
+          }
+        }
+      }
+
+      nav {
+        ul {
+          list-style-type: none;
+          padding-left: 0;
+
+          li {
+            display: inline-block;
+          }
+        }
+      }
+    }
+
+    main {
+      columns: 2 auto;
+      font-size: 1.45em;
+      font-style: italic;
+      font-weight: 100;
+      line-height: 1em;
+
+      p {
+        text-align: justify;
+        margin: 0 0 0.75em 0;
+      }
+    }
+
+    footer {
+      font-weight: 100;
+      margin: 50px 0 150px 0;
+      text-align: center;
+
+      p {
+        &.logo {
+          margin-bottom: 0;
+
+          & + p {
+            margin-top: 0;
+          }
+
+          svg {
+            fill: transparent;
+            height: 39px;
+            padding: 5px;
+            stroke-width: 5px;
+            stroke: var(--color-accent);
+            width: 66.5px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media print {
+  body.br.home {
+    header {
+      hgroup {
+        h1 {
+          margin-bottom: 0;
+        }
+
+        p {
+          font-size: 1.25em;
+          font-style: italic;
+          font-weight: bold;
+          margin-top: 0;
+        }
+      }
+    }
+
+    nav {
+      img {
+        display: none;
+      }
+    }
+
+    footer {
+      p.logo {
+        display: none;
+      }
+    }
+  }
+}

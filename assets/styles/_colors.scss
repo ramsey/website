@@ -1,0 +1,27 @@
+:root {
+  --red: #ff2975;
+  --orange: #ff901f;
+  --goldenrod: #ffb21c;
+  --yellow: #ffd319;
+  --green: #3be528;
+  --cyan: #03fff0;
+  --pink: #ff19e8;
+  --white: #ffffff;
+  --gray-light: #999999;
+  --gray-dark: #666666;
+  --black: #151515;
+
+  --color-accent: var(--red);
+  --color-background: var(--yellow);
+  --color-icon-base: var(--gray-dark);
+  --color-icon-hover: var(--black);
+  --color-text: var(--black);
+
+  @media (prefers-color-scheme: dark) {
+    --color-accent: var(--pink);
+    --color-background: var(--black);
+    --color-icon-base: var(--gray-light);
+    --color-icon-hover: var(--yellow);
+    --color-text: var(--white);
+  }
+}

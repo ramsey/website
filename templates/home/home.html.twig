@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{%  set pageClass = 'home' %}
+
+{% block title %}Ben Ramsey{% endblock %}
+
+{% block body %}
+    <div id="container">
+        <header>
+            <hgroup>
+                <h1 aria-label="Ben Ramsey"><span aria-hidden="true"><span class="ben"><span class="b">B</span><span class="e">e</span><span class="n">n</span></span> <span class="ramsey"><span class="r">R</span><span class="a">a</span><span class="m">m</span><span class="s">s</span><span class="e">e</span><span class="y">y</span></span></span></h1>
+                <p aria-label="Coder, author, &amp; speaker"><span aria-hidden="true"><span class="descriptor">Coder</span><span class="sr">, </span><span class="descriptor">author</span><span class="sr">, &amp; </span><span class="descriptor">speaker</span></span></p>
+            </hgroup>
+            <nav aria-labelledby="contact">
+                <p id="contact" class="sr" aria-hidden="true">You may follow or contact me online at</p>
+                <ul>
+                    <li><a href="https://github.com/ramsey" rel="me" aria-labelledby="contact-github"><span class="icon github" aria-hidden="true"></span><span class="sr" id="contact-github">GitHub</span></a></li>
+                    <li><a href="https://phpc.social/@ramsey" rel="me" aria-labelledby="contact-mastodon"><span class="icon mastodon" aria-hidden="true"></span><span class="sr" id="contact-mastodon">Mastodon</span></a></li>
+                    <li><a href="https://www.linkedin.com/in/benramsey/" rel="me" aria-labelledby="contact-linkedin"><span class="icon linkedin" aria-hidden="true"></span><span class="sr" id="contact-linkedin">Linked In</span></a></li>
+                    <li><a href="mailto:ben@ramsey.dev" aria-labelledby="contact-email"><span class="icon paper-plane" aria-hidden="true"></span><span class="sr" id="contact-email">Email</span></a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <p>Ben is a software engineer with over 25 years experience building, scaling, and securing web and database applications. He specializes in building APIs, libraries, and tools that help development teams work and communicate more efficiently and effectively.</p>
+            <p>Ben is a firm believer in and advocate for open source software and communities. He is a release manager for PHP 8.1 and 8.2, maintainer of the popular ramsey/uuid library for PHP, frequent contributor to open source projects, PHP community advocate, and has organized user groups and conferences in Atlanta, Nashville, and Gatlinburg.</p>
+            <p>A prolific writer and speaker, Ben has contributed to several books, published numerous articles in magazines such as php[architect], and is a popular speaker at conferences. You may find him on Mastodon, or the Fediverse, at @ramsey@phpc.social, where he posts about PHP, open source, life, the universe, and everything.</p>
+        </main>
+        <footer>
+            <p class="logo"><svg viewBox="0 0 266 156" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><path d="M48.789,0L205.391,0C217.164,0 227.227,2.147 235.579,6.441C243.932,10.735 250.216,16.536 254.432,23.843C258.648,31.15 260.756,39.098 260.756,47.686C260.756,57.178 258.051,65.766 252.642,73.45C247.233,81.134 239.358,86.784 229.017,90.4L265.529,155.488L206.346,155.488L177.231,98.762L157.663,98.762L157.663,155.488L47.368,155.488C38.684,155.488 30.71,153.755 23.447,150.29C16.184,146.825 10.46,141.966 6.276,135.713C2.092,129.46 0,122.266 0,114.13C0,92.735 10.342,79.778 31.026,75.258L31.026,74.354C12.868,69.382 3.789,57.329 3.789,38.194C3.789,30.962 5.803,24.408 9.829,18.532C13.855,12.656 19.302,8.098 26.171,4.859C33.039,1.62 40.578,0 48.789,0ZM104.92,119.328L65.131,119.328C61.657,119.328 58.776,118.16 56.486,115.825C54.197,113.49 53.052,110.589 53.052,107.124L53.052,104.864C53.052,101.399 54.197,98.498 56.486,96.163C58.776,93.828 61.657,92.66 65.131,92.66L104.92,92.66L104.92,119.328ZM207.062,49.72C207.062,45.652 205.63,42.262 202.766,39.55C199.902,36.838 196.402,35.482 192.266,35.482L157.663,35.482L157.663,64.184L192.266,64.184C196.402,64.184 199.902,62.79 202.766,60.003C205.63,57.216 207.062,53.788 207.062,49.72ZM104.92,60.568L68.92,60.568C65.447,60.568 62.565,59.4 60.276,57.065C57.986,54.73 56.841,51.829 56.841,48.364L56.841,46.104C56.841,42.789 58.026,39.964 60.394,37.629C62.762,35.294 65.604,34.126 68.92,34.126L104.92,34.126L104.92,60.568Z"/></svg></p>
+            <p>&copy; Ben Ramsey.</p>
+        </footer>
+    </div>
+{% endblock %}

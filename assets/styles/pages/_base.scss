@@ -1,0 +1,22 @@
+@media screen {
+  body {
+    background: var(--color-background);
+    color: var(--color-text);
+    font-family: Urbanist, sans-serif;
+
+    &.br {
+      .sr {
+        // Screen reader, text-to-speech, and print only; visibly hidden on screen.
+        border: 0;
+        clip-path: inset(50%);
+        height: 1px;
+        margin: 0;
+        overflow: hidden;
+        padding: 0;
+        position: absolute !important;
+        white-space: nowrap;
+        width: 1px;
+      }
+    }
+  }
+}

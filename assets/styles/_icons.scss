@@ -1,0 +1,46 @@
+@media screen {
+  body.br {
+    nav {
+      .icon {
+        background-color: var(--color-icon-base);
+        display: inline-block;
+
+        &:hover {
+          background-color: var(--color-icon-hover);
+        }
+
+        &.github {
+          height: 43.15px;
+          width: 40.45px;
+
+          -webkit-mask: url("../svg/github.svg") no-repeat center / contain;
+          mask: url("../svg/github.svg") no-repeat center / contain;
+        }
+
+        &.mastodon {
+          height: 44.9px;
+          width: 39.3px;
+
+          -webkit-mask: url("../svg/mastodon.svg") no-repeat center / contain;
+          mask: url("../svg/mastodon.svg") no-repeat center / contain;
+        }
+
+        &.linkedin {
+          height: 49.95px;
+          width: 47.3px;
+
+          -webkit-mask: url("../svg/linkedin.svg") no-repeat center / contain;
+          mask: url("../svg/linkedin.svg") no-repeat center / contain;
+        }
+
+        &.paper-plane {
+          height: 34.95px;
+          width: 34.95px;
+
+          -webkit-mask: url("../svg/paper-plane.svg") no-repeat center / contain;
+          mask: url("../svg/paper-plane.svg") no-repeat center / contain;
+        }
+      }
+    }
+  }
+}
