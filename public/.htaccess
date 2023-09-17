@@ -1,6 +1,6 @@
 RewriteEngine on
 RewriteCond   "%{HTTP_HOST}"   "!^ben\.ramsey\.dev" [NC]
 RewriteCond   "%{HTTP_HOST}"   "!^$"
-RewriteRule   "^/?(.*)"        "https://ben.ramsey.dev/$1" [L,R,NE]
+RewriteRule   "^/?(.*)"        "https://ben.ramsey.dev/$1" [L,R=308,NE]
 
 FallbackResource /index.php
