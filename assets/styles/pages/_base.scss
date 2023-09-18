@@ -4,6 +4,10 @@
     color: var(--color-text);
     font-family: Urbanist, sans-serif;
 
+    a {
+      color: var(--color-link);
+    }
+
     &.br {
       .sr {
         // Screen reader, text-to-speech, and print only; visibly hidden on screen.
