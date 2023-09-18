@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Closure;
-use DateTimeImmutable;
-use DateTimeInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -70,8 +68,8 @@ class ErrorController extends AbstractController
             '/blog/index.xml' => $this->doRedirect('/feeds/blog.xml', Response::HTTP_PERMANENTLY_REDIRECT, $request),
             '/feed' => $this->doRedirect('/feeds/blog.xml', Response::HTTP_PERMANENTLY_REDIRECT, $request),
             '/feed.xml' => $this->doRedirect('/feeds/blog.xml', Response::HTTP_PERMANENTLY_REDIRECT, $request),
-            '/feeds' => $this->doUnavailable(),
-            '/feeds/blog.xml' => $this->doUnavailable(),
+            '/feeds' => $this->doArchive('/feeds/'),
+            '/feeds/blog.xml' => $this->doArchive('/feeds/blog.xml'),
             '/rss' => $this->doRedirect('/feeds/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
 
             // Old project paths
@@ -98,7 +96,7 @@ class ErrorController extends AbstractController
 
             // Temporary conditions while the website is under construction.
             '/about' => $this->doRedirect('/', Response::HTTP_TEMPORARY_REDIRECT, $request),
-            '/articles' => $this->doUnavailable(),
+            '/articles' => $this->doArchive('/articles/'),
             '/articles/amazon-cloudfront' => $this->doArchive('/articles/amazon-cloudfront/'),
             '/articles/captcha-that-form' => $this->doArchive('/articles/captcha-that-form/'),
             '/articles/debugging-zen' => $this->doArchive('/articles/debugging-zen/'),
@@ -120,7 +118,7 @@ class ErrorController extends AbstractController
             '/articles/simplifying-commerce' => $this->doArchive('/articles/simplifying-commerce/'),
             '/articles/standard-php-library' => $this->doArchive('/articles/standard-php-library/'),
             '/articles/teaching-parrot-to-say-php' => $this->doArchive('/articles/teaching-parrot-to-say-php/'),
-            '/blog' => $this->doUnavailable(),
+            '/blog' => $this->doArchive('/blog/'),
             '/blog/2004/02/apache-license-v20-versus-gpl' => $this->doArchive('/blog/2004/02/apache-license-v20-versus-gpl/'),
             '/blog/2004/02/bloomba-over-mozilla' => $this->doArchive('/blog/2004/02/bloomba-over-mozilla/'),
             '/blog/2004/02/phpcommunityorg' => $this->doArchive('/blog/2004/02/phpcommunityorg/'),
@@ -411,11 +409,11 @@ class ErrorController extends AbstractController
             '/blog/2016/05/phptek-tips' => $this->doArchive('/blog/2016/05/phptek-tips/'),
             '/blog/2016/12/aws-codebuild-php' => $this->doArchive('/blog/2016/12/aws-codebuild-php/'),
             '/blog/2017/07/phptestfest' => $this->doArchive('/blog/2017/07/phptestfest/'),
-            '/books' => $this->doUnavailable(),
+            '/books' => $this->doArchive('/books/'),
             '/notes/2007/mswds' => $this->doArchive('/notes/2007/mswds/'),
             '/notes/2008/mswds' => $this->doArchive('/notes/2008/mswds/'),
             '/notes/2009/mswds' => $this->doArchive('/notes/2009/mswds/'),
-            '/projects' => $this->doUnavailable(),
+            '/projects' => $this->doArchive('/projects/'),
             '/projects/array-column' => $this->doArchive('/projects/array-column/'),
             '/projects/atlanta-php' => $this->doArchive('/projects/atlanta-php/'),
             '/projects/md5' => $this->doArchive('/projects/md5/'),
@@ -428,8 +426,8 @@ class ErrorController extends AbstractController
             '/projects/php-project' => $this->doArchive('/projects/php-project/'),
             '/projects/ramsey-uuid' => $this->doArchive('/projects/ramsey-uuid/'),
             '/projects/virtphp' => $this->doArchive('/projects/virtphp/'),
-            '/purpose' => $this->doUnavailable(),
-            '/talks' => $this->doUnavailable(),
+            '/purpose' => $this->doArchive('/purpose/'),
+            '/talks' => $this->doArchive('/talks/'),
             '/talks/2005/05/ipcse-frameworks' => $this->doArchive('/talks/2005/05/ipcse-frameworks/'),
             '/talks/2005/05/ipcse-php-gtk' => $this->doArchive('/talks/2005/05/ipcse-php-gtk/'),
             '/talks/2005/05/ipcse-security' => $this->doArchive('/talks/2005/05/ipcse-security/'),
@@ -544,7 +542,7 @@ class ErrorController extends AbstractController
             '/talks/2016/07/laracon-http2' => $this->doArchive('/talks/2016/07/laracon-http2/'),
             '/talks/2016/11/tnphp-oauth2' => $this->doArchive('/talks/2016/11/tnphp-oauth2/'),
             '/talks/2016/11/tnphp-uuid' => $this->doArchive('/talks/2016/11/tnphp-uuid/'),
-            '/writings' => $this->doUnavailable(),
+            '/writings' => $this->doArchive('/writings/'),
 
             // Movable Type URLs
             '/archive/cat/around_the_community/atlanta_php.php' => $this->doRedirect('/blog/2004/03/atlanta-php/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
@@ -835,17 +833,6 @@ class ErrorController extends AbstractController
             '/archives/zendcon-ipc-wrap-ups' => $this->doRedirect('/blog/2006/12/zendcon-ipc-wrap-ups/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
             '/archives/zendcon06-talk' => $this->doRedirect('/blog/2006/10/zendcon06-talk/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
             '/archives/zendphp-conference-2007' => $this->doRedirect('/blog/2007/09/zendphp-conference-2007/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
-        ];
-    }
-
-    private function doUnavailable(): array
-    {
-        return [
-            'status' => Response::HTTP_SERVICE_UNAVAILABLE,
-            'headers' => fn () => [
-                'retry-after' => (new DateTimeImmutable('+30 days'))->format(DateTimeInterface::RFC7231),
-            ],
-            'template' => 'error/unavailable.html.twig',
         ];
     }
 
