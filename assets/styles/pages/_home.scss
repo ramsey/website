@@ -5,12 +5,15 @@
 
     div#container {
       margin: auto;
-      width: 75%;
+      width: 80%;
     }
 
     header {
       hgroup {
+        display: block;
+        float: left;
         text-transform: uppercase;
+        width: 100%;
 
         h1 {
           -webkit-text-stroke: 2px var(--color-text);
@@ -21,12 +24,14 @@
           letter-spacing: -0.05em;
           line-height: 0.706em;
           margin: 0;
-          text-align: center;
-          // transform-origin: left top;
+          transform-origin: left top;
           transform: scaleX(1.06);
           width: 100%;
 
           .ben {
+            display: inline-block;
+            width: auto;
+
             .b, .e, .n {
               display: inline-block;
               transform: scale(-1, 1);
@@ -43,6 +48,10 @@
           }
 
           .ramsey {
+            display: inline-block;
+            margin-left: 30%;
+            width: auto;
+
             .r {
               -webkit-text-fill-color: transparent;
             }
@@ -51,6 +60,7 @@
 
         p {
           line-height: 1.45em;
+          margin-top: -4.5em;
 
           span.descriptor {
             display: block;
@@ -65,12 +75,19 @@
       }
 
       nav {
+        float: right;
+        text-align: right;
+        margin-top: -17em;
+
         ul {
+          align-items: start;
+          display: flex;
           list-style-type: none;
           padding-left: 0;
 
           li {
             display: inline-block;
+            padding-left: 2em;
           }
         }
       }
@@ -78,10 +95,12 @@
 
     main {
       columns: 2 auto;
+      clear: left;
       font-size: 1.45em;
       font-style: italic;
       font-weight: 100;
       line-height: 1em;
+      padding-top: 2em;
 
       p {
         text-align: justify;
@@ -91,7 +110,7 @@
 
     footer {
       font-weight: 100;
-      margin: 50px 0 150px 0;
+      margin: 50px 0 0 0;
       text-align: center;
 
       p {
