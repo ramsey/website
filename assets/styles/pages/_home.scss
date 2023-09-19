@@ -49,7 +49,7 @@
 
           .ramsey {
             display: inline-block;
-            margin-left: 30%;
+            margin-left: 2.047em;
             width: auto;
 
             .r {
@@ -60,7 +60,7 @@
 
         p {
           line-height: 1.45em;
-          margin-top: -4.5em;
+          margin-top: -4.55em;
 
           span.descriptor {
             display: block;
@@ -77,7 +77,7 @@
       nav {
         float: right;
         text-align: right;
-        margin-top: -17em;
+        margin-top: -17.25em;
 
         ul {
           align-items: start;
@@ -105,6 +105,7 @@
       p {
         text-align: justify;
         margin: 0 0 0.75em 0;
+        padding: 0 0.25em 0 0.25em;
       }
     }
 
