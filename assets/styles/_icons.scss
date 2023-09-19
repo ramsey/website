@@ -43,6 +43,15 @@
           -webkit-mask: url("../svg/paper-plane.svg") no-repeat center / contain;
           mask: url("../svg/paper-plane.svg") no-repeat center / contain;
         }
+
+        &.speaker-deck {
+          height: 70px;
+          margin-top: 9px;
+          width: 70px;
+
+          -webkit-mask: url("../svg/speaker-deck.svg") no-repeat center / contain;
+          mask: url("../svg/speaker-deck.svg") no-repeat center / contain;
+        }
       }
     }
   }
