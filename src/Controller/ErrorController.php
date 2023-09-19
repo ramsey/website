@@ -70,7 +70,6 @@ class ErrorController extends AbstractController
             '/feed' => $this->doRedirect('/feeds/blog.xml', Response::HTTP_PERMANENTLY_REDIRECT, $request),
             '/feed.xml' => $this->doRedirect('/feeds/blog.xml', Response::HTTP_PERMANENTLY_REDIRECT, $request),
             '/feeds' => $this->doArchive('/feeds/'),
-            '/feeds/blog.xml' => $this->doArchive('/feeds/blog.xml'),
             '/rss' => $this->doRedirect('/feeds/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
 
             // Old project paths
