@@ -1,16 +1,16 @@
 @media screen {
   body {
-    background-color: var(--color-background);
-    background-image: linear-gradient(to bottom, var(--color-background-grad1), var(--color-background-grad2) 60%);
-    background-repeat: no-repeat;
-    color: var(--color-text);
-    font-family: Urbanist, sans-serif;
-
-    a {
-      color: var(--color-link);
-    }
-
     &.br {
+      background-color: var(--color-background);
+      background-image: linear-gradient(to bottom, var(--color-background-grad1), var(--color-background-grad2) 60%);
+      background-repeat: no-repeat;
+      color: var(--color-text);
+      font-family: Urbanist, sans-serif;
+
+      a {
+        color: var(--color-link);
+      }
+
       .sr {
         // Screen reader, text-to-speech, and print only; visibly hidden on screen.
         border: 0;
@@ -22,6 +22,20 @@
         position: absolute !important;
         white-space: nowrap;
         width: 1px;
+      }
+
+      .pr {
+        display: none;
+      }
+    }
+  }
+}
+
+@media print {
+  body {
+    &.br {
+      .pr {
+        display: inline;
       }
     }
   }
