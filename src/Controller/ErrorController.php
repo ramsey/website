@@ -56,6 +56,9 @@ class ErrorController extends AbstractController
             // Link to HTTP Status codes post for Matthew Turland's book
             '/http-status-codes' => $this->doRedirect('/blog/2008/04/http-status-100-continue/', Response::HTTP_TEMPORARY_REDIRECT, $request),
 
+            // General Redirects
+            '/security.txt' => $this->doRedirect('/.well-known/security.txt', Response::HTTP_PERMANENTLY_REDIRECT, $request),
+
             // General Cleanup
             '/archive' => $this->doRedirect('/blog/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
             '/archives' => $this->doRedirect('/blog/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
