@@ -115,13 +115,9 @@
       text-align: center;
 
       p {
+        margin: 0;
+
         &.logo {
-          margin-bottom: 0;
-
-          & + p {
-            margin-top: 0;
-          }
-
           svg {
             fill: transparent;
             height: 39px;
