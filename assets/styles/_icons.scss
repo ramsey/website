@@ -18,6 +18,15 @@
           mask: url("../svg/github.svg") no-repeat center / contain;
         }
 
+        &.home {
+          height: 58.88px;
+          margin-top: 6.5px;
+          width: 66.24px;
+
+          -webkit-mask: url("../svg/house.svg") no-repeat center / contain;
+          mask: url("../svg/house.svg") no-repeat center / contain;
+        }
+
         &.mastodon {
           height: 67.35px;
           margin-top: 16.25px;
@@ -46,7 +55,7 @@
 
         &.speaker-deck {
           height: 70px;
-          margin-top: 9px;
+          margin-top: 8px;
           width: 70px;
 
           -webkit-mask: url("../svg/speaker-deck.svg") no-repeat center / contain;
