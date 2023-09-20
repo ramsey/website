@@ -6,6 +6,8 @@
   --green: #3be528;
   --cyan: #03fff0;
   --pink: #ff19e8;
+  --purple-black: #1a0017;
+  --purple-dark: #4d0045;
   --white: #ffffff;
   --gray-light: #999999;
   --gray-dark: #666666;
@@ -20,7 +22,9 @@
 
   //@media (prefers-color-scheme: dark) {
   --color-accent: var(--pink);
-  --color-background: var(--black);
+  --color-background-grad1: var(--purple-dark);
+  --color-background-grad2: var(--purple-black);
+  --color-background: var(--purple-black);
   --color-icon-base: var(--gray-light);
   --color-icon-hover: var(--yellow);
   --color-link: var(--cyan);

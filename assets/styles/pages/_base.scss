@@ -1,6 +1,8 @@
 @media screen {
   body {
-    background: var(--color-background);
+    background-color: var(--color-background);
+    background-image: linear-gradient(to bottom, var(--color-background-grad1), var(--color-background-grad2) 60%);
+    background-repeat: no-repeat;
     color: var(--color-text);
     font-family: Urbanist, sans-serif;
 
