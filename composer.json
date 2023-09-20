@@ -80,6 +80,10 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "dev:style:watch": [
+            "Composer\\Config::disableProcessTimeout",
+            "php bin/console sass:build --watch"
         ]
     },
     "conflict": {

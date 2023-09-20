@@ -11,19 +11,19 @@
   --gray-dark: #666666;
   --black: #151515;
 
-  --color-accent: var(--red);
-  --color-background: var(--yellow);
-  --color-icon-base: var(--gray-dark);
-  --color-icon-hover: var(--black);
-  --color-link: var(--red);
-  --color-text: var(--black);
+  //--color-accent: var(--red);
+  //--color-background: var(--yellow);
+  //--color-icon-base: var(--gray-dark);
+  //--color-icon-hover: var(--black);
+  //--color-link: var(--red);
+  //--color-text: var(--black);
 
-  @media (prefers-color-scheme: dark) {
-    --color-accent: var(--pink);
-    --color-background: var(--black);
-    --color-icon-base: var(--gray-light);
-    --color-icon-hover: var(--yellow);
-    --color-link: var(--cyan);
-    --color-text: var(--white);
-  }
+  //@media (prefers-color-scheme: dark) {
+  --color-accent: var(--pink);
+  --color-background: var(--black);
+  --color-icon-base: var(--gray-light);
+  --color-icon-hover: var(--yellow);
+  --color-link: var(--cyan);
+  --color-text: var(--white);
+  //}
 }
