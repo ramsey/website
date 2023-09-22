@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ErrorController extends AbstractController
+final class ErrorController extends AbstractController
 {
     public function catchAll(Request $request): Response
     {
