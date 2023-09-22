@@ -17,6 +17,11 @@ final class WebFingerController extends AbstractController
 {
     private const CONTENT_TYPE = 'application/jrd+json';
 
+    private const HEADERS = [
+        'access-control-allow-origin' => '*',
+        'content-type' => self::CONTENT_TYPE,
+    ];
+
     private const BEN_RAMSEY_DEV = [
         'aliases' => [],
         'links' => [
@@ -66,12 +71,10 @@ final class WebFingerController extends AbstractController
     #[Route('/.well-known/webfinger')]
     public function handle(Request $request): Response
     {
-        $headers = ['content-type' => self::CONTENT_TYPE];
-
         $resource = $request->query->getString('resource');
 
         if (trim($resource) === '') {
-            return new Response('{}', Response::HTTP_BAD_REQUEST, $headers);
+            return new Response('{}', Response::HTTP_BAD_REQUEST, self::HEADERS);
         }
 
         $requestedRelations = $this->parseRelations($request);
@@ -97,10 +100,10 @@ final class WebFingerController extends AbstractController
 
             $data['links'] = $links;
 
-            return new JsonResponse(data: $data, headers: $headers);
+            return new JsonResponse(data: $data, headers: self::HEADERS);
         }
 
-        return new Response('{}', Response::HTTP_NOT_FOUND, $headers);
+        return new Response('{}', Response::HTTP_NOT_FOUND, self::HEADERS);
     }
 
     private function parseRelations(Request $request): array
