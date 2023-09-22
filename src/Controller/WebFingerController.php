@@ -49,8 +49,18 @@ final class WebFingerController extends AbstractController
     ];
 
     private const RESOURCES = [
-        'acct:ben@ramsey.dev' => self::BEN_RAMSEY_DEV,
-        'acct:ben@benramsey.com' => self::BEN_RAMSEY_DEV,
+        '127.0.0.1' => [
+            'acct:ben@ramsey.dev' => self::BEN_RAMSEY_DEV,
+        ],
+        'ramsey.dev' => [
+            'acct:ben@ramsey.dev' => self::BEN_RAMSEY_DEV,
+        ],
+        'benramsey.com' => [
+            'acct:ben@benramsey.com' => self::BEN_RAMSEY_DEV,
+        ],
+        'benramsey.dev' => [
+            'acct:ben@benramsey.dev' => self::BEN_RAMSEY_DEV,
+        ],
     ];
 
     #[Route('/.well-known/webfinger')]
@@ -66,8 +76,9 @@ final class WebFingerController extends AbstractController
 
         $requestedRelations = $this->parseRelations($request);
 
-        if (array_key_exists($resource, self::RESOURCES)) {
-            $data = self::RESOURCES[$resource];
+        $resources = $this->getResourcesForDomain($request->getHost());
+        if (array_key_exists($resource, $resources)) {
+            $data = $resources[$resource];
 
             $links = [];
             foreach ($data['links'] ?? [] as $link) {
@@ -111,5 +122,10 @@ final class WebFingerController extends AbstractController
         }
 
         return $relations;
+    }
+
+    private function getResourcesForDomain(string $domain): array
+    {
+        return self::RESOURCES[$domain] ?? [];
     }
 }
