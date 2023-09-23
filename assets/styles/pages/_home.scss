@@ -3,6 +3,8 @@
 
 @media screen {
   body.br.home {
+    margin: 0;
+    overflow-x: clip;
     padding-top: 6.875em;
     width: 100%;
 
@@ -10,7 +12,7 @@
       padding-top: 8em;
     }
 
-    @media (max-width: v.$viewportSmallerest) {
+    @media (max-width: v.$viewportSmallest) {
       padding-top: 12em;
     }
 
@@ -137,13 +139,13 @@
         }
 
         @media (max-width: v.$viewportSmallest) {
-          left: 0;
-          width: 100%;
-        }
-
-        @media (max-width: v.$viewportSmallerest) {
           left: 20%;
           width: 60%;
+        }
+
+        @media (max-width: v.$viewportSmaller) {
+          left: 25%;
+          width: 50%;
         }
 
         ul {
@@ -154,7 +156,7 @@
           margin: 0;
           padding: 0;
 
-          @media (max-width: v.$viewportSmallerest) {
+          @media (max-width: v.$viewportSmallest) {
             flex-wrap: wrap;
           }
         }
