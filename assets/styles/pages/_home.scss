@@ -1,16 +1,32 @@
+@use '../variables' as v;
+@use '../functions' as f;
+
 @media screen {
   body.br.home {
-    padding-top: 110px;
+    padding-top: 6.875em;
     width: 100%;
+
+    @media (min-width: v.$viewportMedium) {
+      padding-top: 8em;
+    }
+
+    @media (max-width: v.$viewportSmallerest) {
+      padding-top: 12em;
+    }
 
     div#container {
       margin: auto;
       width: 80%;
+
+      @media (min-width: v.$viewportLarge) {
+        width: 1106px;
+      }
     }
 
     header {
       hgroup {
         display: block;
+        font-size: 1rem;
         float: left;
         text-transform: uppercase;
         width: 100%;
@@ -19,7 +35,7 @@
           -webkit-text-stroke: 2px var(--color-text);
           display: block;
           font-family: "Archivo Black", sans-serif;
-          font-size: 10em;
+          font-size: f.font-scale(10em, 3.8em, v.$viewportLarge, v.$viewportSmaller);
           font-weight: 400;
           letter-spacing: -0.05em;
           line-height: 0.706em;
@@ -27,6 +43,10 @@
           transform-origin: left top;
           transform: scaleX(1.06);
           width: 100%;
+
+          @media (max-width: v.$viewportSmallest) {
+            font-size: f.font-scale(5em, 1em, v.$viewportSmallest, 50px);
+          }
 
           .ben {
             display: inline-block;
@@ -52,6 +72,22 @@
             margin-left: 2.047em;
             width: auto;
 
+            @media (max-width: v.$viewportSmaller) {
+              margin: 2px auto 0 auto;
+              text-align: right;
+              width: 100%;
+            }
+
+            @media (max-width: v.$viewportSmallest) {
+              margin-left: 1.1em;
+              text-align: left;
+
+              .sey {
+                display: block;
+                margin-left: -1.1em;
+              }
+            }
+
             .r {
               -webkit-text-fill-color: transparent;
             }
@@ -59,9 +95,13 @@
         }
 
         h2 {
-          font-size: 1em;
+          font-size: f.font-scale(1em, 0.6em, v.$viewportLarge, v.$viewportSmall);
           line-height: 1.45em;
           margin-top: -4.55em;
+
+          @media (max-width: v.$viewportMedium) {
+            margin-top: 2.5em;
+          }
 
           span.descriptor {
             display: block;
@@ -71,24 +111,51 @@
             font-weight: 500;
             margin: 0;
             padding: 0;
+
+            @media (max-width: v.$viewportMedium) {
+              display: inline-block;
+              padding-right: 0.5em;
+
+              &::before {
+                content: ' \\ ';
+              }
+            }
           }
         }
       }
 
       nav {
         float: right;
-        text-align: right;
-        margin-top: -17em;
+        margin-top: -25%;
+
+        @media (max-width: v.$viewportMedium) {
+          left: auto;
+          margin-top: 3em;
+          position: absolute;
+          top: 0;
+          width: 80%;
+        }
+
+        @media (max-width: v.$viewportSmallest) {
+          left: 0;
+          width: 100%;
+        }
+
+        @media (max-width: v.$viewportSmallerest) {
+          left: 20%;
+          width: 60%;
+        }
 
         ul {
-          align-items: start;
           display: flex;
+          gap: 1.25em;
+          justify-content: space-evenly;
           list-style-type: none;
-          padding-left: 0;
+          margin: 0;
+          padding: 0;
 
-          li {
-            display: inline-block;
-            padding-left: 2em;
+          @media (max-width: v.$viewportSmallerest) {
+            flex-wrap: wrap;
           }
         }
       }
@@ -97,22 +164,31 @@
     main {
       columns: 2 auto;
       clear: left;
-      font-size: 1.45em;
+      font-size: 1.45rem;
       font-style: italic;
       font-weight: 100;
       line-height: 1em;
       padding-top: 2em;
 
+      @media (max-width: v.$viewportMedium) {
+        columns: 1 auto;
+        padding-top: 0.5em;
+      }
+
       p {
         text-align: justify;
         margin: 0 0 0.75em 0;
-        padding: 0 0.25em 0 0.25em;
+        padding: 0 0.25em;
+
+        @media (max-width: v.$viewportSmallerest) {
+          text-align: left;
+        }
       }
     }
 
     footer {
       font-weight: 100;
-      margin: 50px 0 0 0;
+      margin: 3.125rem 0;
       text-align: center;
 
       p {

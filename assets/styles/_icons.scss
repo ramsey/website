@@ -1,6 +1,11 @@
+@use 'functions' as f;
+@use 'variables' as v;
+
 @media screen {
   body.br {
     nav {
+      font-size: f.font-scale(1em, 0.7em, v.$viewportLarge, v.$viewportSmall);
+
       .icon {
         background-color: var(--color-icon-base);
         display: inline-block;
@@ -10,53 +15,52 @@
         }
 
         &.github {
-          height: 64.725px;
-          margin-top: 9px;
-          width: 60.675px;
+          height: f.scalable-unit(64.72px);
+          width: f.scalable-unit(60.675px);
 
           -webkit-mask: url("../svg/github.svg") no-repeat center / contain;
           mask: url("../svg/github.svg") no-repeat center / contain;
         }
 
         &.home {
-          height: 58.88px;
-          margin-top: 6.5px;
-          width: 66.24px;
+          height: f.scalable-unit(58.88px);
+          margin-top: -0.1em;
+          width: f.scalable-unit(66.24px);
 
           -webkit-mask: url("../svg/house.svg") no-repeat center / contain;
           mask: url("../svg/house.svg") no-repeat center / contain;
         }
 
-        &.mastodon {
-          height: 67.35px;
-          margin-top: 16.25px;
-          width: 58.95px;
-
-          -webkit-mask: url("../svg/mastodon.svg") no-repeat center / contain;
-          mask: url("../svg/mastodon.svg") no-repeat center / contain;
-        }
-
         &.linkedin {
-          height: 74.925px;
-          width: 65.55px;
+          height: f.scalable-unit(74.914px);
+          margin-top: -0.55em;
+          width: f.scalable-unit(65.55px);
 
           -webkit-mask: url("../svg/linkedin.svg") no-repeat center / contain;
           mask: url("../svg/linkedin.svg") no-repeat center / contain;
         }
 
+        &.mastodon {
+          height: f.scalable-unit(67.371px);
+          margin-top: 0.5em;
+          width: f.scalable-unit(58.95px);
+
+          -webkit-mask: url("../svg/mastodon.svg") no-repeat center / contain;
+          mask: url("../svg/mastodon.svg") no-repeat center / contain;
+        }
+
         &.paper-plane {
-          height: 52.425px;
-          margin-top: 16px;
-          width: 52.425px;
+          height: f.scalable-unit(52.425px);
+          margin-top: 0.5em;
+          width: f.scalable-unit(52.425px);
 
           -webkit-mask: url("../svg/paper-plane.svg") no-repeat center / contain;
           mask: url("../svg/paper-plane.svg") no-repeat center / contain;
         }
 
         &.speaker-deck {
-          height: 70px;
-          margin-top: 8px;
-          width: 70px;
+          height: f.scalable-unit(70px);
+          width: f.scalable-unit(70px);
 
           -webkit-mask: url("../svg/speaker-deck.svg") no-repeat center / contain;
           mask: url("../svg/speaker-deck.svg") no-repeat center / contain;
