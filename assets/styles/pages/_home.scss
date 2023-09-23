@@ -72,10 +72,9 @@
           .ramsey {
             display: inline-block;
             margin-left: 2.047em;
-            width: auto;
 
             @media (max-width: v.$viewportSmaller) {
-              margin: 2px auto 0 auto;
+              margin: 1px auto 0 auto;
               text-align: right;
               width: 100%;
             }
@@ -83,10 +82,12 @@
             @media (max-width: v.$viewportSmallest) {
               margin-left: 1.1em;
               text-align: left;
+              width: fit-content;
 
               .sey {
                 display: block;
                 margin-left: -1.1em;
+                width: fit-content;
               }
             }
 
@@ -166,24 +167,26 @@
     main {
       columns: 2 auto;
       clear: left;
-      font-size: 1.45rem;
-      font-style: italic;
-      font-weight: 100;
-      line-height: 1em;
       padding-top: 2em;
 
       @media (max-width: v.$viewportMedium) {
         columns: 1 auto;
-        padding-top: 0.5em;
       }
 
-      p {
-        text-align: justify;
-        margin: 0 0 0.75em 0;
-        padding: 0 0.25em;
+      div.bio {
+        font-size: 1.45rem;
+        line-height: 1em;
 
-        @media (max-width: v.$viewportSmaller) {
-          text-align: left;
+        p {
+          font-style: italic;
+          font-weight: 100;
+          margin: 0 0 0.75em 0;
+          padding: 0 0.25em;
+          text-align: justify;
+
+          @media (max-width: v.$viewportSmaller) {
+            text-align: left;
+          }
         }
       }
     }
