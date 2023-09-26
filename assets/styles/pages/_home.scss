@@ -168,6 +168,9 @@
       clear: left;
       padding-top: 2em;
 
+      -webkit-hyphens: auto;
+      hyphens: auto;
+
       @media (max-width: v.$viewportMedium) {
         columns: 1 auto;
       }
@@ -177,7 +180,6 @@
         line-height: 1em;
 
         p {
-          font-style: italic;
           font-weight: 100;
           margin: 0 0 0.75em 0;
           padding: 0 0.25em;
@@ -186,6 +188,12 @@
           @media (max-width: v.$viewportSmaller) {
             text-align: left;
           }
+        }
+
+        strong {
+          color: var(--yellow);
+          font-weight: 700;
+          font-style: normal;
         }
       }
     }
