@@ -87,7 +87,7 @@
           }
         }
 
-        h2 {
+        h1 + p {
           font-size: f.font-scale(1em, 0.6em, v.$viewportLarge, v.$viewportSmall);
           line-height: 1.45em;
           margin-top: -4.55em;
@@ -192,7 +192,7 @@
           margin-bottom: 0;
         }
 
-        h2 {
+        p {
           font-size: 1.25em;
           font-style: italic;
           font-weight: bold;
