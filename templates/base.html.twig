@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en-US" prefix="cc: http://creativecommons.org/ns# dc: http://purl.org/dc/terms/ foaf: http://xmlns.com/foaf/0.1/ og: https://ogp.me/ns# schema: https://schema.org/">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
@@ -11,6 +11,11 @@
         <link rel="mask-icon" href="{{ asset('svg/br.svg') }}" color="fuchsia">
 
         <link rel="alternate" type="application/atom+xml" title="Ben Ramsey: Atom Feed" href="{{  asset('feeds/blog.xml') }}">
+
+        <meta name="author" content="Ben Ramsey">
+        <meta name="copyright" content="Ben Ramsey">
+        <link about="https://ben.ramsey.dev/#" typeof="schema:WebSite" rel="license" type="application/rdf+xml" href="https://creativecommons.org/licenses/by-sa/4.0/rdf" title="All content, excluding code examples, on this website is licensed under a Creative Commons Attribution-ShareAlike 4.0 International license.">
+        <link about="https://ben.ramsey.dev/#code" typeof="schema:SoftwareSourceCode" rel="license" type="application/rdf+xml" href="https://creativecommons.org/publicdomain/zero/1.0/rdf" title="The code examples appearing on this website are in the public domain.">
 
         {% block head %}
         {% endblock %}

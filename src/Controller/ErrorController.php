@@ -60,10 +60,10 @@ final class ErrorController extends AbstractController
             '/security.txt' => $this->doRedirect('/.well-known/security.txt', Response::HTTP_PERMANENTLY_REDIRECT, $request),
 
             // General Cleanup
-            '/archive' => $this->doRedirect('/blog/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
-            '/archives' => $this->doRedirect('/blog/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
-            '/blog/archives' => $this->doRedirect('/blog/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
-            '/contact' => $this->doRedirect('/about/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
+            '/archive' => $this->doRedirect('/blog', Response::HTTP_PERMANENTLY_REDIRECT, $request),
+            '/archives' => $this->doRedirect('/blog', Response::HTTP_PERMANENTLY_REDIRECT, $request),
+            '/blog/archives' => $this->doRedirect('/blog', Response::HTTP_PERMANENTLY_REDIRECT, $request),
+            '/contact' => $this->doRedirect('/about', Response::HTTP_PERMANENTLY_REDIRECT, $request),
             '/pgp/E85D0311DDFA5BACF3A610E7B02D97989C8C071B.pub.asc' => $this->doRedirect('/keys/benramsey.pub.asc', Response::HTTP_PERMANENTLY_REDIRECT, $request),
 
             // Feeds
@@ -98,7 +98,6 @@ final class ErrorController extends AbstractController
             '/blog/2006/11/zendcon06-talk' => $this->doRedirect('/blog/2006/10/zendcon06-talk/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
 
             // Temporary conditions while the website is under construction.
-            '/about' => $this->doRedirect('/', Response::HTTP_TEMPORARY_REDIRECT, $request),
             '/articles' => $this->doArchive('/articles/'),
             '/articles/amazon-cloudfront' => $this->doArchive('/articles/amazon-cloudfront/'),
             '/articles/captcha-that-form' => $this->doArchive('/articles/captcha-that-form/'),

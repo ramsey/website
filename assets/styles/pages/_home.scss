@@ -3,10 +3,7 @@
 
 @media screen {
   body.br.home {
-    margin: 0;
-    overflow-x: clip;
     padding-top: 6.875em;
-    width: 100%;
 
     @media (min-width: v.$viewportMedium) {
       padding-top: 8em;
@@ -14,15 +11,6 @@
 
     @media (max-width: v.$viewportSmallest) {
       padding-top: 12em;
-    }
-
-    div#container {
-      margin: auto;
-      width: 80%;
-
-      @media (min-width: v.$viewportLarge) {
-        width: 1106px;
-      }
     }
 
     header {
@@ -34,7 +22,6 @@
         width: 100%;
 
         h1 {
-          -webkit-text-stroke: 2px var(--color-text);
           display: block;
           font-family: "Archivo Black", sans-serif;
           font-size: f.font-scale(10em, 3.8em, v.$viewportLarge, v.$viewportSmaller);
@@ -45,6 +32,9 @@
           transform-origin: left top;
           transform: scaleX(1.06);
           width: 100%;
+
+          -webkit-text-stroke: 2px var(--color-text);
+          text-stroke: 2px var(--color-text);
 
           @media (max-width: v.$viewportSmallest) {
             font-size: f.font-scale(5em, 1em, v.$viewportSmallest, 50px);
@@ -164,57 +154,30 @@
     }
 
     main {
-      columns: 2 auto;
       clear: left;
-      padding-top: 2em;
-
-      -webkit-hyphens: auto;
-      hyphens: auto;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding-top: 4em;
 
       @media (max-width: v.$viewportMedium) {
-        columns: 1 auto;
+        padding-top: 2em;
       }
-
-      div.bio {
-        font-size: 1.45rem;
-        line-height: 1em;
-
-        p {
-          font-weight: 100;
-          margin: 0 0 0.75em 0;
-          padding: 0 0.25em;
-          text-align: justify;
-
-          @media (max-width: v.$viewportSmaller) {
-            text-align: left;
-          }
-        }
-
-        strong {
-          color: var(--yellow);
-          font-weight: 700;
-          font-style: normal;
-        }
-      }
-    }
-
-    footer {
-      font-weight: 100;
-      margin: 3.125rem 0;
-      text-align: center;
 
       p {
-        margin: 0;
+        font-size: 1.45rem;
+        font-weight: 100;
+        line-height: 1.1em;
+        margin: 0 0 0.75em 0;
+        padding: 0 0.25em;
+        text-align: justify;
 
-        &.logo {
-          svg {
-            fill: transparent;
-            height: 39px;
-            padding: 5px;
-            stroke-width: 5px;
-            stroke: var(--color-accent);
-            width: 66.5px;
-          }
+        -webkit-hyphens: auto;
+        hyphens: auto;
+
+        @media (max-width: v.$viewportSmaller) {
+          text-align: left;
         }
       }
     }
@@ -240,12 +203,6 @@
 
     nav {
       img {
-        display: none;
-      }
-    }
-
-    footer {
-      p.logo {
         display: none;
       }
     }
