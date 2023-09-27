@@ -64,7 +64,7 @@ final class ErrorController extends AbstractController
             '/archives' => $this->doRedirect('/blog', Response::HTTP_PERMANENTLY_REDIRECT, $request),
             '/blog/archives' => $this->doRedirect('/blog', Response::HTTP_PERMANENTLY_REDIRECT, $request),
             '/contact' => $this->doRedirect('/about', Response::HTTP_PERMANENTLY_REDIRECT, $request),
-            '/pgp/E85D0311DDFA5BACF3A610E7B02D97989C8C071B.pub.asc' => $this->doRedirect('/keys/benramsey.pub.asc', Response::HTTP_PERMANENTLY_REDIRECT, $request),
+            '/pgp/E85D0311DDFA5BACF3A610E7B02D97989C8C071B.pub.asc' => $this->doRedirect('/keys/benramsey.asc.txt', Response::HTTP_PERMANENTLY_REDIRECT, $request),
 
             // Feeds
             '/atom.xml' => $this->doRedirect('/feeds/blog.xml', Response::HTTP_PERMANENTLY_REDIRECT, $request),
