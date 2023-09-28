@@ -11,6 +11,8 @@ RewriteCond "%{HTTP_HOST}" "!^ramsey\.dev$" [NC]
 RewriteCond "%{REQUEST_URI}" "!^/\.well-known/openpgpkey/"
 # Allow requests to /.well-known/webfinger for any host.
 RewriteCond "%{REQUEST_URI}" "!^/\.well-known/webfinger"
+# Allow requests to /.well-known/keybase.txt for any host.
+RewriteCond "%{REQUEST_URI}" "!^/\.well-known/keybase\.txt$"
 RewriteRule "^/?(.*)" "https://ben.ramsey.dev/$1" [L,NE,R=308]
 
 # Do a temporary redirect for ramsey.dev.
@@ -18,3 +20,7 @@ RewriteCond "%{HTTP_HOST}" "^ramsey\.dev$" [NC]
 # Don't do the redirect for /.well-known/webfinger.
 RewriteCond "%{REQUEST_URI}" "!^/\.well-known/webfinger"
 RewriteRule "^/?(.*)" "https://ben.ramsey.dev/$1" [L,NE,R=307]
+
+# Keep both the original ETag and the modified one when compressing responses.
+# See https://symfony.com/doc/current/http_cache/validation.html#validation-with-the-etag-header
+RequestHeader edit "If-None-Match" '^"((.*)-(gzip|br))"$' '"$1", "$2"'
