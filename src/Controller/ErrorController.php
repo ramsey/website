@@ -44,7 +44,7 @@ final class ErrorController extends AbstractController
                 $response->headers->add($headers);
             }
         } else {
-            $response = new Response('<html><body>Whoops!</body></html>', 400);
+            $response = $this->render('error/not-found.html.twig')->setStatusCode(Response::HTTP_NOT_FOUND);
         }
 
         return $response;

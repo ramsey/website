@@ -2,7 +2,7 @@
 
 {%  set pageClass = 'error' %}
 
-{% block title %}Ben Ramsey{% endblock %}
+{% block title %}{%  if status == 307 or status == 302 %}Temporary{% else %}Permanent{% endif %} Redirect{% endblock %}
 
 {% block body %}
     <div id="container">
