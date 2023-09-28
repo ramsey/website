@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 use function md5;
 
-class KeybaseController extends AbstractController
+final class KeybaseController extends AbstractController
 {
     #[Route('/.well-known/keybase.txt')]
     public function handle(Request $request): Response
@@ -22,7 +22,11 @@ class KeybaseController extends AbstractController
         ]);
 
         $response = match (strtolower($request->getHost())) {
-            'benramsey.com', 'www.benramsey.com' => $this->render(
+            'ben.ramsey.dev' => $this->render(
+                view: 'keybase/ben-ramsey-dev.txt.twig',
+                response: $response,
+            ),
+            'benramsey.com' => $this->render(
                 view: 'keybase/benramsey-com.txt.twig',
                 response: $response,
             ),
