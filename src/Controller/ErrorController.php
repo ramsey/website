@@ -546,6 +546,9 @@ final class ErrorController extends AbstractController
             '/talks/2016/11/tnphp-uuid' => $this->doArchive('/talks/2016/11/tnphp-uuid/'),
             '/writings' => $this->doArchive('/writings/'),
 
+            // Old blog URLs
+            '/2004/08/07/technology-advocacy-group' => $this->doRedirect('/blog/2004/08/technology-advocacy-group/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
+
             // Movable Type URLs
             '/archive/cat/around_the_community/atlanta_php.php' => $this->doRedirect('/blog/2004/03/atlanta-php/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
             '/archive/cat/around_the_community/atlanta_php_getting_off_the_ground.php' => $this->doRedirect('/blog/2004/03/atlanta-php-getting-off-the-ground/', Response::HTTP_PERMANENTLY_REDIRECT, $request),
