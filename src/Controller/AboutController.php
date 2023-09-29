@@ -12,14 +12,24 @@ use Symfony\Component\Routing\Annotation\Route;
 final class AboutController extends AbstractController
 {
     #[Route('/about')]
-    public function about(): Response
+    public function about(Request $request): Response
     {
-        return $this->render('about/about.html.twig');
+        $response = $this->render('about/about.html.twig');
+        $response->setEtag(md5($response->getContent()));
+        $response->setPublic();
+        $response->isNotModified($request);
+
+        return $response;
     }
 
     #[Route('/copyright')]
-    public function copyright(): Response
+    public function copyright(Request $request): Response
     {
-        return $this->render('about/copyright.html.twig');
+        $response = $this->render('about/copyright.html.twig');
+        $response->setEtag(md5($response->getContent()));
+        $response->setPublic();
+        $response->isNotModified($request);
+
+        return $response;
     }
 }

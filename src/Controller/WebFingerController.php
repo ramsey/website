@@ -100,7 +100,12 @@ final class WebFingerController extends AbstractController
 
             $data['links'] = $links;
 
-            return new JsonResponse(data: $data, headers: self::HEADERS);
+            $response = new JsonResponse(data: $data, headers: self::HEADERS);
+            $response->setEtag(md5($response->getContent()));
+            $response->setPublic();
+            $response->isNotModified($request);
+
+            return $response;
         }
 
         return new Response('{}', Response::HTTP_NOT_FOUND, self::HEADERS);
