@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -15,11 +16,12 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class WebFingerController extends AbstractController
 {
-    private const CONTENT_TYPE = 'application/jrd+json';
+    private const MAX_AGE = 60 * 60 * 24 * 7;
+    private const STALE = 60 * 60 * 24;
 
     private const HEADERS = [
         'access-control-allow-origin' => '*',
-        'content-type' => self::CONTENT_TYPE,
+        'content-type' => 'application/jrd+json',
     ];
 
     private const BEN_RAMSEY_DEV = [
@@ -69,6 +71,7 @@ final class WebFingerController extends AbstractController
     ];
 
     #[Route('/.well-known/webfinger')]
+    #[Cache(maxage: self::MAX_AGE, public: true, staleWhileRevalidate: self::STALE)]
     public function handle(Request $request): Response
     {
         $resource = $request->query->getString('resource');
@@ -102,7 +105,6 @@ final class WebFingerController extends AbstractController
 
             $response = new JsonResponse(data: $data, headers: self::HEADERS);
             $response->setEtag(md5($response->getContent()));
-            $response->setPublic();
             $response->isNotModified($request);
 
             return $response;

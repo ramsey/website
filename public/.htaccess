@@ -1,7 +1,7 @@
 FallbackResource /index.php
 
 <FilesMatch "\.(css|gif|html|ico|jpg|js|pdf|png|svg|txt|woff2|xml)$">
-Header set Cache-Control "max-age=604800, public"
+Header set Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
 </FilesMatch>
 
 RewriteEngine on
