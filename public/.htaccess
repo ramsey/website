@@ -1,5 +1,9 @@
 FallbackResource /index.php
 
+<FilesMatch "\.(css|gif|html|ico|jpg|js|pdf|png|svg|txt|woff2|xml)$">
+Header set Cache-Control "max-age=604800, public"
+</FilesMatch>
+
 RewriteEngine on
 
 # If the host isn't `ben.ramsey.dev`, then redirect to `ben.ramsey.dev`.
