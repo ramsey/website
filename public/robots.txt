@@ -48,4 +48,9 @@ Disallow: /
 User-agent: ChatGPT-User
 Disallow: /
 
+# Google Bard and Vertex AI
+# https://searchengineland.com/google-extended-crawler-432636
+User-agent: Google-Extended
+Disallow: /
+
 Sitemap: https://ben.ramsey.dev/sitemap.xml
