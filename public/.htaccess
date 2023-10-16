@@ -11,6 +11,8 @@ RewriteCond "%{HTTP_HOST}" "!^ben\.ramsey\.dev$" [NC]
 RewriteCond "%{HTTP_HOST}" "!^$"
 # Don't do this redirect for `ramsey.dev`; we want to temporary redirect for it.
 RewriteCond "%{HTTP_HOST}" "!^ramsey\.dev$" [NC]
+# Allow requests to /.well-known/matrix/ for any host.
+RewriteCond "%{REQUEST_URI}" "!^/\.well-known/matrix/"
 # Allow requests to /.well-known/openpgpkey/ for any host.
 RewriteCond "%{REQUEST_URI}" "!^/\.well-known/openpgpkey/"
 # Allow requests to /.well-known/webfinger for any host.
@@ -21,6 +23,8 @@ RewriteRule "^/?(.*)" "https://ben.ramsey.dev/$1" [L,NE,R=301]
 
 # Do a temporary redirect for ramsey.dev.
 RewriteCond "%{HTTP_HOST}" "^ramsey\.dev$" [NC]
+# Don't do the redirect for /.well-known/matrix/.
+RewriteCond "%{REQUEST_URI}" "!^/\.well-known/matrix/"
 # Don't do the redirect for /.well-known/webfinger.
 RewriteCond "%{REQUEST_URI}" "!^/\.well-known/webfinger"
 RewriteRule "^/?(.*)" "https://ben.ramsey.dev/$1" [L,NE,R=302]
