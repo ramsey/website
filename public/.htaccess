@@ -6,6 +6,11 @@ Header set Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
 
 RewriteEngine on
 
+# If the request is for _matrix, redirect to matrix.ramsey.dev.
+RewriteCond "%{REQUEST_URI}" "^/_matrix/" [OR]
+RewriteCond "%{REQUEST_URI}" "^/_synapse/"
+RewriteRule "^/?(.*)" "https://matrix.ramsey.dev/$1" [L,NE,R=308]
+
 # If the host isn't `ben.ramsey.dev`, then redirect to `ben.ramsey.dev`.
 RewriteCond "%{HTTP_HOST}" "!^ben\.ramsey\.dev$" [NC]
 RewriteCond "%{HTTP_HOST}" "!^$"
