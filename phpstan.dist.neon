@@ -1,0 +1,10 @@
+parameters:
+    tmpDir: ./var/phpstan-cache
+    treatPhpDocTypesAsCertain: false
+    level: max
+    paths:
+        - bin/
+        - config/
+        - public/
+        - src/
+        - tests/
