@@ -5,12 +5,12 @@ name: "Continuous Integration"
 on:
   push:
     branches:
-      - "main-symfony"
+      - "main"
     tags:
       - "*"
   pull_request:
     branches:
-      - "main-symfony"
+      - "main"
 
 # Cancels all previous workflow runs for the same branch that have not yet completed.
 concurrency:
