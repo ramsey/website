@@ -1,5 +1,8 @@
 framework:
     asset_mapper:
-        # The paths to make available to the asset mapper.
+        exclude_dotfiles: true
         paths:
             - assets/
+        excluded_patterns:
+            - '*/_*.scss'
+            - '*/fonts/**/OFL.txt'
