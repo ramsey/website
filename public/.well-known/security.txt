@@ -1,0 +1,25 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+Canonical: https://ben.ramsey.dev/.well-known/security.txt
+Contact: mailto:security@ramsey.dev
+Encryption: https://static.ben.ramsey.dev/pgp-keys/security-7402CB02.asc
+Expires: 2024-12-31T23:59:59Z
+Preferred-Languages: en
+-----BEGIN PGP SIGNATURE-----
+
+iQJIBAEBCAAyFiEE4drPD+/ofZ570fAYq0bvvXQCywIFAmVWmuIUHHNlY3VyaXR5
+QHJhbXNleS5kZXYACgkQq0bvvXQCywL49A/+L1LN5zOsiqj5jwYN8I4DpyOMWMKD
+hnsBWrcGqgUMVCtIfsmDl7Ictt1kt68O34YiiqwZnjNOv//FNueUVJ1lErLHnMys
+65Vu+FGm6Tti+svP6LEbb0YCstoU4Ik2tN17+NLR/ma9Hb2xSxgIoOS/8eg+V40Q
+F7b5D9S9tkrRtHelgmL3P9OfX9JJAk1YPjfsB1NPs5rA/WagQQNyzo2BZGlmAizB
+6HYEwM+GHOZLeSv4fXLWpjk9OUiKSywMwPWkOkD6O3J3L2XeVNn1iRq6C51P91xV
+QhTDGIyxnfwMcbExcjiaIhtMLbBX1rywMU0/VZnNd7EiPM5VCKO4hf+7cZunYl9P
+C15mcxhvFzythBF+sb/SzaUoMXigwjpKHfjVMSj4xMzShawJwbWD8J/ONZrGO3tP
+B996J7iCoxXv0veE/cUJ+gabUCHgYNVTHkxqSwuFrvN+8aLJlvXLs20YWauPY/dG
+29C+NK1cu4n0JydyelJJUeInQHB/KZSsBnKSSzZdxePSL7Nd/+tOviSRofusRWMe
+fvWJlqqY1WteW+Xxwt3CdXwBljS72V5Ng4xyxieFjto/HitsCoda7uT2JhUNQwtv
+qLZSzNjOIDIcgOorp7jDh40+R3EKMfrn5EpmFlAwgWg5lAH0EVxeBiZj/Mkykgzz
+gePGDj4McdtnuH4=
+=Hkvq
+-----END PGP SIGNATURE-----
