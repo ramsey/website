@@ -55,6 +55,7 @@
         "symfony/validator": "~7.0.0",
         "symfony/web-link": "~7.0.0",
         "symfony/yaml": "~7.0.0",
+        "symfonycasts/sass-bundle": "^0.6.0",
         "twig/extra-bundle": "^3.0",
         "twig/twig": "^3.0"
     },
@@ -149,6 +150,10 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
             "importmap:install": "symfony-cmd"
         },
+        "build:assets:watch": [
+            "Composer\\Config::disableProcessTimeout",
+            "php bin/console sass:build --watch"
+        ],
         "lint": [
             "@lint:syntax",
             "@lint:style"
