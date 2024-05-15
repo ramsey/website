@@ -1,0 +1,71 @@
+@use 'functions' as f;
+@use 'variables' as v;
+
+@media screen {
+  body.br {
+    nav {
+      font-size: f.font-scale(1em, 0.7em, v.$viewportLarge, v.$viewportSmall);
+
+      .icon {
+        background-color: var(--color-icon-base);
+        display: inline-block;
+
+        &:hover {
+          background-color: var(--color-icon-hover);
+        }
+
+        &.github {
+          height: f.scalable-unit(64.72px);
+          width: f.scalable-unit(60.675px);
+
+          -webkit-mask: url("../media/svg/github.svg") no-repeat center / contain;
+          mask: url("../media/svg/github.svg") no-repeat center / contain;
+        }
+
+        &.home {
+          height: f.scalable-unit(58.88px);
+          margin-top: -0.1em;
+          width: f.scalable-unit(66.24px);
+
+          -webkit-mask: url("../media/svg/house.svg") no-repeat center / contain;
+          mask: url("../media/svg/house.svg") no-repeat center / contain;
+        }
+
+        &.linkedin {
+          height: f.scalable-unit(74.914px);
+          margin-top: -0.55em;
+          width: f.scalable-unit(65.55px);
+
+          -webkit-mask: url("../media/svg/linkedin.svg") no-repeat center / contain;
+          mask: url("../media/svg/linkedin.svg") no-repeat center / contain;
+        }
+
+        &.mastodon {
+          height: f.scalable-unit(67.371px);
+          margin-top: 0.5em;
+          width: f.scalable-unit(58.95px);
+
+          -webkit-mask: url("../media/svg/mastodon.svg") no-repeat center / contain;
+          mask: url("../media/svg/mastodon.svg") no-repeat center / contain;
+        }
+
+        &.paper-plane {
+          height: f.scalable-unit(52.425px);
+          margin-top: 0.5em;
+          width: f.scalable-unit(52.425px);
+
+          -webkit-mask: url("../media/svg/paper-plane.svg") no-repeat center / contain;
+          mask: url("../media/svg/paper-plane.svg") no-repeat center / contain;
+        }
+
+        &.speaker-deck {
+          height: f.scalable-unit(70px);
+          width: f.scalable-unit(70px);
+
+          -webkit-mask: url("../media/svg/speaker-deck.svg") no-repeat center / contain;
+          mask: url("../media/svg/speaker-deck.svg") no-repeat center / contain;
+        }
+      }
+    }
+  }
+}

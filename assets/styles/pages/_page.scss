@@ -1,0 +1,60 @@
+@use '../variables' as v;
+@use '../functions' as f;
+
+@media screen {
+  body.br.page {
+    div#container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    nav {
+      width: 20%;
+
+      @media (max-width: v.$viewportSmaller) {
+        width: 100%;
+      }
+    }
+
+    main {
+      padding: 0;
+      width: 70%;
+
+      @media (max-width: v.$viewportSmaller) {
+        width: 100%;
+      }
+
+      article {
+        p {
+          font-size: 1.45rem;
+          font-weight: 200;
+          line-height: 1.1em;
+          margin: 0 0 0.75em 0;
+          padding: 0 0.25em;
+          text-align: justify;
+
+          -webkit-hyphens: auto;
+          hyphens: auto;
+
+          @media (max-width: v.$viewportSmaller) {
+            text-align: left;
+          }
+        }
+      }
+    }
+
+    footer {
+      width: 100%;
+    }
+  }
+}
+
+@media print {
+  body.br.page {
+    nav {
+      display: none;
+    }
+  }
+}

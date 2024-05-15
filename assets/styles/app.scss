@@ -1,3 +1,7 @@
-body {
-    background-color: skyblue;
-}
+@use 'fonts';
+@use 'colors';
+@use 'icons';
+
+@use 'pages/base';
+@use 'pages/home';
+@use 'pages/page';

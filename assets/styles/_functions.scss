@@ -1,0 +1,38 @@
+@use 'sass:math';
+@use 'sass:string';
+@use 'variables' as v;
+
+/// Remove the unit of a length
+/// From https://css-tricks.com/snippets/sass/strip-unit-function/
+/// @param {Number} $number - Number to remove unit from
+/// @return {Number} - Unitless number
+@function strip-unit($number) {
+  @if type-of($number) == 'number' and not unitless($number) {
+    @return math.div($number, $number * 0 + 1);
+  }
+
+  @return $number;
+}
+
+/// Returns a clamp() function for scaling font sizes
+/// See https://css-tricks.com/linearly-scale-font-size-with-css-clamp-based-on-the-viewport/
+/// @param {Length} $maxFontSize - The font size should grow no larger than this.
+/// @param {Length} $minFontSize - The font size should grow no smaller than this.
+/// @param {Length} $maxWidth - The viewport size at which the max font size should occur.
+/// @param {Length} $minWidth - The viewport size at which the min font size should occur.
+/// @return {String} - The clamp() function with proper values embedded
+@function font-scale($maxFontSize, $minFontSize, $maxWidth, $minWidth) {
+  $maxWidth: $maxWidth * v.$fontRatio;
+  $minWidth: $minWidth * v.$fontRatio;
+  $slope: math.div($maxFontSize - $minFontSize, $maxWidth - $minWidth);
+  $yIntersect: ($minWidth * -1) * $slope + $minFontSize;
+
+  @return string.unquote("clamp(#{$minFontSize}, #{$yIntersect} + #{strip-unit($slope) * 100vw}, #{$maxFontSize})");
+}
+
+/// Derives a scalable unit from a fixed unit (i.e., px, pt)
+/// @param {Length} $length - The fixed unit to convert to a scalable unit
+/// @return {String} The scalable unit
+@function scalable-unit($length) {
+  @return string.unquote("#{strip-unit($length * v.$fontRatio)}em");
+}

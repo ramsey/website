@@ -1,0 +1,265 @@
+@font-face {
+  font-family: "Archivo Black";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../media/fonts/ArchivoBlack/ArchivoBlack-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Sarabun";
+  font-style: italic;
+  font-weight: 500;
+  src: url("../media/fonts/Sarabun/Sarabun-MediumItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: normal;
+  font-weight: 100;
+  src: url("../media/fonts/Saira/Saira-Thin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: italic;
+  font-weight: 100;
+  src: url("../media/fonts/Saira/Saira-ThinItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: normal;
+  font-weight: 200;
+  src: url("../media/fonts/Saira/Saira-ExtraLight.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: italic;
+  font-weight: 200;
+  src: url("../media/fonts/Saira/Saira-ExtraLightItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: normal;
+  font-weight: 300;
+  src: url("../media/fonts/Saira/Saira-Light.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: italic;
+  font-weight: 300;
+  src: url("../media/fonts/Saira/Saira-LightItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../media/fonts/Saira/Saira-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: italic;
+  font-weight: 400;
+  src: url("../media/fonts/Saira/Saira-Italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: normal;
+  font-weight: 500;
+  src: url("../media/fonts/Saira/Saira-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: italic;
+  font-weight: 500;
+  src: url("../media/fonts/Saira/Saira-MediumItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: normal;
+  font-weight: 600;
+  src: url("../media/fonts/Saira/Saira-SemiBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: italic;
+  font-weight: 600;
+  src: url("../media/fonts/Saira/Saira-SemiBoldItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: normal;
+  font-weight: 700;
+  src: url("../media/fonts/Saira/Saira-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: italic;
+  font-weight: 700;
+  src: url("../media/fonts/Saira/Saira-BoldItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: normal;
+  font-weight: 800;
+  src: url("../media/fonts/Saira/Saira-ExtraBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: italic;
+  font-weight: 800;
+  src: url("../media/fonts/Saira/Saira-ExtraBoldItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: normal;
+  font-weight: 900;
+  src: url("../media/fonts/Saira/Saira-Black.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Saira";
+  font-style: italic;
+  font-weight: 900;
+  src: url("../media/fonts/Saira/Saira-BlackItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: normal;
+  font-weight: 100;
+  src: url("../media/fonts/Urbanist/Urbanist-Thin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: italic;
+  font-weight: 100;
+  src: url("../media/fonts/Urbanist/Urbanist-ThinItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: normal;
+  font-weight: 200;
+  src: url("../media/fonts/Urbanist/Urbanist-ExtraLight.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: italic;
+  font-weight: 200;
+  src: url("../media/fonts/Urbanist/Urbanist-ExtraLightItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: normal;
+  font-weight: 300;
+  src: url("../media/fonts/Urbanist/Urbanist-Light.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: italic;
+  font-weight: 300;
+  src: url("../media/fonts/Urbanist/Urbanist-LightItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../media/fonts/Urbanist/Urbanist-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: italic;
+  font-weight: 400;
+  src: url("../media/fonts/Urbanist/Urbanist-Italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: normal;
+  font-weight: 500;
+  src: url("../media/fonts/Urbanist/Urbanist-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: italic;
+  font-weight: 500;
+  src: url("../media/fonts/Urbanist/Urbanist-MediumItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: normal;
+  font-weight: 600;
+  src: url("../media/fonts/Urbanist/Urbanist-SemiBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: italic;
+  font-weight: 600;
+  src: url("../media/fonts/Urbanist/Urbanist-SemiBoldItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: normal;
+  font-weight: 700;
+  src: url("../media/fonts/Urbanist/Urbanist-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: italic;
+  font-weight: 700;
+  src: url("../media/fonts/Urbanist/Urbanist-BoldItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: normal;
+  font-weight: 800;
+  src: url("../media/fonts/Urbanist/Urbanist-ExtraBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: italic;
+  font-weight: 800;
+  src: url("../media/fonts/Urbanist/Urbanist-ExtraBoldItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: normal;
+  font-weight: 900;
+  src: url("../media/fonts/Urbanist/Urbanist-Black.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Urbanist";
+  font-style: italic;
+  font-weight: 900;
+  src: url("../media/fonts/Urbanist/Urbanist-BlackItalic.woff2") format("woff2");
+}
