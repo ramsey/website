@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% set pageClass = 'error' %}
+
+{% block title %}{% if status == 307 or status == 302 %}Temporary{% else %}Permanent{% endif %} Redirect{% endblock %}
+
+{% block body %}
+    <div id="container">
+        <h1>{%  if status == 307 or status == 302 %}Temporary{% else %}Permanent{% endif %} Redirect</h1>
+        <p>This page has {%  if status == 307 or status == 302 %}temporarily{% else %}permanently{% endif %} moved to <a href="{{ uri }}">{{ uri }}</a></p>
+    </div>
+{% endblock %}
