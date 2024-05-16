@@ -25,7 +25,7 @@ final readonly class KeybaseController
     {
     }
 
-    public function handle(Request $request): Response
+    public function __invoke(Request $request): Response
     {
         $content = match (strtolower($request->getHost())) {
             'ben.ramsey.dev' => $this->twig->render('keybase/ben-ramsey-dev.txt.twig'),
