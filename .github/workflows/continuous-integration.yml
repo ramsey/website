@@ -66,33 +66,8 @@ jobs:
       - name: "Statically analyze code (PHPStan)"
         run: "composer analyze:phpstan"
 
-  #code-coverage:
-  #  name: "Code coverage"
-  #  needs: ["coding-standards", "static-analysis"]
-  #  runs-on: "ubuntu-latest"
-
-  #  steps:
-  #    - name: "Checkout repository"
-  #      uses: "actions/checkout@v4.1.5"
-
-  #    - name: "Install PHP"
-  #      uses: "shivammathur/setup-php@2.30.4"
-  #      with:
-  #        php-version: "latest"
-  #        coverage: "xdebug"
-  #        ini-values: "memory_limit=-1"
-
-  #    - name: "Install dependencies (Composer)"
-  #      uses: "ramsey/composer-install@3.0.0"
-
-  #    - name: "Run unit tests (PHPUnit)"
-  #      run: "composer test:coverage:ci"
-
-  #    - name: "Publish coverage report to Codecov"
-  #      uses: "codecov/codecov-action@v4.3.1"
-
-  unit-tests:
-    name: "Unit tests"
+  tests:
+    name: "Tests"
     needs: ["coding-standards", "static-analysis"]
     runs-on: "ubuntu-latest"
 
@@ -104,13 +79,17 @@ jobs:
         uses: "shivammathur/setup-php@2.30.4"
         with:
           php-version: "latest"
-          coverage: "none"
+          coverage: "xdebug"
+          ini-values: "memory_limit=-1"
 
       - name: "Install dependencies (Composer)"
         uses: "ramsey/composer-install@3.0.0"
 
-      - name: "Build the stylesheet"
+      - name: "Build Sass"
         run: "php bin/console sass:build"
 
       - name: "Run unit tests (PHPUnit)"
-        run: "composer test:unit"
+        run: "composer test:coverage:ci"
+
+      - name: "Publish coverage report to Codecov"
+        uses: "codecov/codecov-action@v4.3.1"

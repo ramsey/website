@@ -166,10 +166,10 @@
             "@analyze",
             "@test:unit"
         ],
-        "test:coverage:ci": "phpunit --colors=always --coverage-text --coverage-clover var/coverage/clover.xml",
+        "test:coverage:ci": "phpunit --colors=always --testdox --coverage-text --coverage-clover var/coverage/clover.xml",
         "test:coverage:clear": "git clean -fx var/coverage/.",
         "test:coverage:html": "phpunit --colors=always --coverage-html var/coverage/coverage-html",
-        "test:unit": "phpunit --colors=always"
+        "test:unit": "phpunit --colors=always --testdox"
     },
     "scripts-descriptions": {
         "analyze": "Run all static analysis checks.",
