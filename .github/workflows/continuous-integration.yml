@@ -109,5 +109,8 @@ jobs:
       - name: "Install dependencies (Composer)"
         uses: "ramsey/composer-install@3.0.0"
 
+      - name: "Build the stylesheet"
+        run: "php bin/console sass:build"
+
       - name: "Run unit tests (PHPUnit)"
         run: "composer test:unit"
