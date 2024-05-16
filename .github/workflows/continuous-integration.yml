@@ -18,6 +18,9 @@ concurrency:
   group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: true
 
+env:
+  APP_ENV: test
+
 jobs:
   coding-standards:
     name: "Coding standards"
