@@ -31,8 +31,6 @@ use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment;
 
-use function md5;
-
 #[AsController]
 #[Route('/copyright', 'app_copyright')]
 #[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
@@ -44,12 +42,6 @@ final readonly class CopyrightController
 
     public function __invoke(Request $request): Response
     {
-        $content = $this->twig->render('copyright.html.twig');
-
-        $response = new Response($content);
-        $response->setEtag(md5($content));
-        $response->isNotModified($request);
-
-        return $response;
+        return new Response($this->twig->render('copyright.html.twig'));
     }
 }

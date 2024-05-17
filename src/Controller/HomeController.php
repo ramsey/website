@@ -31,8 +31,6 @@ use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment;
 
-use function md5;
-
 #[AsController]
 #[Route('/', 'app_home')]
 #[Cache(maxage: CacheTtl::Hour->value * 8, public: true, staleWhileRevalidate: CacheTtl::Hour->value * 2)]
@@ -44,10 +42,6 @@ final readonly class HomeController
 
     public function __invoke(Request $request): Response
     {
-        $response = new Response($this->twig->render('home.html.twig'));
-        $response->setEtag(md5((string) $response->getContent()));
-        $response->isNotModified($request);
-
-        return $response;
+        return new Response($this->twig->render('home.html.twig'));
     }
 }

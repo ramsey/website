@@ -36,8 +36,6 @@ use function array_map;
 use function count;
 use function explode;
 use function in_array;
-use function md5;
-use function str_starts_with;
 use function strtolower;
 use function trim;
 use function urldecode;
@@ -143,21 +141,12 @@ final readonly class WebFingerController
                     continue;
                 }
 
-                // If the href begins with a "/", turn it into an absolute URL.
-                if (str_starts_with($link['href'], '/')) {
-                    $link['href'] = $request->getUriForPath($link['href']);
-                }
-
                 $links[] = $link;
             }
 
             $data['links'] = $links;
 
-            $response = new JsonResponse(data: $data, headers: self::HEADERS);
-            $response->setEtag(md5((string) $response->getContent()));
-            $response->isNotModified($request);
-
-            return $response;
+            return new JsonResponse(data: $data, headers: self::HEADERS);
         }
 
         return new Response('{}', Response::HTTP_NOT_FOUND, self::HEADERS);

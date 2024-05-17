@@ -32,7 +32,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment;
 
-use function md5;
 use function strtolower;
 
 #[AsController]
@@ -54,8 +53,6 @@ final readonly class KeybaseController
 
         $response = new Response($content);
         $response->headers->add(['content-type' => 'text/plain']);
-        $response->setEtag(md5((string) $response->getContent()));
-        $response->isNotModified($request);
 
         return $response;
     }
