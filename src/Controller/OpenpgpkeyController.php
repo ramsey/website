@@ -32,7 +32,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 use function base64_decode;
-use function md5;
 use function strtolower;
 
 /**
@@ -50,20 +49,18 @@ final readonly class OpenpgpkeyController
     #[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
     public function policy(Request $request): Response
     {
-        return $this->policyWithHostname($request, $request->getHost());
+        return $this->policyWithHostname($request->getHost());
     }
 
     #[Route('/.well-known/openpgpkey/{hostname}/policy')]
     #[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
-    public function policyWithHostname(Request $request, string $hostname): Response
+    public function policyWithHostname(string $hostname): Response
     {
         $response = new Response($this->getPolicyDoc($hostname));
         $response->headers->add([
             'access-control-allow-origin' => '*',
-            'content-type' => 'text/plain',
+            'content-type' => 'text/plain; charset=utf-8',
         ]);
-        $response->setEtag(md5((string) $response->getContent()));
-        $response->isNotModified($request);
 
         return $response;
     }
@@ -75,7 +72,7 @@ final readonly class OpenpgpkeyController
     #[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
     public function key(Request $request, string $id): Response
     {
-        return $this->keyWithHostname($request, $request->getHost(), $id);
+        return $this->keyWithHostname($request->getHost(), $id);
     }
 
     /**
@@ -83,15 +80,13 @@ final readonly class OpenpgpkeyController
      */
     #[Route('/.well-known/openpgpkey/{hostname}/hu/{id}', requirements: ['id' => self::ZBASE32_PATTERN])]
     #[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
-    public function keyWithHostname(Request $request, string $hostname, string $id): Response
+    public function keyWithHostname(string $hostname, string $id): Response
     {
         $response = new Response($this->getKey($hostname, $id));
         $response->headers->add([
             'access-control-allow-origin' => '*',
             'content-type' => 'application/octet-stream',
         ]);
-        $response->setEtag(md5((string) $response->getContent()));
-        $response->isNotModified($request);
 
         return $response;
     }
