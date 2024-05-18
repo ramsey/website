@@ -66,17 +66,16 @@ Please see [COPYING.content](COPYING.content) for more information.
 ### Code Examples in Website Content
 
 Code examples within the content of this website, unless indicated otherwise,
-are in the public domain (through
-[CC0 1.0 Universal, Public Domain Dedication](https://creativecommons.org/publicdomain/zero/1.0/)).
-To the extent possible under law, Ben Ramsey has waived all copyright and
-related or neighboring rights to the code examples appearing within the content
-of this website. Please see [COPYING.examples](COPYING.examples) for more
-information.
+are marked with [CC0 1.0 Universal (CC0-1.0)](https://creativecommons.org/publicdomain/zero/1.0/)
+and dedicated to the public domain. To the extent possible under law, Ben Ramsey
+has waived all copyright and related or neighboring rights to the code examples
+appearing within the content of this website. Please see
+[COPYING.examples](COPYING.examples) for more information.
 
 ### Source Code
 
-Except where otherwise noted, all source code for ramsey/website is copyright ©
-[Ben Ramsey](https://ben.ramsey.dev), and contributors, and is licensed for use
+Except where otherwise noted, all source code for this website is Copyright ©
+[Ben Ramsey](https://ben.ramsey.dev) and contributors and is licensed for use
 under the terms of the GNU Affero General Public License (AGPL-3.0-or-later) as
 published by the Free Software Foundation. Please see [COPYING](COPYING) and
 [NOTICE](NOTICE) for more information.
