@@ -67,7 +67,7 @@ final readonly class WebFingerController
 {
     private const array HEADERS = [
         'access-control-allow-origin' => '*',
-        'content-type' => 'application/jrd+json',
+        'content-type' => 'application/jrd+json; charset=utf-8',
     ];
 
     /**

@@ -52,7 +52,7 @@ final readonly class KeybaseController
         };
 
         $response = new Response($content);
-        $response->headers->add(['content-type' => 'text/plain']);
+        $response->headers->add(['content-type' => 'text/plain; charset=utf-8']);
 
         return $response;
     }

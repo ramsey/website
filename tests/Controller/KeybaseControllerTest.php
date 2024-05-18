@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use App\Controller\KeybaseController;
-use Mockery;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Request;
-use Twig\Environment;
 
 class KeybaseControllerTest extends WebTestCase
 {
@@ -17,7 +14,7 @@ class KeybaseControllerTest extends WebTestCase
     public function testKeybaseResponseWhenNotFound(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/.well-known/keybase.txt');
+        $client->request('GET', 'https://benramsey.dev/.well-known/keybase.txt');
 
         $this->assertResponseStatusCodeSame(404);
         $this->assertResponseHeaderSame(
@@ -26,41 +23,22 @@ class KeybaseControllerTest extends WebTestCase
         );
     }
 
-    #[TestDox('Request to /.well-known/keybase.txt responds successfully for ben.ramsey.dev')]
-    public function testKeybaseResponseForBenDotRamseyDotDev(): void
+    #[TestDox('Request to /.well-known/keybase.txt responds successfully')]
+    #[TestWith(['ben.ramsey.dev', 'I am an admin of https://ben.ramsey.dev'])]
+    #[TestWith(['benramsey.com', 'I am an admin of https://benramsey.com'])]
+    public function testKeybaseSuccessfulResponse(string $host, string $testContent): void
     {
-        $twig = Mockery::mock(Environment::class);
-        $twig
-            ->expects('render')
-            ->with('keybase/ben-ramsey-dev.txt.twig')
-            ->andReturn('keybase proof for ben.ramsey.dev');
+        $client = static::createClient();
+        $client->request('GET', "https://{$host}/.well-known/keybase.txt");
 
-        $request = Request::create('https://ben.ramsey.dev/.well-known/keybase.txt');
+        $content = (string) $client->getResponse()->getContent();
 
-        $controller = new KeybaseController($twig);
-        $response = $controller($request);
-
-        $this->assertSame('keybase proof for ben.ramsey.dev', $response->getContent());
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('text/plain', $response->headers->get('Content-Type'));
-    }
-
-    #[TestDox('Request to /.well-known/keybase.txt responds successfully for benramsey.com')]
-    public function testKeybaseResponseForBenRamseyDotCom(): void
-    {
-        $twig = Mockery::mock(Environment::class);
-        $twig
-            ->expects('render')
-            ->with('keybase/benramsey-com.txt.twig')
-            ->andReturn('keybase proof for benramsey.com');
-
-        $request = Request::create('https://benramsey.com/.well-known/keybase.txt');
-
-        $controller = new KeybaseController($twig);
-        $response = $controller($request);
-
-        $this->assertSame('keybase proof for benramsey.com', $response->getContent());
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('text/plain', $response->headers->get('Content-Type'));
+        $this->assertStringContainsString($testContent, $content);
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('content-type', 'text/plain; charset=utf-8');
+        $this->assertResponseHeaderSame(
+            'cache-control',
+            'max-age=604800, public, stale-while-revalidate=86400',
+        );
     }
 }

@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
-use App\Controller\WebFingerController;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Request;
 
 use function array_values;
 use function json_encode;
@@ -50,7 +48,7 @@ class WebFingerControllerTest extends WebTestCase
         'subject' => 'acct:ben@ramsey.dev',
     ];
 
-    #[TestDox('Request to /.well-known/webfinger returns Bad Request response')]
+    #[TestDox('Request to /.well-known/webfinger responds with 400')]
     public function testWebFingerRespondsWithBadRequest(): void
     {
         $client = static::createClient();
@@ -58,10 +56,10 @@ class WebFingerControllerTest extends WebTestCase
 
         $this->assertResponseStatusCodeSame(400);
         $this->assertResponseHeaderSame('access-control-allow-origin', '*');
-        $this->assertResponseHeaderSame('content-type', 'application/jrd+json');
+        $this->assertResponseHeaderSame('content-type', 'application/jrd+json; charset=utf-8');
     }
 
-    #[TestDox('Request to /.well-known/webfinger?resource=acct%3AFrodo%40example.com returns Not Found response')]
+    #[TestDox('Request to /.well-known/webfinger?resource=acct%3AFrodo%40example.com responds with 404')]
     public function testWebFingerRespondsWithNotFound(): void
     {
         $client = static::createClient();
@@ -69,7 +67,7 @@ class WebFingerControllerTest extends WebTestCase
 
         $this->assertResponseStatusCodeSame(404);
         $this->assertResponseHeaderSame('access-control-allow-origin', '*');
-        $this->assertResponseHeaderSame('content-type', 'application/jrd+json');
+        $this->assertResponseHeaderSame('content-type', 'application/jrd+json; charset=utf-8');
         $this->assertResponseHeaderSame(
             'cache-control',
             'max-age=604800, public, stale-while-revalidate=86400',
@@ -88,37 +86,27 @@ class WebFingerControllerTest extends WebTestCase
         string $resourceValue,
         bool $shouldPass = true,
     ): void {
-        $request = Request::create(
-            "https://{$host}/.well-known/webfinger?resource=" . urlencode($resourceValue),
-        );
+        $client = static::createClient();
+        $client->request('GET', "https://{$host}/.well-known/webfinger?resource=" . urlencode($resourceValue));
 
-        $controller = new WebFingerController();
-        $response = $controller($request);
-
-        $this->assertSame('*', $response->headers->get('access-control-allow-origin'));
-        $this->assertSame('application/jrd+json', $response->headers->get('Content-Type'));
+        $this->assertResponseHeaderSame('access-control-allow-origin', '*');
+        $this->assertResponseHeaderSame('content-type', 'application/jrd+json; charset=utf-8');
 
         if ($shouldPass) {
-            $this->assertSame(200, $response->getStatusCode());
+            $this->assertResponseIsSuccessful();
             $this->assertJsonStringEqualsJsonString(
                 (string) json_encode(self::EXPECTED_DATA),
-                (string) $response->getContent(),
+                (string) $client->getResponse()->getContent(),
             );
         } else {
-            $this->assertSame(404, $response->getStatusCode());
-            $this->assertJsonStringEqualsJsonString('{}', (string) $response->getContent());
+            $this->assertResponseStatusCodeSame(404);
+            $this->assertJsonStringEqualsJsonString('{}', (string) $client->getResponse()->getContent());
         }
     }
 
     #[TestDox('Request to /.well-known/webfinger with limited relations')]
     public function testWebFingerResponsesWithLimitedRelations(): void
     {
-        $request = Request::create(
-            'https://ramsey.dev/.well-known/webfinger?resource='
-            . urlencode('acct:ben@ramsey.dev')
-            . '&rel=me&rel=' . urlencode('http://webfinger.net/rel/profile-page'),
-        );
-
         $expectedData = self::EXPECTED_DATA;
         $expectedLinks = $expectedData['links'];
 
@@ -131,13 +119,17 @@ class WebFingerControllerTest extends WebTestCase
         // Reset the array keys.
         $expectedData['links'] = array_values($expectedLinks);
 
-        $controller = new WebFingerController();
-        $response = $controller($request);
+        $client = static::createClient();
+        $client->request(
+            'GET',
+            'https://ramsey.dev/.well-known/webfinger?resource=' . urlencode('acct:ben@ramsey.dev')
+            . '&rel=me&rel=' . urlencode('http://webfinger.net/rel/profile-page'),
+        );
 
-        $this->assertSame(200, $response->getStatusCode());
+        $this->assertResponseIsSuccessful();
         $this->assertJsonStringEqualsJsonString(
             (string) json_encode($expectedData),
-            (string) $response->getContent(),
+            (string) $client->getResponse()->getContent(),
         );
     }
 }
