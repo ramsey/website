@@ -7,11 +7,11 @@
 <p align="center">
     <a href="https://github.com/ramsey/website"><img src="https://img.shields.io/badge/source-ramsey/website-blue.svg?style=flat-square" alt="Source Code"></a>
     <a href="https://php.net"><img src="https://img.shields.io/badge/php-%5E8.3-color.svg?style=flat-square&colorB=%238892BF" alt="PHP Programming Language"></a>
-    <a href="https://github.com/ramsey/website/blob/main/COPYING.contents"><img src="https://img.shields.io/badge/content-CC--BY--SA--4.0-darkcyan.svg?style=flat-square" alt="License for content"></a>
-    <a href="https://github.com/ramsey/website/blob/main/COPYING.examples"><img src="https://img.shields.io/badge/examples-CC0--1.0-darkcyan.svg?style=flat-square" alt="License for code examples in content"></a>
     <a href="https://github.com/ramsey/website/blob/main/COPYING"><img src="https://img.shields.io/badge/source-AGPL--3.0-darkcyan.svg?style=flat-square" alt="License for source code"></a>
+    <a href="https://github.com/ramsey/website/blob/main/COPYING.content"><img src="https://img.shields.io/badge/content-CC--BY--SA--4.0-darkcyan.svg?style=flat-square" alt="License for content"></a>
+    <a href="https://github.com/ramsey/website/blob/main/COPYING.examples"><img src="https://img.shields.io/badge/examples-CC0--1.0-darkcyan.svg?style=flat-square" alt="License for code examples in content"></a>
     <a href="https://github.com/ramsey/website/actions/workflows/continuous-integration.yml"><img src="https://img.shields.io/github/actions/workflow/status/ramsey/website/continuous-integration.yml?branch=main&style=flat-square&logo=github" alt="Build Status"></a>
-    <a href="https://codecov.io/gh/ramsey/my-project"><img src="https://img.shields.io/codecov/c/gh/ramsey/website?label=codecov&logo=codecov&style=flat-square" alt="Codecov Code Coverage"></a>
+    <a href="https://codecov.io/gh/ramsey/website"><img src="https://img.shields.io/codecov/c/gh/ramsey/website?label=codecov&logo=codecov&style=flat-square" alt="Codecov Code Coverage"></a>
 </p>
 
 ## About
