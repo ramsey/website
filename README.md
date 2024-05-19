@@ -4,21 +4,15 @@
     <strong>My personal website and blog.</strong>
 </p>
 
-<!--
-TODO: Make sure the following URLs are correct and working for your project.
-      Then, remove these comments to display the badges, giving users a quick
-      overview of your package.
-
 <p align="center">
-    <a href="https://github.com/ramsey/my-project"><img src="https://img.shields.io/badge/source-ramsey/website-blue.svg?style=flat-square" alt="Source Code"></a>
-    <a href="https://packagist.org/packages/ramsey/website"><img src="https://img.shields.io/packagist/v/ramsey/website.svg?style=flat-square&label=release" alt="Download Package"></a>
-    <a href="https://php.net"><img src="https://img.shields.io/packagist/php-v/ramsey/website.svg?style=flat-square&colorB=%238892BF" alt="PHP Programming Language"></a>
-    <a href="https://github.com/ramsey/my-project/blob/main/LICENSE"><img src="https://img.shields.io/packagist/l/ramsey/website.svg?style=flat-square&colorB=darkcyan" alt="Read License"></a>
-    <a href="https://github.com/ramsey/my-project/actions/workflows/continuous-integration.yml"><img src="https://img.shields.io/github/actions/workflow/status/ramsey/my-project/continuous-integration.yml?branch=main&style=flat-square&logo=github" alt="Build Status"></a>
-    <a href="https://codecov.io/gh/ramsey/my-project"><img src="https://img.shields.io/codecov/c/gh/ramsey/my-project?label=codecov&logo=codecov&style=flat-square" alt="Codecov Code Coverage"></a>
-    <a href="https://shepherd.dev/github/ramsey/my-project"><img src="https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fshepherd.dev%2Fgithub%2Framsey%2Fmy-project%2Fcoverage" alt="Psalm Type Coverage"></a>
+    <a href="https://github.com/ramsey/website"><img src="https://img.shields.io/badge/source-ramsey/website-blue.svg?style=flat-square" alt="Source Code"></a>
+    <a href="https://php.net"><img src="https://img.shields.io/badge/php-%5E8.3-color.svg?style=flat-square&colorB=%238892BF" alt="PHP Programming Language"></a>
+    <a href="https://github.com/ramsey/website/blob/main/COPYING.contents"><img src="https://img.shields.io/badge/content-CC--BY--SA--4.0-darkcyan.svg?style=flat-square" alt="License for content"></a>
+    <a href="https://github.com/ramsey/website/blob/main/COPYING.examples"><img src="https://img.shields.io/badge/examples-CC0--1.0-darkcyan.svg?style=flat-square" alt="License for code examples in content"></a>
+    <a href="https://github.com/ramsey/website/blob/main/COPYING"><img src="https://img.shields.io/badge/source-AGPL--3.0-darkcyan.svg?style=flat-square" alt="License for source code"></a>
+    <a href="https://github.com/ramsey/website/actions/workflows/continuous-integration.yml"><img src="https://img.shields.io/github/actions/workflow/status/ramsey/website/continuous-integration.yml?branch=main&style=flat-square&logo=github" alt="Build Status"></a>
+    <a href="https://codecov.io/gh/ramsey/my-project"><img src="https://img.shields.io/codecov/c/gh/ramsey/website?label=codecov&logo=codecov&style=flat-square" alt="Codecov Code Coverage"></a>
 </p>
--->
 
 ## About
 
