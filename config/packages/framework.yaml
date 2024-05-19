@@ -2,7 +2,7 @@
 framework:
     secret: '%env(APP_SECRET)%'
     #csrf_protection: true
-    error_controller: App\Controller\ErrorController
+    error_controller: App\Controller\UnknownUriController
 
     # Note that the session will be started ONLY if you read or write from it.
     session: true
