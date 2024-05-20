@@ -15,7 +15,7 @@ final class ChangedWebsiteUriRepositoryTest extends TestCase
 {
     private ChangedWebsiteUriRepository $repository;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->repository = new ChangedWebsiteUriRepository(
             __DIR__ . '/fixtures/changed_website_uri.php',

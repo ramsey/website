@@ -11,6 +11,7 @@
 
     <file>bin/</file>
     <file>config/</file>
+    <file>data/</file>
     <file>public/</file>
     <file>src/</file>
     <file>tests/</file>
@@ -20,4 +21,13 @@
 
     <rule ref="Ramsey"/>
 
+    <rule ref="PSR12.Files.FileHeader.IncorrectOrder">
+        <exclude-pattern>data/*.php</exclude-pattern>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Whitespaces.DuplicateSpaces">
+        <properties>
+            <property name="ignoreSpacesInComment" value="true"/>
+        </properties>
+    </rule>
 </ruleset>
