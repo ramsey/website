@@ -37,7 +37,15 @@ use function strtolower;
 /**
  * Implements OpenPGP Web Key Directory
  *
- * @link https://www.ietf.org/archive/id/draft-koch-openpgp-webkey-service-17.html I-D: OpenPGP Web Key Directory
+ * Test the implementation with the following commands:
+ *
+ *     gpg-wks-client check me@example.com
+ *     gpg --locate-keys --auto-key-locate clear,nodefault,wkd me@example.com
+ *
+ * See the comments in "data/openpgp_web_key.php" for more information.
+ *
+ * @link https://datatracker.ietf.org/doc/draft-koch-openpgp-webkey-service/
+ * @see data/openpgp_web_key.php
  */
 #[AsController]
 final readonly class OpenpgpkeyController
