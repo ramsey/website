@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\WebFingerAccount;
+use App\Repository\WebFingerAccountRepository;
 use App\Util\CacheTtl;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +33,6 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\Routing\Annotation\Route;
 
-use function array_key_exists;
 use function array_map;
 use function count;
 use function explode;
@@ -44,21 +45,6 @@ use function urldecode;
  * Implements the WebFinger protocol
  *
  * @link https://www.rfc-editor.org/rfc/rfc7033.html RFC 7033: WebFinger
- *
- * @phpstan-type WebLink array{
- *     rel: string,
- *     href: string,
- *     type: string,
- * }
- * @phpstan-type WebFingerResource array{
- *     aliases: list<string>,
- *     links: list<WebLink>,
- *     properties: array{
- *         "https://schema.org/name": string,
- *         "https://schema.org/email": string,
- *     },
- *     subject: string,
- * }
  */
 #[AsController]
 #[Route('/.well-known/webfinger')]
@@ -70,55 +56,10 @@ final readonly class WebFingerController
         'content-type' => 'application/jrd+json; charset=utf-8',
     ];
 
-    /**
-     * @phpstan-var WebFingerResource
-     * @noinspection HttpUrlsUsage
-     */
-    private const array BEN_RAMSEY_DEV = [
-        'aliases' => [],
-        'links' => [
-            [
-                'rel' => 'me',
-                'href' => 'https://ben.ramsey.dev',
-                'type' => 'text/html',
-            ],
-            [
-                'rel' => 'http://webfinger.net/rel/avatar',
-                'href' => 'https://www.gravatar.com/avatar/a0fa77843de8a4a2265bb939180a384b.jpg?s=2000',
-                'type' => 'image/png',
-            ],
-            [
-                'rel' => 'http://webfinger.net/rel/profile-page',
-                'href' => 'https://ben.ramsey.dev',
-                'type' => 'text/html',
-            ],
-            [
-                'rel' => 'self',
-                'href' => 'https://phpc.social/users/ramsey',
-                'type' => 'application/activity+json',
-            ],
-        ],
-        'properties' => [
-            'https://schema.org/name' => 'Ben Ramsey',
-            'https://schema.org/email' => 'ben@ramsey.dev',
-        ],
-        'subject' => 'acct:ben@ramsey.dev',
-    ];
-
-    /**
-     * @phpstan-var array<string, array<string, WebFingerResource>>
-     */
-    private const array RESOURCES = [
-        'ramsey.dev' => [
-            'acct:ben@ramsey.dev' => self::BEN_RAMSEY_DEV,
-        ],
-        'benramsey.com' => [
-            'acct:ben@benramsey.com' => self::BEN_RAMSEY_DEV,
-        ],
-        'benramsey.dev' => [
-            'acct:ben@benramsey.dev' => self::BEN_RAMSEY_DEV,
-        ],
-    ];
+    public function __construct(
+        private WebFingerAccountRepository $repository,
+    ) {
+    }
 
     public function __invoke(Request $request): Response
     {
@@ -128,28 +69,48 @@ final readonly class WebFingerController
             return new Response('{}', Response::HTTP_BAD_REQUEST, self::HEADERS);
         }
 
+        $account = $this->repository->findOneBy(['hostname' => $request->getHost(), 'account' => $resource]);
+
+        if ($account === null) {
+            return new Response('{}', Response::HTTP_NOT_FOUND, self::HEADERS);
+        }
+
+        return new JsonResponse(data: $this->buildData($account, $request), headers: self::HEADERS);
+    }
+
+    /**
+     * @return array{
+     *     subject: string,
+     *     aliases: list<string>,
+     *     properties: array<string, string|null>,
+     *     links: list<array<string, string>>,
+     * }
+     */
+    private function buildData(WebFingerAccount $account, Request $request): array
+    {
         $requestedRelations = $this->parseRelations($request);
 
-        $resources = $this->getResourcesForDomain($request->getHost());
-        if (array_key_exists($resource, $resources)) {
-            $data = $resources[$resource];
-
-            $links = [];
-            foreach ($data['links'] as $link) {
-                if (count($requestedRelations) > 0 && !in_array($link['rel'], $requestedRelations)) {
-                    // Skip this link if the relation wasn't requested.
+        $links = [];
+        foreach ($account->links as $link) {
+            foreach ($link->getRels() as $rel) {
+                if (count($requestedRelations) > 0 && !in_array($rel, $requestedRelations)) {
                     continue;
                 }
 
-                $links[] = $link;
+                $links[] = [
+                    'rel' => $rel,
+                    'href' => $link->getHref(),
+                    ...$link->getAttributes(),
+                ];
             }
-
-            $data['links'] = $links;
-
-            return new JsonResponse(data: $data, headers: self::HEADERS);
         }
 
-        return new Response('{}', Response::HTTP_NOT_FOUND, self::HEADERS);
+        return [
+            'subject' => $account->subject,
+            'aliases' => $account->aliases,
+            'properties' => $account->properties,
+            'links' => $links,
+        ];
     }
 
     /**
@@ -177,13 +138,5 @@ final readonly class WebFingerController
         }
 
         return $relations;
-    }
-
-    /**
-     * @phpstan-return array<string, WebFingerResource>
-     */
-    private function getResourcesForDomain(string $domain): array
-    {
-        return self::RESOURCES[$domain] ?? [];
     }
 }

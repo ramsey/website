@@ -7,6 +7,7 @@ parameters:
     app.data_dir: '%kernel.project_dir%/data'
     app.data.changed_website_uri: '%app.data_dir%/changed_website_uri.php'
     app.data.openpgp_web_key: '%app.data_dir%/openpgp_web_key.php'
+    app.data.webfinger_account: '%app.data_dir%/webfinger_account.php'
 
 services:
     # default configuration for services in *this* file
