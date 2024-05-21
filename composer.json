@@ -147,7 +147,7 @@
         "analyze": [
             "@analyze:phpstan"
         ],
-        "analyze:phpstan": "phpstan analyze --ansi",
+        "analyze:phpstan": "phpstan analyze --ansi -v",
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
