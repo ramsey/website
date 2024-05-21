@@ -127,8 +127,21 @@ final class OpenPgpWebKeyRepositoryTest extends TestCase
     #[TestDox('findOneBy() returns null when an entity is not found')]
     public function testFindOneByReturnsNullWhenNoEntityFound(): void
     {
-        $openPgpWebKey = $this->repository->findOneBy(['hostname' => 'foo.example.com']);
+        $openPgpWebKey = $this->repository->findOneBy(['hostname' => 'one.example.com', 'localPart' => 'foobar']);
 
         $this->assertNull($openPgpWebKey);
+    }
+
+    #[TestDox('findOneBy() returns null when either criteria are not provided')]
+    public function testFindOneByWithoutEitherCriteria(): void
+    {
+        // @phpstan-ignore argument.type
+        $key1 = $this->repository->findOneBy(['hostname' => 'one.example.com']);
+
+        // @phpstan-ignore argument.type
+        $key2 = $this->repository->findOneBy(['localPart' => 'localPart1']);
+
+        $this->assertNull($key1);
+        $this->assertNull($key2);
     }
 }

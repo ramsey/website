@@ -86,10 +86,14 @@ final readonly class OpenPgpWebKeyRepository implements ObjectRepository
     }
 
     /**
-     * @param array{hostname?: string, localPart?: string} $criteria
+     * @param array{hostname: string, localPart: string} $criteria
      */
     public function findOneBy(array $criteria): ?OpenPgpWebKey
     {
+        if (!isset($criteria['hostname']) || !isset($criteria['localPart'])) {
+            return null;
+        }
+
         $keys = $this->findBy($criteria);
 
         return $keys[0] ?? null;
