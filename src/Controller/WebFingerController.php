@@ -47,7 +47,7 @@ use function urldecode;
  * @link https://www.rfc-editor.org/rfc/rfc7033.html RFC 7033: WebFinger
  */
 #[AsController]
-#[Route('/.well-known/webfinger')]
+#[Route('/.well-known/webfinger', 'app_webfinger')]
 #[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
 final readonly class WebFingerController
 {

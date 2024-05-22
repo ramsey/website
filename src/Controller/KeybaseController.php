@@ -35,7 +35,7 @@ use Twig\Environment;
 use function strtolower;
 
 #[AsController]
-#[Route('/.well-known/keybase.txt')]
+#[Route('/.well-known/keybase.txt', 'app_keybase')]
 #[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
 final readonly class KeybaseController
 {
