@@ -46,8 +46,9 @@ final readonly class KeybaseController
     public function __invoke(Request $request): Response
     {
         $content = match (strtolower($request->getHost())) {
-            'ben.ramsey.dev' => $this->twig->render('keybase/ben-ramsey-dev.txt.twig'),
-            'benramsey.com' => $this->twig->render('keybase/benramsey-com.txt.twig'),
+            'ben.ramsey.dev' => $this->twig->render('keybase/ben-ramsey-dev.txt'),
+            'benramsey.com' => $this->twig->render('keybase/benramsey-com.txt'),
+            'localhost', '127.0.0.1' => $this->twig->render('keybase/localhost.txt'),
             default => throw new NotFoundHttpException(),
         };
 
