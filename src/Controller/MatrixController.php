@@ -25,17 +25,21 @@ namespace App\Controller;
 
 use App\Util\CacheTtl;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\Cache;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+
+use function strtolower;
 
 #[AsController]
 final readonly class MatrixController
 {
     #[Route('/.well-known/matrix/client')]
     #[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
-    public function client(): Response
+    public function client(Request $request): Response
     {
         $data = [
             'm.homeserver' => [
@@ -47,17 +51,25 @@ final readonly class MatrixController
             ],
         ];
 
-        return new JsonResponse(data: $data, headers: ['access-control-allow-origin' => '*']);
+        return match (strtolower($request->getHost())) {
+            'ramsey.dev', 'localhost',
+                '127.0.0.1' => new JsonResponse(data: $data, headers: ['access-control-allow-origin' => '*']),
+            default => throw new NotFoundHttpException(),
+        };
     }
 
     #[Route('/.well-known/matrix/server')]
     #[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
-    public function server(): Response
+    public function server(Request $request): Response
     {
         $data = [
             'm.server' => 'matrix.ramsey.dev:443',
         ];
 
-        return new JsonResponse(data: $data, headers: ['access-control-allow-origin' => '*']);
+        return match (strtolower($request->getHost())) {
+            'ramsey.dev', 'localhost',
+                '127.0.0.1' => new JsonResponse(data: $data, headers: ['access-control-allow-origin' => '*']),
+            default => throw new NotFoundHttpException(),
+        };
     }
 }

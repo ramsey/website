@@ -79,8 +79,8 @@ class WebFingerControllerTest extends WebTestCase
     #[TestWith(['ramsey.dev', 'acct:invalid@ramsey.dev', false])]
     #[TestWith(['benramsey.com', 'acct:ben@benramsey.com'])]
     #[TestWith(['benramsey.com', 'acct:invalid@benramsey.com', false])]
-    #[TestWith(['benramsey.dev', 'acct:ben@benramsey.dev'])]
-    #[TestWith(['benramsey.dev', 'acct:invalid@benramsey.dev', false])]
+    #[TestWith(['localhost', 'acct:ben@benramsey.dev'])]
+    #[TestWith(['localhost', 'acct:invalid@benramsey.dev', false])]
     public function testWebFingerResponsesForAccountRequests(
         string $host,
         string $resourceValue,

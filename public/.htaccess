@@ -4,28 +4,6 @@ FallbackResource /index.php
 Header set Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
 </FilesMatch>
 
-RewriteEngine on
-
-# If the request is for _matrix, redirect to matrix.ramsey.dev.
-RewriteCond "%{REQUEST_URI}" "^/_matrix/" [OR]
-RewriteCond "%{REQUEST_URI}" "^/_synapse/"
-RewriteRule "^/?(.*)" "https://matrix.ramsey.dev/$1" [L,NE,R=308]
-
-# If the host isn't `ben.ramsey.dev`, then redirect to `ben.ramsey.dev`.
-RewriteCond "%{HTTP_HOST}" "!^ben\.ramsey\.dev$" [NC]
-RewriteCond "%{HTTP_HOST}" "!^$"
-# Don't do this redirect for `ramsey.dev`; we want to temporary redirect for it.
-RewriteCond "%{HTTP_HOST}" "!^ramsey\.dev$" [NC]
-# Allow requests for these to any host:
-RewriteCond "%{REQUEST_URI}" "!^/\.well-known/(matrix|openpgpkey|webfinger|keybase\.txt)/?"
-RewriteRule "^/?(.*)" "https://ben.ramsey.dev/$1" [L,NE,R=301]
-
-# Do a temporary redirect for ramsey.dev.
-RewriteCond "%{HTTP_HOST}" "^ramsey\.dev$" [NC]
-# Don't do the redirect for these:
-RewriteCond "%{REQUEST_URI}" "!^/\.well-known/(matrix|openpgpkey|webfinger|keybase\.txt)/?"
-RewriteRule "^/?(.*)" "https://ben.ramsey.dev/$1" [L,NE,R=302]
-
 # Keep both the original ETag and the modified one when compressing responses.
 # See https://symfony.com/doc/current/http_cache/validation.html#validation-with-the-etag-header
 RequestHeader edit "If-None-Match" '^"((.*)-(gzip|br))"$' '"$1", "$2"'

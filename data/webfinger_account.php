@@ -41,7 +41,7 @@ return (function (): array {
         'benramsey.com' => [
             'acct:ben@benramsey.com' => $benRamseyDev,
         ],
-        'benramsey.dev' => [
+        'localhost' => [
             'acct:ben@benramsey.dev' => $benRamseyDev,
         ],
     ];
