@@ -49,6 +49,9 @@ final readonly class MatrixController
             'm.identity_server' => [
                 'base_url' => 'https://vector.im',
             ],
+            'org.matrix.msc3575.proxy' => [
+                'url' => 'https://matrix.ramsey.dev',
+            ],
         ];
 
         return match (strtolower($request->getHost())) {
