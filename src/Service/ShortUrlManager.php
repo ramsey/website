@@ -27,14 +27,11 @@ use App\Entity\ShortUrl;
 use App\Repository\ShortUrlRepository;
 use App\Service\Codec\Base62Codec;
 use DateTimeImmutable;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\Criteria;
 use InvalidArgumentException;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-use function count;
 use function preg_match;
 use function random_bytes;
 
@@ -59,30 +56,17 @@ final readonly class ShortUrlManager
 
     public function createShortUrl(string $url, ?string $customSlug = null): ShortUrl
     {
-        $shortUrl = $this->checkUrl($url, $customSlug);
-
-        if ($shortUrl && ($shortUrl->getCustomSlug() !== null || $customSlug === null)) {
-            return $shortUrl;
-        }
-
         $this->checkCustomSlug($customSlug);
 
-        $shortUrl = $shortUrl ?? new ShortUrl();
-        $shortUrl->setDestinationUrl($this->uriFactory->createUri($url));
-
-        if ($shortUrl->getSlug() === null) {
-            $shortUrl->setSlug($this->getRandomSlug());
-        }
+        $shortUrl = (new ShortUrl())
+            ->setDestinationUrl($this->uriFactory->createUri($url))
+            ->setSlug($this->getRandomSlug())
+            ->setCreatedAt(new DateTimeImmutable())
+            ->setUpdatedAt(new DateTimeImmutable());
 
         if ($customSlug !== null) {
             $shortUrl->setCustomSlug($customSlug);
         }
-
-        if ($shortUrl->getCreatedAt() === null) {
-            $shortUrl->setCreatedAt(new DateTimeImmutable());
-        }
-
-        $shortUrl->setUpdatedAt(new DateTimeImmutable());
 
         return $shortUrl;
     }
@@ -109,54 +93,6 @@ final readonly class ShortUrlManager
         }
 
         throw new InvalidArgumentException("Invalid custom slug: $customSlug");
-    }
-
-    private function checkUrl(string $url, ?string $customSlug): ?ShortUrl
-    {
-        $criteria = new Criteria();
-        $criteria->where(Criteria::expr()->eq('destinationUrl', $url));
-        $criteria->where(Criteria::expr()->isNull('deletedAt'));
-
-        /** @var Collection<int, ShortUrl> $shortUrls */
-        $shortUrls = $this->repository->matching($criteria);
-
-        if (count($shortUrls) === 0) {
-            return null;
-        }
-
-        if ($customSlug !== null) {
-            // Return the first short URL that matches the custom slug.
-            foreach ($shortUrls as $shortUrl) {
-                if ($shortUrl->getCustomSlug() === $customSlug) {
-                    return $shortUrl;
-                }
-            }
-
-            // We didn't find one that matched the custom slug, so let's find
-            // one that does not have a custom slug and return it. We will
-            // update it with the custom slug.
-            foreach ($shortUrls as $shortUrl) {
-                if ($shortUrl->getCustomSlug() === null) {
-                    return $shortUrl;
-                }
-            }
-
-            // We could not match the custom slug, and we couldn't find one
-            // without a custom slug, so we'll return null and create a new one.
-            return null;
-        }
-
-        // We're not attempting to set a custom slug, so if we have short URLs,
-        // return the first one with a custom slug and use it.
-        foreach ($shortUrls as $shortUrl) {
-            if ($shortUrl->getCustomSlug() !== null) {
-                return $shortUrl;
-            }
-        }
-
-        // We couldn't find a short URL with a custom slug, so return the first
-        // one we find.
-        return $shortUrls[0];
     }
 
     private function getRandomSlug(): string

@@ -14,7 +14,7 @@ final class Version20240601192032 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'Provide support for short URLs';
     }
 
     public function up(Schema $schema): void
