@@ -134,6 +134,11 @@
         "captainhook": {
             "force-install": true
         },
+        "ramsey/composer-repl": {
+            "includes": [
+                "repl.php"
+            ]
+        },
         "ramsey/conventional-commits": {
             "configFile": "conventional-commits.json"
         },
@@ -168,7 +173,12 @@
         ],
         "lint:fix": "phpcbf --cache=var/phpcs-cache",
         "lint:style": "phpcs --colors --cache=var/phpcs-cache",
-        "lint:syntax": "parallel-lint --colors src tests",
+        "lint:syntax": [
+            "parallel-lint --colors src tests",
+            "bin/console lint:twig templates",
+            "bin/console lint:yaml config",
+            "bin/console lint:container"
+        ],
         "test": [
             "@lint",
             "@analyze",
