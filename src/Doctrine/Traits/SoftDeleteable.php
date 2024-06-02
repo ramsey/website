@@ -21,10 +21,32 @@
 
 declare(strict_types=1);
 
-use App\Kernel;
+namespace App\Doctrine\Traits;
 
-require_once dirname(__DIR__) . '/vendor/autoload_runtime.php';
+use DateTimeImmutable;
+use DateTimeInterface;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 
-date_default_timezone_set('UTC');
+trait SoftDeleteable
+{
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
 
-return fn (array $context) => new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+    public function getDeletedAt(): ?DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @return $this
+     *
+     * @phpstan-assert !null $this->getDeletedAt()
+     */
+    public function setDeletedAt(DateTimeInterface $deletedAt): static
+    {
+        $this->deletedAt = DateTimeImmutable::createFromInterface($deletedAt);
+
+        return $this;
+    }
+}

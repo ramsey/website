@@ -19,7 +19,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  APP_ENV: test
+  APP_ENV: "test"
+  DATABASE_URL: "postgresql://app:9b487983153e2a5a9be25c8d9788e6eb@postgres:5432/app_test?sslmode=require"
 
 jobs:
   coding-standards:
@@ -71,6 +72,20 @@ jobs:
     needs: ["coding-standards", "static-analysis"]
     runs-on: "ubuntu-latest"
 
+    services:
+      postgres:
+        image: "postgres"
+        env:
+          POSTGRES_PASSWORD: "9b487983153e2a5a9be25c8d9788e6eb"
+          POSTGRES_USER: "app"
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - "5432:5432"
+
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v4.1.5"
@@ -85,6 +100,12 @@ jobs:
       - name: "Install dependencies (Composer)"
         uses: "ramsey/composer-install@3.0.0"
 
+      - name: "Set up database for testing"
+        run: |
+          php bin/console --env=test doctrine:database:create
+          php bin/console --env=test doctrine:schema:create
+          php bin/console --env=test doctrine:fixtures:load --no-interaction
+
       - name: "Build Sass"
         run: "php bin/console sass:build"
 
@@ -95,4 +116,4 @@ jobs:
         uses: "codecov/codecov-action@v4.3.1"
         with:
           fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: "${{ secrets.CODECOV_TOKEN }}"

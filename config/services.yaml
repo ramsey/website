@@ -9,6 +9,8 @@ parameters:
     app.data.openpgp_web_key: '%app.data_dir%/openpgp_web_key.php'
     app.data.webfinger_account: '%app.data_dir%/webfinger_account.php'
 
+    app.shortener.base_url: 'https://bram.se/'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -29,3 +31,15 @@ services:
 
     Laminas\Diactoros\UriFactory: ~
     Psr\Http\Message\UriFactoryInterface: '@Laminas\Diactoros\UriFactory'
+
+when@test:
+    parameters:
+        app.shortener.base_url: 'https://localhost:8000/su/'
+
+    services:
+        _defaults:
+            autowire: true
+            autoconfigure: true
+
+        App\Tests\DataFixtures\:
+            resource: '../tests/DataFixtures'
