@@ -72,7 +72,7 @@ jobs:
     runs-on: "ubuntu-latest"
 
     env:
-      DATABASE_URL: "postgresql://app:9b487983153e2a5a9be25c8d9788e6eb@127.0.0.1:5432/app_test?sslmode=require"
+      DATABASE_URL: "postgresql://app:9b487983153e2a5a9be25c8d9788e6eb@127.0.0.1:5432/app_test"
 
     services:
       postgres:
