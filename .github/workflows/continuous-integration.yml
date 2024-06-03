@@ -20,7 +20,6 @@ concurrency:
 
 env:
   APP_ENV: "test"
-  DATABASE_URL: "postgresql://app:9b487983153e2a5a9be25c8d9788e6eb@postgres:5432/app_test?sslmode=require"
 
 jobs:
   coding-standards:
@@ -71,6 +70,9 @@ jobs:
     name: "Tests"
     needs: ["coding-standards", "static-analysis"]
     runs-on: "ubuntu-latest"
+
+    env:
+      DATABASE_URL: "postgresql://app:9b487983153e2a5a9be25c8d9788e6eb@postgres:5432/app_test?sslmode=require"
 
     services:
       postgres:
