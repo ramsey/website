@@ -36,21 +36,26 @@ final class ShortUrl extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $shortUrl = $this->shortUrlManager->createShortUrl('https://example.com/this-is-a-long-url');
-        $shortUrl->setCreatedAt(new DateTime('14 days ago'));
-        $shortUrl->setUpdatedAt(new DateTime('last week'));
-        $shortUrl->setDeletedAt(new DateTime('yesterday'));
+        $shortUrl = $this->shortUrlManager
+            ->createShortUrl('https://example.com/this-is-a-long-url')
+            ->setCreatedAt(new DateTime('14 days ago'))
+            ->setUpdatedAt(new DateTime('last week'))
+            ->setDeletedAt(new DateTime('yesterday'));
         $manager->persist($shortUrl);
 
-        $shortUrl = $this->shortUrlManager->createShortUrl('https://example.com/this-is-a-long-url');
+        $shortUrl = $this->shortUrlManager
+            ->createShortUrl('https://example.com/this-is-a-long-url')
+            ->setSlug('F0084R');
         $manager->persist($shortUrl);
 
-        $shortUrl = $this->shortUrlManager->createShortUrl('https://example.com/another-long-url', 'custom1');
-        $shortUrl->setCreatedAt(new DateTime('13 days ago'));
-        $shortUrl->setUpdatedAt(new DateTime('6 days ago'));
+        $shortUrl = $this->shortUrlManager
+            ->createShortUrl('https://example.com/another-long-url', 'custom1')
+            ->setCreatedAt(new DateTime('13 days ago'))
+            ->setUpdatedAt(new DateTime('6 days ago'));
         $manager->persist($shortUrl);
 
-        $shortUrl = $this->shortUrlManager->createShortUrl('https://example.com/another-long-url', 'custom2');
+        $shortUrl = $this->shortUrlManager
+            ->createShortUrl('https://example.com/another-long-url', 'custom2');
         $manager->persist($shortUrl);
 
         $manager->flush();
