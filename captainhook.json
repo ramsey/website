@@ -43,11 +43,11 @@
                 ]
             },
             {
-                "action": "composer lint:syntax -- {$STAGED_FILES|of-type:php}",
+                "action": "composer lint:syntax",
                 "conditions": [
                     {
                         "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileStaged\\OfType",
-                        "args": ["php"]
+                        "args": [["php", "twig", "yaml", "yml"]]
                     }
                 ]
             },
@@ -56,7 +56,7 @@
                 "conditions": [
                     {
                         "exec": "\\CaptainHook\\App\\Hook\\Condition\\FileStaged\\OfType",
-                        "args": ["php"]
+                        "args": [["php"]]
                     }
                 ]
             }

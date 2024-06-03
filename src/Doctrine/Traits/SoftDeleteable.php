@@ -21,30 +21,32 @@
 
 declare(strict_types=1);
 
-namespace App\Controller;
+namespace App\Doctrine\Traits;
 
-use App\Util\CacheTtl;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\AsController;
-use Symfony\Component\HttpKernel\Attribute\Cache;
-use Symfony\Component\Routing\Attribute\Route;
-use Twig\Environment;
+use DateTimeImmutable;
+use DateTimeInterface;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 
-#[AsController]
-#[Route('/.well-known/security.txt', 'app_security')]
-#[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
-final readonly class SecurityController
+trait SoftDeleteable
 {
-    public function __construct(private Environment $twig)
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $deletedAt = null;
+
+    public function getDeletedAt(): ?DateTimeImmutable
     {
+        return $this->deletedAt;
     }
 
-    public function __invoke(Request $request): Response
+    /**
+     * @return $this
+     *
+     * @phpstan-assert !null $this->getDeletedAt()
+     */
+    public function setDeletedAt(DateTimeInterface $deletedAt): static
     {
-        return new Response(
-            content: $this->twig->render('security.txt'),
-            headers: ['content-type' => 'text/plain; charset=utf-8'],
-        );
+        $this->deletedAt = DateTimeImmutable::createFromInterface($deletedAt);
+
+        return $this;
     }
 }

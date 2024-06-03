@@ -21,10 +21,25 @@
 
 declare(strict_types=1);
 
-use App\Kernel;
+namespace App\EventListener;
 
-require_once dirname(__DIR__) . '/vendor/autoload_runtime.php';
+use App\Controller\ShortUrlController;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
-date_default_timezone_set('UTC');
+use function str_starts_with;
+use function strtolower;
 
-return fn (array $context) => new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+#[AsEventListener(event: 'kernel.request', priority: 250)]
+final readonly class UrlShortenerListener
+{
+    public function __invoke(RequestEvent $event): void
+    {
+        $host = strtolower($event->getRequest()->getHost());
+        $path = $event->getRequest()->getRequestUri();
+
+        if ($host === 'bram.se' || str_starts_with($path, '/su/')) {
+            $event->getRequest()->attributes->set('_controller', ShortUrlController::class);
+        }
+    }
+}

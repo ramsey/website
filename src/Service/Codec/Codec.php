@@ -21,10 +21,11 @@
 
 declare(strict_types=1);
 
-use App\Kernel;
+namespace App\Service\Codec;
 
-require_once dirname(__DIR__) . '/vendor/autoload_runtime.php';
+interface Codec
+{
+    public function encode(string $data): string;
 
-date_default_timezone_set('UTC');
-
-return fn (array $context) => new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+    public function decode(string $data): string;
+}
