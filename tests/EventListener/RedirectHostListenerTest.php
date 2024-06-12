@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Tests\EventListener;
 
+use App\Controller\ShortUrlController;
 use App\EventListener\RedirectHostListener;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Twig\Environment;
@@ -43,6 +46,26 @@ class RedirectHostListenerTest extends TestCase
         $event->expects('getRequest->getHost')->andReturn('ben.ramsey.dev');
         $event->expects('getRequest->getRequestUri')->never();
         $event->expects('setResponse')->never();
+
+        $twig = Mockery::mock(Environment::class);
+
+        $listener = new RedirectHostListener('prod', $twig);
+        $listener($event);
+    }
+
+    #[TestDox('redirect listener simply returns when on short URL host with correct controller')]
+    public function testRedirectHostListenerOnShorUrlHost(): void
+    {
+        $request = Mockery::mock(Request::class);
+        $request->expects('getHost')->andReturn('bram.se');
+        $request->expects('getRequestUri')->never();
+
+        $attributes = Mockery::mock(ParameterBag::class);
+        $attributes->expects('get')->with('_controller')->andReturn(ShortUrlController::class);
+        $request->attributes = $attributes;
+
+        $event = Mockery::mock(RequestEvent::class);
+        $event->allows('getRequest')->andReturn($request);
 
         $twig = Mockery::mock(Environment::class);
 
@@ -232,11 +255,19 @@ class RedirectHostListenerTest extends TestCase
     #[TestWith(['benramsey.dev', '/'])]
     #[TestWith(['benramsey.dev', '/about'])]
     #[TestWith(['benramsey.dev', '/copyright'])]
+    #[TestWith(['bram.se', '/redirects-when-controller-not-set'])]
     public function testEverythingElsePermanentlyRedirects(string $host, string $path): void
     {
+        $request = Mockery::mock(Request::class);
+        $request->expects('getHost')->andReturn($host);
+        $request->expects('getRequestUri')->andReturn($path);
+
+        $attributes = Mockery::mock(ParameterBag::class);
+        $attributes->allows('get')->with('_controller')->andReturn(null);
+        $request->attributes = $attributes;
+
         $event = Mockery::mock(RequestEvent::class);
-        $event->expects('getRequest->getHost')->andReturn($host);
-        $event->expects('getRequest->getRequestUri')->andReturn($path);
+        $event->allows('getRequest')->andReturn($request);
 
         /** @phpstan-param Response $response */
         $event->expects('setResponse')->with(Mockery::capture($response));

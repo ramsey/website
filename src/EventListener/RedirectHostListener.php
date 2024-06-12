@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
+use App\Controller\ShortUrlController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -67,6 +68,11 @@ final readonly class RedirectHostListener
 
         // If we're already on ben.ramsey.dev, then everything is good.
         if ($host === 'ben.ramsey.dev') {
+            return;
+        }
+
+        // If the host is for short URLs and the short URL controller is already set, then we're good.
+        if ($host === 'bram.se' && $event->getRequest()->attributes->get('_controller') === ShortUrlController::class) {
             return;
         }
 
