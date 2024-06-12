@@ -21,6 +21,7 @@
         "ext-ctype": "*",
         "ext-gmp": "*",
         "ext-iconv": "*",
+        "ext-intl": "*",
         "doctrine/dbal": "^4",
         "doctrine/doctrine-bundle": "^2.12",
         "doctrine/doctrine-migrations-bundle": "^3.3",
