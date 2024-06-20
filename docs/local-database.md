@@ -24,14 +24,13 @@ the last time you ran migrations) with:
 
 To run tests, you'll need to set up a database for the `test` environment.
 Use the same database as before (i.e., `docker compose up -d`), run the
-following commands with `--env=test`, which will execute them for the test
-environment, and Symfony/Doctrine will automatically add the suffix `_test` to
-the database name that's created.
+following commands, which will execute them for the test environment, and
+Symfony/Doctrine will automatically add the suffix `_test` to the database name
+that's created.
 
 ```shell
-./bin/console --env=test doctrine:database:create
-./bin/console --env=test doctrine:schema:create
-./bin/console --env=test doctrine:fixtures:load --no-interaction
+composer test:db:setup
+composer test:db:fixtures
 ```
 
 Now, you can run the tests (i.e., `composer test`), and the test database will
@@ -40,5 +39,5 @@ be ready for the integration tests.
 If you need to drop the test database to recreate it:
 
 ```shell
-./bin/console --env=test doctrine:database:drop --force
+composer test:db:teardown
 ```
