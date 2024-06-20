@@ -34,7 +34,7 @@ services:
 
 when@test:
     parameters:
-        app.shortener.base_url: 'https://localhost:8000/su/'
+        app.shortener.base_url: 'https://localhost/su/'
 
     services:
         _defaults:
@@ -43,3 +43,7 @@ when@test:
 
         App\Tests\DataFixtures\:
             resource: '../tests/DataFixtures'
+
+when@dev:
+    parameters:
+        app.shortener.base_url: 'https://localhost:8000/su/'

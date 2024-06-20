@@ -104,9 +104,8 @@ jobs:
 
       - name: "Set up database for testing"
         run: |
-          php bin/console --env=test doctrine:database:create
-          php bin/console --env=test doctrine:schema:create
-          php bin/console --env=test doctrine:fixtures:load --no-interaction
+          composer test:db:setup
+          composer test:db:fixtures
 
       - name: "Build Sass"
         run: "php bin/console sass:build"

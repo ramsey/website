@@ -192,6 +192,16 @@
         "test:coverage:ci": "phpunit --colors=always --testdox --coverage-text --coverage-clover var/coverage/clover.xml",
         "test:coverage:clear": "git clean -fx var/coverage/.",
         "test:coverage:html": "phpunit --colors=always --coverage-html var/coverage/coverage-html",
+        "test:db:fixtures": [
+            "bin/console --env=test doctrine:fixtures:load --no-interaction"
+        ],
+        "test:db:setup": [
+            "bin/console --env=test doctrine:database:create",
+            "bin/console --env=test doctrine:schema:create"
+        ],
+        "test:db:teardown": [
+            "bin/console --env=test doctrine:database:drop --force"
+        ],
         "test:unit": "phpunit --colors=always --testdox"
     },
     "scripts-descriptions": {
