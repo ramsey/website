@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Doctrine\Traits\Blamable;
 use App\Doctrine\Traits\SoftDeleteable;
 use App\Doctrine\Traits\Timestampable;
 use App\Repository\ShortUrlRepository;
@@ -31,10 +32,14 @@ use Psr\Http\Message\UriInterface;
 use Ramsey\Uuid\Doctrine\UuidV7Generator;
 use Ramsey\Uuid\UuidInterface;
 
+/**
+ * Represents a short URL with a slug or custom slug that redirect to a specified destination URL
+ */
 #[ORM\Entity(repositoryClass: ShortUrlRepository::class)]
 #[ORM\Index(fields: ['destinationUrl'])]
 class ShortUrl
 {
+    use Blamable;
     use Timestampable;
     use SoftDeleteable;
 
@@ -45,7 +50,7 @@ class ShortUrl
     private UuidInterface $id;
 
     #[ORM\Column(length: 50, unique: true)]
-    private ?string $slug = null;
+    private string $slug;
 
     #[ORM\Column(length: 100, unique: true, nullable: true)]
     private ?string $customSlug = null;
@@ -53,16 +58,25 @@ class ShortUrl
     #[ORM\Column(type: 'url')]
     private ?UriInterface $destinationUrl = null;
 
+    /**
+     * Returns the short URL's database identifier
+     */
     public function getId(): UuidInterface
     {
         return $this->id;
     }
 
-    public function getSlug(): ?string
+    /**
+     * Returns the auto-generated slug for the short URL
+     */
+    public function getSlug(): string
     {
         return $this->slug;
     }
 
+    /**
+     * Sets the auto-generated slug for the short URL
+     */
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
@@ -70,11 +84,17 @@ class ShortUrl
         return $this;
     }
 
+    /**
+     * Returns a custom slug (if set) for the short URL
+     */
     public function getCustomSlug(): ?string
     {
         return $this->customSlug;
     }
 
+    /**
+     * Sets a custom slug for the short URL
+     */
     public function setCustomSlug(string $customSlug): static
     {
         $this->customSlug = $customSlug;
@@ -82,11 +102,17 @@ class ShortUrl
         return $this;
     }
 
+    /**
+     * Returns the destination (or redirect) URL for the short URL
+     */
     public function getDestinationUrl(): ?UriInterface
     {
         return $this->destinationUrl;
     }
 
+    /**
+     * Sets a destination (or redirect) URL for the short URL
+     */
     public function setDestinationUrl(UriInterface $destinationUrl): static
     {
         $this->destinationUrl = $destinationUrl;

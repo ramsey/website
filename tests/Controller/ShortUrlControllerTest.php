@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+#[Group('db')]
 class ShortUrlControllerTest extends WebTestCase
 {
     #[TestDox('request to https://ben.ramsey.dev/su/foobar responds with a 404')]

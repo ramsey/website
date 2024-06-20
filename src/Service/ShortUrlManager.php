@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\ShortUrl;
+use App\Entity\User;
 use App\Repository\ShortUrlRepository;
 use App\Service\Codec\Base62Codec;
 use DateTimeImmutable;
@@ -35,7 +36,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use function preg_match;
 use function random_bytes;
 
-final readonly class ShortUrlManager
+final readonly class ShortUrlManager implements ShortUrlService
 {
     public function __construct(
         #[Autowire('%app.shortener.base_url%')] private string $baseUrl,
@@ -54,19 +55,35 @@ final readonly class ShortUrlManager
         return $this->uriFactory->createUri($this->baseUrl . $shortUrl->getSlug());
     }
 
-    public function createShortUrl(string $url, ?string $customSlug = null): ShortUrl
+    public function createShortUrl(string $url, User $user, ?string $customSlug = null): ShortUrl
+    {
+        $shortUrl = (new ShortUrl())->setDestinationUrl($this->uriFactory->createUri($url));
+
+        return $this->updateShortUrl($shortUrl, $user, $customSlug);
+    }
+
+    public function updateShortUrl(ShortUrl $shortUrl, User $user, ?string $customSlug = null): ShortUrl
     {
         $this->checkCustomSlug($customSlug);
 
-        $shortUrl = (new ShortUrl())
-            ->setDestinationUrl($this->uriFactory->createUri($url))
-            ->setSlug($this->getRandomSlug())
-            ->setCreatedAt(new DateTimeImmutable())
-            ->setUpdatedAt(new DateTimeImmutable());
+        if ($shortUrl->getSlug() === null) {
+            $shortUrl->setSlug($this->generateRandomSlug());
+        }
 
         if ($customSlug !== null) {
             $shortUrl->setCustomSlug($customSlug);
         }
+
+        if ($shortUrl->getCreatedAt() === null) {
+            $shortUrl->setCreatedAt(new DateTimeImmutable());
+        }
+
+        if ($shortUrl->getCreatedBy() === null) {
+            $shortUrl->setCreatedBy($user);
+        }
+
+        $shortUrl->setUpdatedAt(new DateTimeImmutable());
+        $shortUrl->setUpdatedBy($user);
 
         return $shortUrl;
     }
@@ -75,9 +92,10 @@ final readonly class ShortUrlManager
      * @phpstan-assert !null $shortUrl->getDeletedAt()
      * @phpstan-impure
      */
-    public function softDeleteShortUrl(ShortUrl $shortUrl): ShortUrl
+    public function softDeleteShortUrl(ShortUrl $shortUrl, User $user): ShortUrl
     {
         $shortUrl->setDeletedAt(new DateTimeImmutable());
+        $shortUrl->setUpdatedBy($user);
 
         return $shortUrl;
     }
@@ -88,14 +106,16 @@ final readonly class ShortUrlManager
             return;
         }
 
-        if (preg_match('/^[a-z0-9\-_.]+$/i', $customSlug)) {
-            return;
+        if (!preg_match('/^[a-z0-9\-_.]+$/i', $customSlug)) {
+            throw new InvalidArgumentException("Invalid custom slug: $customSlug");
         }
 
-        throw new InvalidArgumentException("Invalid custom slug: $customSlug");
+        if ($this->repository->findOneByCustomSlug($customSlug) !== null) {
+            throw new InvalidArgumentException("Custom slug already exists: $customSlug");
+        }
     }
 
-    private function getRandomSlug(): string
+    private function generateRandomSlug(): string
     {
         do {
             $randomSlug = $this->codec->encode(random_bytes(5));

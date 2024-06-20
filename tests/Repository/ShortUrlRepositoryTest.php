@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 use function count;
 
-#[Group(name: 'db')]
+#[Group('db')]
 class ShortUrlRepositoryTest extends KernelTestCase
 {
     private ShortUrlRepository $repository;

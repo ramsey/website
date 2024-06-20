@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Service;
 
 use App\Entity\ShortUrl;
+use App\Entity\User;
 use App\Repository\ShortUrlRepository;
 use App\Service\Codec\Base62Codec;
 use App\Service\ShortUrlManager;
@@ -14,8 +15,10 @@ use Laminas\Diactoros\UriFactory;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
+#[TestDox('ShortUrlManager')]
 final class ShortUrlManagerTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
@@ -34,6 +37,7 @@ final class ShortUrlManagerTest extends TestCase
         );
     }
 
+    #[TestDox('builds a URL with a custom slug')]
     public function testBuildUrlWithCustomSlug(): void
     {
         $shortUrl = new ShortUrl();
@@ -42,6 +46,7 @@ final class ShortUrlManagerTest extends TestCase
         $this->assertSame('https://example.com/custom-slug', (string) $this->manager->buildUrl($shortUrl));
     }
 
+    #[TestDox('builds a URL with a random slug')]
     public function testBuildUrlWithoutCustomSlug(): void
     {
         $shortUrl = new ShortUrl();
@@ -50,27 +55,33 @@ final class ShortUrlManagerTest extends TestCase
         $this->assertSame('https://example.com/non-custom-slug', (string) $this->manager->buildUrl($shortUrl));
     }
 
+    #[TestDox('creates a short URL instance with random slug')]
     public function testCreateShortUrl(): void
     {
         $url = 'https://example.com/this-is-a-long-url';
+        $user = new User();
 
         $this->repository
             ->expects('findOneBySlug')
             ->with(Mockery::type('string'))
             ->andReturn(null);
 
-        $shortUrl = $this->manager->createShortUrl($url);
+        $shortUrl = $this->manager->createShortUrl($url, $user);
 
         $this->assertSame($url, (string) $shortUrl->getDestinationUrl());
         $this->assertIsString($shortUrl->getSlug());
         $this->assertNull($shortUrl->getCustomSlug());
         $this->assertInstanceOf(DateTimeImmutable::class, $shortUrl->getCreatedAt());
         $this->assertInstanceOf(DateTimeImmutable::class, $shortUrl->getUpdatedAt());
+        $this->assertSame($user, $shortUrl->getCreatedBy());
+        $this->assertSame($user, $shortUrl->getUpdatedBy());
     }
 
+    #[TestDox('creates a short URL, generating a random slug until it is unique')]
     public function testCreateShortUrlGeneratesSameSlugMultipleTimes(): void
     {
         $url = 'https://example.com/this-is-a-long-url';
+        $user = new User();
 
         $this->repository
             ->expects('findOneBySlug')
@@ -78,15 +89,18 @@ final class ShortUrlManagerTest extends TestCase
             ->times(4)
             ->andReturn(new ShortUrl(), new ShortUrl(), new ShortUrl(), null);
 
-        $shortUrl = $this->manager->createShortUrl($url);
+        $shortUrl = $this->manager->createShortUrl($url, $user);
 
         $this->assertSame($url, (string) $shortUrl->getDestinationUrl());
         $this->assertIsString($shortUrl->getSlug());
         $this->assertNull($shortUrl->getCustomSlug());
         $this->assertInstanceOf(DateTimeImmutable::class, $shortUrl->getCreatedAt());
         $this->assertInstanceOf(DateTimeImmutable::class, $shortUrl->getUpdatedAt());
+        $this->assertSame($user, $shortUrl->getCreatedBy());
+        $this->assertSame($user, $shortUrl->getUpdatedBy());
     }
 
+    #[TestDox('throws an exception when trying to create a short URL with an invalid custom slug')]
     public function testCreateShortUrlThrowsExceptionForInvalidCustomSlug(): void
     {
         $url = 'https://example.com/this-is-a-long-url';
@@ -96,17 +110,38 @@ final class ShortUrlManagerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid custom slug: foo bar baz');
 
-        $this->manager->createShortUrl($url, 'foo bar baz');
+        $this->manager->createShortUrl($url, new User(), 'foo bar baz');
     }
 
+    #[TestDox('throws an exception when trying to create a short URL with an existing custom slug')]
+    public function testCreateShortUrlThrowsExceptionForExistingCustomSlug(): void
+    {
+        $url = 'https://example.com/a-long-url-using-existing-custom-slug';
+
+        $this->repository->expects('findOneBySlug')->never();
+        $this->repository
+            ->expects('findOneByCustomSlug')
+            ->with('already-exists')
+            ->andReturn(new ShortUrl());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Custom slug already exists: already-exists');
+
+        $this->manager->createShortUrl($url, new User(), 'already-exists');
+    }
+
+    #[TestDox('sets the deletedAt property to soft-delete a short URL')]
     public function testSoftDeleteShortUrl(): void
     {
         $shortUrl = new ShortUrl();
+        $user = new User();
 
         $this->assertNull($shortUrl->getDeletedAt());
+        $this->assertNull($shortUrl->getUpdatedBy());
 
-        $this->manager->softDeleteShortUrl($shortUrl);
+        $this->manager->softDeleteShortUrl($shortUrl, $user);
 
         $this->assertInstanceOf(DateTimeImmutable::class, $shortUrl->getDeletedAt());
+        $this->assertSame($user, $shortUrl->getUpdatedBy());
     }
 }
