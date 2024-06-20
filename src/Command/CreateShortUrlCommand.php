@@ -23,20 +23,26 @@ declare(strict_types=1);
 
 namespace App\Command;
 
+use App\Repository\UserRepository;
 use App\Service\ShortUrlManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Creates a short URL and persists it to the database
+ */
 #[AsCommand(name: 'app:short-url:create', description: 'Add a new short URL to the database')]
 final class CreateShortUrlCommand extends Command
 {
     public function __construct(
         private readonly ShortUrlManager $shortUrlManager,
+        private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct();
@@ -45,8 +51,9 @@ final class CreateShortUrlCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('custom-slug', 's', InputOption::VALUE_OPTIONAL, 'A custom short URL slug.', null)
-            ->addArgument('url', InputArgument::REQUIRED, 'The URL to redirect to.');
+            ->addOption('custom-slug', 's', InputOption::VALUE_OPTIONAL, 'A custom short URL slug', null)
+            ->addArgument('url', InputArgument::REQUIRED, 'The URL to redirect to')
+            ->addArgument('email', InputArgument::REQUIRED, 'The email address of the user to associate as "creator"');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -54,16 +61,24 @@ final class CreateShortUrlCommand extends Command
         /** @var string $url */
         $url = $input->getArgument('url');
 
+        /** @var string $email */
+        $email = $input->getArgument('email');
+
         /** @var string|null $slug */
         $slug = $input->getOption('custom-slug');
 
-        $shortUrl = $this->shortUrlManager->createShortUrl($url, $slug);
+        $user = $this->userRepository->findOneBy(['email' => $email]);
+
+        if ($user === null) {
+            throw new InvalidArgumentException("User with email '$email' does not exist");
+        }
+
+        $shortUrl = $this->shortUrlManager->createShortUrl($url, $user, $slug);
+
         $this->entityManager->persist($shortUrl);
         $this->entityManager->flush();
 
-        $url = $this->shortUrlManager->buildUrl($shortUrl);
-
-        $output->writeln([(string) $url]);
+        $output->writeln([(string) $this->shortUrlManager->buildUrl($shortUrl)]);
 
         return Command::SUCCESS;
     }
