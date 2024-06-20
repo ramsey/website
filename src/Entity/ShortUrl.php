@@ -50,13 +50,13 @@ class ShortUrl
     private UuidInterface $id;
 
     #[ORM\Column(length: 50, unique: true)]
-    private string $slug;
+    private ?string $slug = null;
 
     #[ORM\Column(length: 100, unique: true, nullable: true)]
     private ?string $customSlug = null;
 
-    #[ORM\Column(type: 'url')]
-    private ?UriInterface $destinationUrl = null;
+    #[ORM\Column(length: 255)]
+    private string $destinationUrl;
 
     /**
      * Returns the short URL's database identifier
@@ -69,7 +69,7 @@ class ShortUrl
     /**
      * Returns the auto-generated slug for the short URL
      */
-    public function getSlug(): string
+    public function getSlug(): ?string
     {
         return $this->slug;
     }
@@ -105,7 +105,7 @@ class ShortUrl
     /**
      * Returns the destination (or redirect) URL for the short URL
      */
-    public function getDestinationUrl(): ?UriInterface
+    public function getDestinationUrl(): string
     {
         return $this->destinationUrl;
     }
@@ -113,9 +113,9 @@ class ShortUrl
     /**
      * Sets a destination (or redirect) URL for the short URL
      */
-    public function setDestinationUrl(UriInterface $destinationUrl): static
+    public function setDestinationUrl(UriInterface | string $destinationUrl): static
     {
-        $this->destinationUrl = $destinationUrl;
+        $this->destinationUrl = (string) $destinationUrl;
 
         return $this;
     }
