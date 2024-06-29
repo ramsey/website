@@ -46,13 +46,17 @@ final readonly class ShortUrlManager implements ShortUrlService
     ) {
     }
 
-    public function buildUrl(ShortUrl $shortUrl): UriInterface
+    public function buildUrl(ShortUrl $shortUrl): ?UriInterface
     {
         if ($shortUrl->getCustomSlug() !== null) {
             return $this->uriFactory->createUri($this->baseUrl . $shortUrl->getCustomSlug());
         }
 
-        return $this->uriFactory->createUri($this->baseUrl . $shortUrl->getSlug());
+        if ($shortUrl->getSlug() !== null) {
+            return $this->uriFactory->createUri($this->baseUrl . $shortUrl->getSlug());
+        }
+
+        return null;
     }
 
     public function createShortUrl(string $url, User $user, ?string $customSlug = null): ShortUrl

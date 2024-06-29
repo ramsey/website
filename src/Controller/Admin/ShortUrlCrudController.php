@@ -24,6 +24,9 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Entity\ShortUrl;
+use App\Service\ShortUrlService;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -34,21 +37,31 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 
 final class ShortUrlCrudController extends AbstractCrudController
 {
+    public function __construct(
+        private readonly ShortUrlService $shortUrlManager,
+    ) {
+    }
+
     public static function getEntityFqcn(): string
     {
         return ShortUrl::class;
     }
 
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions->add(Crud::PAGE_INDEX, Action::DETAIL);
+    }
+
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
+            ->setEntityPermission('ROLE_ADMIN')
             ->setEntityLabelInSingular('Short URL')
             ->setEntityLabelInPlural('Short URLs')
             ->setDateFormat('yyyy-MM-dd')
             ->setSearchFields(['slug', 'customSlug', 'destinationUrl'])
             ->setAutofocusSearch()
-            ->setDefaultSort(['createdAt' => 'DESC'])
-            ->hideNullValues();
+            ->setDefaultSort(['createdAt' => 'DESC']);
     }
 
     /**
@@ -57,9 +70,17 @@ final class ShortUrlCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnDetail();
-        yield TextField::new('slug')->hideOnForm();
+        yield TextField::new('slug')->hideOnIndex()->setDisabled();
+        yield TextField::new('slug', 'Short URL')
+            ->setSortable(false)
+            ->formatValue(function (string $value, ShortUrl $entity): string {
+                $url = $this->shortUrlManager->buildUrl($entity);
+
+                return '<a href="' . $url . '" target="_blank" rel="noopener">' . $url . '</a>';
+            })
+            ->hideOnForm();
         yield UrlField::new('destinationUrl', 'Destination URL');
-        yield TextField::new('customSlug');
+        yield TextField::new('customSlug')->hideOnIndex();
         yield DateField::new('createdAt')->hideOnForm();
         yield DateField::new('updatedAt')->hideOnForm();
     }

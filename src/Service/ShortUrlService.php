@@ -35,7 +35,7 @@ interface ShortUrlService
     /**
      * Returns a UriInterface for the given ShortUrl entity
      */
-    public function buildUrl(ShortUrl $shortUrl): UriInterface;
+    public function buildUrl(ShortUrl $shortUrl): ?UriInterface;
 
     /**
      * Creates a ShortUrl entity for the given URL and user and (optionally) a custom slug
