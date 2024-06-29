@@ -38,8 +38,17 @@ final readonly class UrlShortenerListener
         $host = strtolower($event->getRequest()->getHost());
         $path = $event->getRequest()->getRequestUri();
 
-        if ($host === 'bram.se' || str_starts_with($path, '/su/')) {
+        if ($this->isShortUrlPath($host, $path)) {
             $event->getRequest()->attributes->set('_controller', ShortUrlController::class);
         }
+    }
+
+    private function isShortUrlPath(string $host, string $path): bool
+    {
+        if (str_starts_with($path, '/su/') && $path !== '/su/') {
+            return true;
+        }
+
+        return $host === 'bram.se' && $path !== '/';
     }
 }

@@ -18,7 +18,7 @@ class UrlShortenerListenerTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    #[TestDox("requests that aren't to bram.se or /su/ path through the listener")]
+    #[TestDox("requests that aren't to bram.se or /su/ pass through the listener")]
     public function testUrlShortenerListenerDoesNothing(): void
     {
         $parameterBag = Mockery::mock(ParameterBag::class);
@@ -67,6 +67,42 @@ class UrlShortenerListenerTest extends TestCase
 
         $event = Mockery::mock(RequestEvent::class);
         $event->expects('getRequest')->times(3)->andReturn($request);
+
+        $listener = new UrlShortenerListener();
+        $listener($event);
+    }
+
+    #[TestDox("requests that are to bram.se with path '/' pass through the listener")]
+    public function testUrlShortenerListenerForBarePath(): void
+    {
+        $parameterBag = Mockery::mock(ParameterBag::class);
+        $parameterBag->expects('set')->never();
+
+        $request = Mockery::mock(Request::class);
+        $request->expects('getHost')->andReturn('bram.se');
+        $request->expects('getRequestUri')->andReturn('/');
+        $request->attributes = $parameterBag;
+
+        $event = Mockery::mock(RequestEvent::class);
+        $event->expects('getRequest')->twice()->andReturn($request);
+
+        $listener = new UrlShortenerListener();
+        $listener($event);
+    }
+
+    #[TestDox("requests that are exactly the path '/su/' pass through the listener")]
+    public function testUrlShortenerListenerForBareSuPath(): void
+    {
+        $parameterBag = Mockery::mock(ParameterBag::class);
+        $parameterBag->expects('set')->never();
+
+        $request = Mockery::mock(Request::class);
+        $request->expects('getHost')->andReturn('ben.ramsey.dev');
+        $request->expects('getRequestUri')->andReturn('/su/');
+        $request->attributes = $parameterBag;
+
+        $event = Mockery::mock(RequestEvent::class);
+        $event->expects('getRequest')->twice()->andReturn($request);
 
         $listener = new UrlShortenerListener();
         $listener($event);
