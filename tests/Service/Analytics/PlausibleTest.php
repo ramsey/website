@@ -65,7 +65,6 @@ class PlausibleTest extends TestCase
                 'redirect_uri' => null,
             ],
             null,
-            true,
         );
 
         $request = Request::create(
@@ -107,7 +106,6 @@ class PlausibleTest extends TestCase
                 'currency' => $currency,
                 'amount' => 315.42,
             ],
-            true,
         );
 
         $request = Request::create(
@@ -149,7 +147,6 @@ class PlausibleTest extends TestCase
                 'redirect_uri' => null,
             ],
             null,
-            true,
         );
 
         $request = Request::create(
@@ -192,7 +189,6 @@ class PlausibleTest extends TestCase
                 'redirect_uri' => $expectedRedirectUri,
             ],
             null,
-            true,
         );
 
         $request = Request::create(

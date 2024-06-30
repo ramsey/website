@@ -90,7 +90,6 @@ final readonly class Plausible implements AnalyticsService
             referrer: $referrer,
             properties: $propertiesWithoutRevenue,
             revenue: $revenue,
-            debug: true,
         );
     }
 }
