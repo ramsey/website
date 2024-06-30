@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "110da66feaf13909bdee940d15e2cd22",
+    "content-hash": "f0eaab14e10c39f22d8d4535384bad7d",
     "packages": [
         {
             "name": "brick/math",
@@ -149,22 +149,23 @@
         },
         {
             "name": "devarts/plausible-php",
-            "version": "dev-feature/events-api",
+            "version": "dev-feature/events-debugging",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/plausible-php.git",
-                "reference": "cc72557685c2429739fece3361120fa26df59963"
+                "reference": "208b0b39bcb6add232c618a319e82d61e6330a02"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/plausible-php/zipball/cc72557685c2429739fece3361120fa26df59963",
-                "reference": "cc72557685c2429739fece3361120fa26df59963",
+                "url": "https://api.github.com/repos/ramsey/plausible-php/zipball/208b0b39bcb6add232c618a319e82d61e6330a02",
+                "reference": "208b0b39bcb6add232c618a319e82d61e6330a02",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^6.3|^7.0",
-                "php": "^7.4|^8.0"
+                "php": "^7.4|^8.0",
+                "psr/log": "^1.0|^2.0|^3.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^8.0|^9.0"
@@ -201,9 +202,9 @@
                 "wrapper"
             ],
             "support": {
-                "source": "https://github.com/ramsey/plausible-php/tree/feature/events-api"
+                "source": "https://github.com/ramsey/plausible-php/tree/feature/events-debugging"
             },
-            "time": "2024-06-29T23:14:55+00:00"
+            "time": "2024-06-30T21:54:19+00:00"
         },
         {
             "name": "doctrine/cache",
@@ -15723,7 +15724,7 @@
     "aliases": [
         {
             "package": "devarts/plausible-php",
-            "version": "dev-feature/events-api",
+            "version": "dev-feature/events-debugging",
             "alias": "3.x-dev",
             "alias_normalized": "3.9999999.9999999.9999999-dev"
         }

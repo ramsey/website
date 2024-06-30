@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace App\Service\Analytics;
 
 use Devarts\PlausiblePHP\PlausibleAPI;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,7 +44,9 @@ final readonly class Plausible implements AnalyticsService
     public function __construct(
         private PlausibleAPI $plausibleApi,
         #[Autowire('%app.service.plausible.domains%')] private array $domains,
+        LoggerInterface $logger,
     ) {
+        $this->plausibleApi->setLogger($logger);
     }
 
     public function recordEvent(
@@ -86,6 +89,7 @@ final readonly class Plausible implements AnalyticsService
             referrer: $referrer,
             properties: $propertiesWithoutRevenue,
             revenue: $revenue,
+            debug: true,
         );
     }
 }

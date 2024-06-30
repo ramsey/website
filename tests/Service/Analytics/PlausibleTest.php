@@ -13,6 +13,7 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,8 +28,12 @@ class PlausibleTest extends TestCase
     protected function setUp(): void
     {
         $this->faker = Factory::create();
+
+        $logger = Mockery::mock(LoggerInterface::class);
         $this->plausibleApi = Mockery::mock(PlausibleAPI::class);
-        $this->service = new Plausible($this->plausibleApi, ['foo.example.com', 'bar.example.com']);
+        $this->plausibleApi->expects('setLogger')->with($logger);
+
+        $this->service = new Plausible($this->plausibleApi, ['foo.example.com', 'bar.example.com'], $logger);
     }
 
     public function testRecordEventWhenDomainNotInList(): void
@@ -60,6 +65,7 @@ class PlausibleTest extends TestCase
                 'redirect_uri' => null,
             ],
             null,
+            true,
         );
 
         $request = Request::create(
@@ -101,6 +107,7 @@ class PlausibleTest extends TestCase
                 'currency' => $currency,
                 'amount' => 315.42,
             ],
+            true,
         );
 
         $request = Request::create(
@@ -147,6 +154,7 @@ class PlausibleTest extends TestCase
                 'redirect_uri' => $expectedRedirectUri,
             ],
             null,
+            true,
         );
 
         $request = Request::create(
