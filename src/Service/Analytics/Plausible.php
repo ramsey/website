@@ -30,6 +30,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 use function array_replace;
 use function in_array;
+use function preg_replace;
 
 /**
  * A service for interacting with the Plausible API to record analytics events
@@ -56,12 +57,17 @@ final readonly class Plausible implements AnalyticsService
         }
 
         $referrer = $request->headers->get('referer');
+        $redirectUrl = $response->headers->get('location');
+        if ($redirectUrl !== null) {
+            // Replace the second "://" in Archive.org redirect URIs to ensure proper parsing in Plausible.
+            $redirectUrl = preg_replace('#(?<!^)(https?)://#', '${1}%3A%2F%2F', $redirectUrl);
+        }
 
         $properties = array_replace([
             'http_method' => $request->getMethod(),
             'http_referer' => $referrer,
             'status_code' => $response->getStatusCode(),
-            'redirect_uri' => $response->headers->get('location'),
+            'redirect_uri' => $redirectUrl,
         ], $properties ?? []);
 
         /** @var array{currency: string, amount: float | string} | null $revenue */
