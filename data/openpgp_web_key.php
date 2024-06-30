@@ -5,49 +5,7 @@ declare(strict_types=1);
 /**
  * OpenPGP Web Key data
  *
- * The keys here are organized by hostname and local part. The local parts are
- * hashed with SHA-1, and the raw binary format of the hash is encoded with
- * the Z-Base-32 algorithm described in RFC 6189 (section 5.1.6).
- *
- * You may determine the local part hash with the following command, or you may
- * use the later command below, which outputs files named with the local part
- * hash.
- *
- *     gpg-wks-client print-wkd-hash you@example.org
- *
- * The keys stored here are base-64 encoded versions of the binary output from
- * exporting the key:
- *
- *     mkdir openpgpkey/
- *     gpg --list-options show-only-fpr-mbox -k KEY-ID \
- *         | gpg-wks-client --install-key
- *
- * This command will output one or more keys (depending on the number of local
- * part and domain combinations that are associated with the KEY-ID), storing
- * them to the openpgpkey/ directory in a structure similar to the following:
- *
- *     openpgpkey
- *     ├── hostname1
- *     │   ├── hu
- *     │   │   └── local_part_hash
- *     │   └── policy
- *     └── hostname2
- *         ├── hu
- *         │   └── local_part_hash
- *         └── policy
- *
- * You may then convert the contents of these files to base-64 encoding and
- * store them in this array.
- *
- *     cat openpgpkey/hostname1/hu/local_part_hash | base64
- *
- * Afterward, you may delete the openpgpkey directory.
- *
- * @link https://wiki.gnupg.org/WKD
- * @link https://www.uriports.com/blog/setting-up-openpgp-web-key-directory/
- * @link https://docs.keyoxide.org/wiki/web-key-directory/
- * @link https://datatracker.ietf.org/doc/draft-koch-openpgp-webkey-service/
- * @link https://teknikaldomain.me/post/pgp-key-discovery-mechanisms-explained/
+ * See the documentation in docs/web-key-directory.md, for more information.
  */
 
 return [
