@@ -55,8 +55,11 @@ final readonly class Plausible implements AnalyticsService
             return;
         }
 
+        $referrer = $request->headers->get('referer');
+
         $properties = array_replace([
             'http_method' => $request->getMethod(),
+            'http_referer' => $referrer,
             'status_code' => $response->getStatusCode(),
             'redirect_uri' => $response->headers->get('location'),
         ], $properties ?? []);
@@ -74,7 +77,7 @@ final readonly class Plausible implements AnalyticsService
             url: $request->getUri(),
             user_agent: (string) $request->headers->get('user-agent'),
             ip_address: (string) $request->getClientIp(),
-            referrer: $request->headers->get('referer'),
+            referrer: $referrer,
             properties: $propertiesWithoutRevenue,
             revenue: $revenue,
         );

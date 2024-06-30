@@ -54,6 +54,7 @@ class PlausibleTest extends TestCase
             $referrer,
             [
                 'http_method' => 'GET',
+                'http_referer' => $referrer,
                 'status_code' => 200,
                 'redirect_uri' => null,
             ],
@@ -90,6 +91,7 @@ class PlausibleTest extends TestCase
             null,
             [
                 'http_method' => 'POST',
+                'http_referer' => null,
                 'status_code' => 302,
                 'redirect_uri' => $redirectUri,
                 'extra_prop' => true,
