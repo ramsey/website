@@ -55,6 +55,14 @@ final class ShortUrlManagerTest extends TestCase
         $this->assertSame('https://example.com/non-custom-slug', (string) $this->manager->buildUrl($shortUrl));
     }
 
+    #[TestDox('::buildUrl() returns NULL when the ShortUrl does not have a custom slug and it has not been saved')]
+    public function testBuildUrlWithUnsavedShortUrl(): void
+    {
+        $shortUrl = new ShortUrl();
+
+        $this->assertNull($this->manager->buildUrl($shortUrl));
+    }
+
     #[TestDox('creates a short URL instance with random slug')]
     public function testCreateShortUrl(): void
     {

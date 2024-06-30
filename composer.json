@@ -22,6 +22,7 @@
         "ext-gmp": "*",
         "ext-iconv": "*",
         "ext-intl": "*",
+        "devarts/plausible-php": "dev-feature/events-api as 3.x-dev",
         "doctrine/dbal": "^4",
         "doctrine/doctrine-bundle": "^2.12",
         "doctrine/doctrine-migrations-bundle": "^3.3",
@@ -110,6 +111,12 @@
     "conflict": {
         "symfony/symfony": "*"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/ramsey/plausible-php"
+        }
+    ],
     "minimum-stability": "stable",
     "prefer-stable": true,
     "autoload": {

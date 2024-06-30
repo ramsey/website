@@ -8,7 +8,9 @@ parameters:
     app.data.changed_website_uri: '%app.data_dir%/changed_website_uri.php'
     app.data.openpgp_web_key: '%app.data_dir%/openpgp_web_key.php'
     app.data.webfinger_account: '%app.data_dir%/webfinger_account.php'
-
+    app.service.plausible.domains:
+        - 'ben.ramsey.dev'
+        - 'bram.se'
     app.shortener.base_url: 'https://bram.se/'
 
 services:
@@ -29,6 +31,9 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    Devarts\PlausiblePHP\PlausibleAPI:
+        arguments:
+            - '%env(resolve:PLAUSIBLE_API_TOKEN)%'
     Laminas\Diactoros\UriFactory: ~
     Psr\Http\Message\UriFactoryInterface: '@Laminas\Diactoros\UriFactory'
 
