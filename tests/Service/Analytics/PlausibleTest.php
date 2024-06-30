@@ -130,6 +130,44 @@ class PlausibleTest extends TestCase
         ]);
     }
 
+    public function testRecordEventUsingDigitalOceanConnectingIpHeader(): void
+    {
+        $ip = $this->faker->ipv4();
+        $referrer = $this->faker->url();
+
+        $this->plausibleApi->expects('recordEvent')->with(
+            'foo.example.com',
+            'pageview',
+            'https://foo.example.com/path/to/page',
+            'MyUserAgent/1.0',
+            $ip,
+            $referrer,
+            [
+                'http_method' => 'GET',
+                'http_referer' => $referrer,
+                'status_code' => 200,
+                'redirect_uri' => null,
+            ],
+            null,
+            true,
+        );
+
+        $request = Request::create(
+            uri: 'https://foo.example.com/path/to/page',
+            method: 'GET',
+            server: [
+                'HTTP_USER_AGENT' => 'MyUserAgent/1.0',
+                'HTTP_REFERER' => $referrer,
+                'HTTP_DO_CONNECTING_IP' => $ip,
+                'REMOTE_ADDR' => 'should_not_be_accessed',
+            ],
+        );
+
+        $response = new Response();
+
+        $this->service->recordEvent('pageview', $request, $response);
+    }
+
     #[TestWith(['https://archive/web/http%3A%2F%2Fexample.com/foo', 'https://archive/web/http://example.com/foo'])]
     #[TestWith(['https://archive/web/https%3A%2F%2Fexample.com/foo', 'https://archive/web/https://example.com/foo'])]
     #[TestWith(['http://archive/web/http%3A%2F%2Fexample.com/foo', 'http://archive/web/http://example.com/foo'])]

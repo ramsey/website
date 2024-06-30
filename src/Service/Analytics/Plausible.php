@@ -59,6 +59,7 @@ final readonly class Plausible implements AnalyticsService
             return;
         }
 
+        $ipAddress = $request->headers->get('do-connecting-ip') ?? $request->getClientIp();
         $referrer = $request->headers->get('referer');
         $redirectUrl = $response->headers->get('location');
         if ($redirectUrl !== null) {
@@ -85,7 +86,7 @@ final readonly class Plausible implements AnalyticsService
             event_name: $eventName,
             url: $request->getUri(),
             user_agent: (string) $request->headers->get('user-agent'),
-            ip_address: (string) $request->getClientIp(),
+            ip_address: (string) $ipAddress,
             referrer: $referrer,
             properties: $propertiesWithoutRevenue,
             revenue: $revenue,
