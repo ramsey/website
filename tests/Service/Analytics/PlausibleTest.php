@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace App\Tests\Service\Analytics;
 
 use App\Service\Analytics\Plausible;
+use App\Service\Analytics\UnknownAnalyticsDomain;
 use Devarts\PlausiblePHP\PlausibleAPI;
 use Faker\Factory;
 use Faker\Generator;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+#[TestDox('Plausible analytics service')]
 class PlausibleTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
@@ -28,14 +30,11 @@ class PlausibleTest extends TestCase
     protected function setUp(): void
     {
         $this->faker = Factory::create();
-
-        $logger = Mockery::mock(LoggerInterface::class);
         $this->plausibleApi = Mockery::mock(PlausibleAPI::class);
-        $this->plausibleApi->expects('setLogger')->with($logger);
-
-        $this->service = new Plausible($this->plausibleApi, ['foo.example.com', 'bar.example.com'], $logger);
+        $this->service = new Plausible($this->plausibleApi, ['foo.example.com', 'bar.example.com']);
     }
 
+    #[TestDox('throws UnknownAnalyticsDomain exception when domain is not in the list')]
     public function testRecordEventWhenDomainNotInList(): void
     {
         $this->plausibleApi->expects('recordEvent')->never();
@@ -43,10 +42,14 @@ class PlausibleTest extends TestCase
         $request = Request::create('https://baz.example.com/path/to/page', 'GET');
         $response = new Response();
 
+        $this->expectException(UnknownAnalyticsDomain::class);
+        $this->expectExceptionMessage('baz.example.com is not a valid analytics domain');
+
         $this->service->recordEvent('pageview', $request, $response);
     }
 
-    public function testRecordEventWithoutProperties(): void
+    #[TestDox('successfully records the event when no additional tags are provided')]
+    public function testRecordEventWithoutTags(): void
     {
         $ip = $this->faker->ipv4();
         $referrer = $this->faker->url();
@@ -82,7 +85,8 @@ class PlausibleTest extends TestCase
         $this->service->recordEvent('pageview', $request, $response);
     }
 
-    public function testRecordEventWithProperties(): void
+    #[TestDox('successfully records the event when additional tags are provided')]
+    public function testRecordEventWithTags(): void
     {
         $ip = $this->faker->ipv4();
         $currency = $this->faker->currencyCode();
@@ -128,9 +132,10 @@ class PlausibleTest extends TestCase
         ]);
     }
 
+    #[TestDox('uses do-connecting-ip header for IP address, if present')]
     public function testRecordEventUsingDigitalOceanConnectingIpHeader(): void
     {
-        $ip = $this->faker->ipv4();
+        $doConnectingIp = $this->faker->ipv4();
         $referrer = $this->faker->url();
 
         $this->plausibleApi->expects('recordEvent')->with(
@@ -138,7 +143,7 @@ class PlausibleTest extends TestCase
             'pageview',
             'https://foo.example.com/path/to/page',
             'MyUserAgent/1.0',
-            $ip,
+            $doConnectingIp,
             $referrer,
             [
                 'http_method' => 'GET',
@@ -155,7 +160,7 @@ class PlausibleTest extends TestCase
             server: [
                 'HTTP_USER_AGENT' => 'MyUserAgent/1.0',
                 'HTTP_REFERER' => $referrer,
-                'HTTP_DO_CONNECTING_IP' => $ip,
+                'HTTP_DO_CONNECTING_IP' => $doConnectingIp,
                 'REMOTE_ADDR' => 'should_not_be_accessed',
             ],
         );
@@ -165,6 +170,7 @@ class PlausibleTest extends TestCase
         $this->service->recordEvent('pageview', $request, $response);
     }
 
+    #[TestDox('escapes the :// in Archive.org redirect URLs to avoid problems in the analytics service')]
     #[TestWith(['https://archive/web/http%3A%2F%2Fexample.com/foo', 'https://archive/web/http://example.com/foo'])]
     #[TestWith(['https://archive/web/https%3A%2F%2Fexample.com/foo', 'https://archive/web/https://example.com/foo'])]
     #[TestWith(['http://archive/web/http%3A%2F%2Fexample.com/foo', 'http://archive/web/http://example.com/foo'])]

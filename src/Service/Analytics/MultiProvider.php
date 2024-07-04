@@ -26,18 +26,26 @@ namespace App\Service\Analytics;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * A service for recording analytics events
- */
-interface AnalyticsService
+final readonly class MultiProvider implements AnalyticsService
 {
     /**
-     * @param string $eventName The name of the event to record
-     * @param Request $request The request for this context
-     * @param Response $response The response for this context
-     * @param array<string, array<string, scalar> | scalar | null> | null $tags Additional tags to record with the event
-     *
-     * @throws UnknownAnalyticsDomain
+     * @var array<AnalyticsService>
      */
-    public function recordEvent(string $eventName, Request $request, Response $response, ?array $tags = null): void;
+    private array $providers;
+
+    public function __construct(AnalyticsService ...$providers)
+    {
+        $this->providers = $providers;
+    }
+
+    public function recordEvent(string $eventName, Request $request, Response $response, ?array $tags = null): void
+    {
+        foreach ($this->providers as $provider) {
+            try {
+                $provider->recordEvent($eventName, $request, $response, $tags);
+            } catch (UnknownAnalyticsDomain) {
+                // Ignore exception.
+            }
+        }
+    }
 }

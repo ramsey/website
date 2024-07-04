@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\Service\Analytics\AnalyticsService;
+use App\Service\Analytics\UnknownAnalyticsDomain;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 
@@ -36,6 +37,10 @@ final readonly class PageViewAnalyticsListener
 
     public function __invoke(TerminateEvent $event): void
     {
-        $this->analytics->recordEvent('pageview', $event->getRequest(), $event->getResponse());
+        try {
+            $this->analytics->recordEvent('pageview', $event->getRequest(), $event->getResponse());
+        } catch (UnknownAnalyticsDomain) {
+            // Ignore the exception.
+        }
     }
 }

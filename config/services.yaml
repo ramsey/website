@@ -8,9 +8,18 @@ parameters:
     app.data.changed_website_uri: '%app.data_dir%/changed_website_uri.php'
     app.data.openpgp_web_key: '%app.data_dir%/openpgp_web_key.php'
     app.data.webfinger_account: '%app.data_dir%/webfinger_account.php'
+    app.service.plausible.api_token: '%env(resolve:PLAUSIBLE_API_TOKEN)%'
+    app.service.plausible.base_uri: 'https://plausible.io/api/'
     app.service.plausible.domains:
         - 'ben.ramsey.dev'
         - 'bram.se'
+    app.service.umami.api_token: '%env(resolve:UMAMI_API_TOKEN)%'
+    app.service.umami.base_uri: 'https://analytics.eu.umami.is/api/'
+    app.service.umami.domains:
+        - domain: 'ben.ramsey.dev'
+          website_id: '%env(resolve:UMAMI_WEBSITE_ID_BEN_RAMSEY_DEV)%'
+        - domain: 'bram.se'
+          website_id: '%env(resolve:UMAMI_WEBSITE_ID_BRAM_SE)%'
     app.shortener.base_url: 'https://bram.se/'
 
 services:
@@ -31,14 +40,25 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    App\Service\Analytics\AnalyticsService: '@App\Service\Analytics\MultiProvider'
+    App\Service\Analytics\MultiProvider:
+        arguments:
+            - '@App\Service\Analytics\Plausible'
+            - '@App\Service\Analytics\Umami'
     Devarts\PlausiblePHP\PlausibleAPI:
         arguments:
-            - '%env(resolve:PLAUSIBLE_API_TOKEN)%'
+            - '%app.service.plausible.api_token%'
+            - '%app.service.plausible.base_uri%'
     Laminas\Diactoros\UriFactory: ~
     Psr\Http\Message\UriFactoryInterface: '@Laminas\Diactoros\UriFactory'
 
 when@test:
     parameters:
+        app.service.plausible.domains:
+            - 'not-a-domain-that-should-be-used-in-a-test.example.com'
+        app.service.umami.domains:
+            - domain: 'not-a-domain-that-should-be-used-in-a-test.example.com'
+              website_id: '01907677-e250-7676-9c6b-1a3f5a6d5b94'
         app.shortener.base_url: 'https://localhost/su/'
 
     services:

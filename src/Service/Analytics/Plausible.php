@@ -24,71 +24,51 @@ declare(strict_types=1);
 namespace App\Service\Analytics;
 
 use Devarts\PlausiblePHP\PlausibleAPI;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use function array_replace;
 use function in_array;
-use function preg_replace;
 
 /**
  * A service for interacting with the Plausible API to record analytics events
  */
 final readonly class Plausible implements AnalyticsService
 {
+    use AnalyticsHelper;
+
     /**
      * @param list<string> $domains
      */
     public function __construct(
         private PlausibleAPI $plausibleApi,
         #[Autowire('%app.service.plausible.domains%')] private array $domains,
-        LoggerInterface $logger,
     ) {
-        $this->plausibleApi->setLogger($logger);
     }
 
-    public function recordEvent(
-        string $eventName,
-        Request $request,
-        Response $response,
-        ?array $properties = null,
-    ): void {
+    public function recordEvent(string $eventName, Request $request, Response $response, ?array $tags = null): void
+    {
         if (!in_array($request->getHost(), $this->domains)) {
-            return;
+            throw new UnknownAnalyticsDomain("{$request->getHost()} is not a valid analytics domain");
         }
 
-        $ipAddress = $request->headers->get('do-connecting-ip') ?? $request->getClientIp();
-        $referrer = $request->headers->get('referer');
-        $redirectUrl = $response->headers->get('location');
-        if ($redirectUrl !== null) {
-            // Replace the second "://" in Archive.org redirect URIs to ensure proper parsing in Plausible.
-            $redirectUrl = preg_replace('#(?<!^)(https?)://#', '${1}%3A%2F%2F', $redirectUrl);
-        }
-
-        $properties = array_replace([
-            'http_method' => $request->getMethod(),
-            'http_referer' => $referrer,
-            'status_code' => $response->getStatusCode(),
-            'redirect_uri' => $redirectUrl,
-        ], $properties ?? []);
+        $details = $this->getAnalyticsDetails($eventName, $request, $response, $tags);
 
         /** @var array{currency: string, amount: float | string} | null $revenue */
-        $revenue = $properties['revenue'] ?? null;
-        unset($properties['revenue']);
+        $revenue = $details->tags['revenue'] ?? null;
 
-        /** @var array<string, scalar | null> $propertiesWithoutRevenue */
-        $propertiesWithoutRevenue = $properties;
+        /** @var array<string, scalar | null> $tagsWithoutRevenue */
+        $tagsWithoutRevenue = $details->tags;
+        unset($tagsWithoutRevenue['revenue']);
 
         $this->plausibleApi->recordEvent(
             site_id: $request->getHost(),
-            event_name: $eventName,
-            url: $request->getUri(),
-            user_agent: (string) $request->headers->get('user-agent'),
-            ip_address: (string) $ipAddress,
-            referrer: $referrer,
-            properties: $propertiesWithoutRevenue,
+            event_name: $details->eventName,
+            url: $details->url,
+            user_agent: $details->userAgent,
+            ip_address: $details->ipAddress,
+            referrer: $details->referrer,
+            properties: $tagsWithoutRevenue,
             revenue: $revenue,
         );
     }

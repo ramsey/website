@@ -23,21 +23,19 @@ declare(strict_types=1);
 
 namespace App\Service\Analytics;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-
-/**
- * A service for recording analytics events
- */
-interface AnalyticsService
+final readonly class AnalyticsDetails
 {
     /**
-     * @param string $eventName The name of the event to record
-     * @param Request $request The request for this context
-     * @param Response $response The response for this context
-     * @param array<string, array<string, scalar> | scalar | null> | null $tags Additional tags to record with the event
-     *
-     * @throws UnknownAnalyticsDomain
+     * @param array<string, array<string, scalar> | scalar | null> $tags Additional tags to record with the event
      */
-    public function recordEvent(string $eventName, Request $request, Response $response, ?array $tags = null): void;
+    public function __construct(
+        public string $eventName,
+        public string $ipAddress,
+        public string $userAgent,
+        public string $url,
+        public ?string $referrer,
+        public ?string $redirectUrl,
+        public array $tags,
+    ) {
+    }
 }
