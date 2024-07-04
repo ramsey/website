@@ -52,7 +52,7 @@ services:
     Laminas\Diactoros\UriFactory: ~
     Psr\Http\Message\UriFactoryInterface: '@Laminas\Diactoros\UriFactory'
 
-when@test:
+when@test: &services_test
     parameters:
         app.service.plausible.domains:
             - 'not-a-domain-that-should-be-used-in-a-test.example.com'
@@ -68,6 +68,8 @@ when@test:
 
         App\Tests\DataFixtures\:
             resource: '../tests/DataFixtures'
+
+when@test_no_db: *services_test
 
 when@dev:
     parameters:

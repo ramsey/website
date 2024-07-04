@@ -38,6 +38,11 @@ when@test:
             # "TEST_TOKEN" is typically set by ParaTest
             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
 
+when@test_no_db:
+    doctrine:
+        dbal:
+            url: 'postgresql://app:bad_password@bad-host:5432/app?serverVersion=16&charset=utf8'
+
 when@prod:
     doctrine:
         orm:
