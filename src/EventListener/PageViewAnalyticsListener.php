@@ -28,6 +28,8 @@ use App\Service\Analytics\UnknownAnalyticsDomain;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 
+use function str_starts_with;
+
 #[AsEventListener(event: 'kernel.terminate', priority: 20)]
 final readonly class PageViewAnalyticsListener
 {
@@ -38,6 +40,11 @@ final readonly class PageViewAnalyticsListener
     public function __invoke(TerminateEvent $event): void
     {
         try {
+            // Don't record page view analytics for the /health endpoint.
+            if (str_starts_with($event->getRequest()->getRequestUri(), '/health')) {
+                return;
+            }
+
             $this->analytics->recordEvent('pageview', $event->getRequest(), $event->getResponse());
         } catch (UnknownAnalyticsDomain) {
             // Ignore the exception.
