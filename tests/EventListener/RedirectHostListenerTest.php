@@ -44,7 +44,7 @@ class RedirectHostListenerTest extends TestCase
     {
         $event = Mockery::mock(RequestEvent::class);
         $event->expects('getRequest->getHost')->andReturn('ben.ramsey.dev');
-        $event->expects('getRequest->getRequestUri')->never();
+        $event->expects('getRequest->getRequestUri')->andReturn('/');
         $event->expects('setResponse')->never();
 
         $twig = Mockery::mock(Environment::class);
@@ -58,7 +58,7 @@ class RedirectHostListenerTest extends TestCase
     {
         $request = Mockery::mock(Request::class);
         $request->expects('getHost')->andReturn('bram.se');
-        $request->expects('getRequestUri')->never();
+        $request->expects('getRequestUri')->andReturn('/');
 
         $attributes = Mockery::mock(ParameterBag::class);
         $attributes->expects('get')->with('_controller')->andReturn(ShortUrlController::class);

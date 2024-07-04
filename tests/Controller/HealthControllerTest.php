@@ -22,7 +22,7 @@ class HealthControllerTest extends WebTestCase
     public function testUnhealthyResponse(): void
     {
         $client = static::createClient(['environment' => 'test_no_db']);
-        $client->request('GET', 'https://ben.ramsey.dev/health');
+        $client->request('GET', '/health');
 
         $this->assertResponseStatusCodeSame(503);
         $this->assertResponseHasHeader('retry-after');

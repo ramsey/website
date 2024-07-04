@@ -65,9 +65,11 @@ final readonly class RedirectHostListener
         }
 
         $host = strtolower($event->getRequest()->getHost());
+        $path = $event->getRequest()->getRequestUri();
 
-        // If we're already on ben.ramsey.dev, then everything is good.
-        if ($host === 'ben.ramsey.dev') {
+        // If we're already on ben.ramsey.dev, then everything is good, and
+        // do not redirect for the /health route.
+        if ($host === 'ben.ramsey.dev' || $path === '/health') {
             return;
         }
 
@@ -75,8 +77,6 @@ final readonly class RedirectHostListener
         if ($host === 'bram.se' && $event->getRequest()->attributes->get('_controller') === ShortUrlController::class) {
             return;
         }
-
-        $path = $event->getRequest()->getRequestUri();
 
         if ($this->redirectForWww($event, $host, $path)) {
             return;
