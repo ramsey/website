@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Util\CacheTtl;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\Cache;
@@ -40,7 +39,7 @@ final readonly class SecurityController
     {
     }
 
-    public function __invoke(Request $request): Response
+    public function __invoke(): Response
     {
         return new Response(
             content: $this->twig->render('security.txt'),

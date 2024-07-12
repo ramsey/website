@@ -31,19 +31,39 @@ use Symfony\Component\Routing\Attribute\Route;
 use Twig\Environment;
 
 #[AsController]
-#[Route('/feeds/blog.xml', 'app_feeds_blog')]
-#[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
-final readonly class FeedsController
+final readonly class RobotsController
 {
+    private const string ADS_TXT = "placeholder.example.com, placeholder, DIRECT, placeholder\n";
+
     public function __construct(private Environment $twig)
     {
     }
 
-    public function __invoke(): Response
+    #[Route('/robots.txt')]
+    #[Cache(maxage: CacheTtl::Day->value, public: true, mustRevalidate: true)]
+    public function robots(): Response
     {
         return new Response(
-            content: $this->twig->render('feeds/blog.xml'),
-            headers: ['content-type' => 'text/xml; charset=utf-8'],
+            content: $this->twig->render('robots/robots.txt'),
+            headers: ['content-type' => 'text/plain; charset=utf-8'],
+        );
+    }
+
+    /**
+     * Support for ads.txt and app-ads.txt to deny injection of ads by malware
+     *
+     * See section 3.2.1 of the Ads.txt Version 1.1 specification, for more details.
+     *
+     * @link https://iabtechlab.com/ads-txt/ Ads.txt - Authorized Digital Sellers
+     */
+    #[Route('/ads.txt')]
+    #[Route('/app-ads.txt')]
+    #[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
+    public function ads(): Response
+    {
+        return new Response(
+            content: self::ADS_TXT,
+            headers: ['content-type' => 'text/plain; charset=utf-8'],
         );
     }
 }
