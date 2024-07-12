@@ -47,7 +47,6 @@ services:
             - '@App\Service\Analytics\AnalyticsDetailsFactory'
             - '@App\Service\Analytics\AppDatabase'
             - '@App\Service\Analytics\Plausible'
-            - '@App\Service\Analytics\Umami'
     Devarts\PlausiblePHP\PlausibleAPI:
         arguments:
             - '%app.service.plausible.api_token%'
