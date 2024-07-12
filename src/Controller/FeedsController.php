@@ -31,18 +31,28 @@ use Symfony\Component\Routing\Attribute\Route;
 use Twig\Environment;
 
 #[AsController]
-#[Route('/feeds/blog.xml', 'app_feeds_blog')]
-#[Cache(maxage: CacheTtl::Week->value, public: true, staleWhileRevalidate: CacheTtl::Day->value)]
 final readonly class FeedsController
 {
     public function __construct(private Environment $twig)
     {
     }
 
-    public function __invoke(): Response
+    #[Route('/feeds/blog.xml', 'app_feeds_blog')]
+    #[Cache(maxage: CacheTtl::Hour->value, public: true, mustRevalidate: true)]
+    public function blogFeed(): Response
     {
         return new Response(
             content: $this->twig->render('feeds/blog.xml'),
+            headers: ['content-type' => 'text/xml; charset=utf-8'],
+        );
+    }
+
+    #[Route('/sitemap.xml', 'app_sitemap')]
+    #[Cache(maxage: CacheTtl::Hour->value, public: true, mustRevalidate: true)]
+    public function sitemap(): Response
+    {
+        return new Response(
+            content: $this->twig->render('feeds/sitemap.xml'),
             headers: ['content-type' => 'text/xml; charset=utf-8'],
         );
     }
