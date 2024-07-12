@@ -175,8 +175,7 @@
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
-            "importmap:install": "symfony-cmd",
-            "geoip2:update": "symfony-cmd"
+            "importmap:install": "symfony-cmd"
         },
         "build:assets:watch": [
             "Composer\\Config::disableProcessTimeout",
