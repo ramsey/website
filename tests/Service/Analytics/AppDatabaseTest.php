@@ -75,6 +75,31 @@ class AppDatabaseTest extends TestCase
         $transaction($entityManager);
     }
 
+    #[TestDox('recordEventFromWebContext() skips recording /health for kube-probe')]
+    public function testRecordEventFromWebContextForHealth(): void
+    {
+        $analyticsEventService = Mockery::mock(AnalyticsEventService::class);
+        $analyticsEventService->expects('createAnalyticsEventFromDetails')->never();
+
+        $entityManager = Mockery::mock(EntityManagerInterface::class);
+        $entityManager->expects('wrapInTransaction')->never();
+        $entityManager->expects('persist')->never();
+        $entityManager->expects('flush')->never();
+
+        $request = Request::create(uri: 'https://example.com/health', server: [
+            'REMOTE_ADDR' => '127.0.0.1',
+            'HTTP_USER_AGENT' => 'kube-probe/1.28',
+        ]);
+        $response = new Response();
+
+        $logger = new Logger('test');
+        $factory = Mockery::mock(AnalyticsDetailsFactory::class);
+        $factory->expects('createFromWebContext')->never();
+
+        $databaseService = new AppDatabase($analyticsEventService, $entityManager, $factory, $logger);
+        $databaseService->recordEventFromWebContext('anEvent', $request, $response, ['abc' => 123]);
+    }
+
     #[TestDox('records an event using analytics details')]
     public function testRecordEventFromDetails(): void
     {
@@ -102,6 +127,30 @@ class AppDatabaseTest extends TestCase
         // Call the transaction closure to assert its work.
         $this->assertInstanceOf(Closure::class, $transaction);
         $transaction($entityManager);
+    }
+
+    #[TestDox('recordEventFromDetails() skips recording /health for kube-probe')]
+    public function testRecordEventFromDetailsSkipsHealth(): void
+    {
+        $analyticsDetails = new AnalyticsDetails(
+            eventName: 'anEvent',
+            url: (new UriFactory())->createUri('https://example.com/health'),
+            userAgent: 'kube-probe/1.29',
+        );
+
+        $analyticsEventService = Mockery::mock(AnalyticsEventService::class);
+        $analyticsEventService->expects('createAnalyticsEventFromDetails')->never();
+
+        $entityManager = Mockery::mock(EntityManagerInterface::class);
+        $entityManager->expects('wrapInTransaction')->never();
+        $entityManager->expects('persist')->never();
+        $entityManager->expects('flush')->never();
+
+        $logger = new Logger('test');
+        $factory = Mockery::mock(AnalyticsDetailsFactory::class);
+
+        $databaseService = new AppDatabase($analyticsEventService, $entityManager, $factory, $logger);
+        $databaseService->recordEventFromDetails($analyticsDetails);
     }
 
     #[TestDox('logs an error if unable to write to the database')]

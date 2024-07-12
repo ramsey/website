@@ -30,6 +30,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use function str_starts_with;
+
 /**
  * A service for recording analytics events in the application database
  */
@@ -49,12 +51,20 @@ final readonly class AppDatabase implements AnalyticsService
         Response $response,
         ?array $tags = null,
     ): void {
+        if ($this->skipHealthForKubeProbe($request->headers->get('user-agent'), $request->getRequestUri())) {
+            return;
+        }
+
         $details = $this->analyticsDetailsFactory->createFromWebContext($eventName, $request, $response, $tags);
         $this->recordEventFromDetails($details);
     }
 
     public function recordEventFromDetails(AnalyticsDetails $details): void
     {
+        if ($this->skipHealthForKubeProbe($details->userAgent, $details->url->getPath())) {
+            return;
+        }
+
         try {
             $this->entityManager->wrapInTransaction(
                 function (EntityManagerInterface $entityManager) use ($details): void {
@@ -69,5 +79,10 @@ final readonly class AppDatabase implements AnalyticsService
                 'message' => $exception->getMessage(),
             ]);
         }
+    }
+
+    public function skipHealthForKubeProbe(?string $userAgent, string $path): bool
+    {
+        return str_starts_with((string) $userAgent, 'kube-probe/') && $path === '/health';
     }
 }
