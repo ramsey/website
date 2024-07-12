@@ -4,17 +4,25 @@ declare(strict_types=1);
 
 namespace App\Tests\Service\Analytics;
 
+use App\Service\Analytics\AnalyticsDetails;
+use App\Service\Analytics\AnalyticsDetailsFactory;
 use App\Service\Analytics\Plausible;
 use App\Service\Analytics\UnknownAnalyticsDomain;
 use Devarts\PlausiblePHP\PlausibleAPI;
 use Faker\Factory;
 use Faker\Generator;
+use Laminas\Diactoros\UriFactory;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Message\UriInterface;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -23,194 +31,211 @@ class PlausibleTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
+    private AnalyticsDetails $analyticsDetails;
+    private AnalyticsDetailsFactory & MockInterface $analyticsDetailsFactory;
     private Generator $faker;
-    private Plausible $service;
     private PlausibleAPI & MockInterface $plausibleApi;
+    private Plausible $service;
+    private TestHandler $testHandler;
+    private UriInterface & MockInterface $uri;
 
     protected function setUp(): void
     {
         $this->faker = Factory::create();
         $this->plausibleApi = Mockery::mock(PlausibleAPI::class);
-        $this->service = new Plausible($this->plausibleApi, ['foo.example.com', 'bar.example.com']);
+        $this->analyticsDetailsFactory = Mockery::mock(AnalyticsDetailsFactory::class);
+        $this->uri = Mockery::mock(UriInterface::class);
+
+        $this->testHandler = new TestHandler();
+        $logger = new Logger('test', [$this->testHandler]);
+
+        $this->service = new Plausible(
+            $this->plausibleApi,
+            ['foo.example.com', 'bar.example.com'],
+            $this->analyticsDetailsFactory,
+            $logger,
+        );
+
+        $this->analyticsDetails = new AnalyticsDetails(
+            eventName: 'anEvent',
+            url: $this->uri,
+        );
     }
 
-    #[TestDox('throws UnknownAnalyticsDomain exception when domain is not in the list')]
-    public function testRecordEventWhenDomainNotInList(): void
+    #[TestDox('recordEventFromDetails() throws UnknownAnalyticsDomain exception when domain is not in the list')]
+    public function testRecordEventFromDetailsWhenDomainNotInList(): void
     {
         $this->plausibleApi->expects('recordEvent')->never();
-
-        $request = Request::create('https://baz.example.com/path/to/page', 'GET');
-        $response = new Response();
+        $this->uri->allows('getPath')->andReturn('/path/to/content');
+        $this->uri->allows('getHost')->andReturn('baz.example.com');
 
         $this->expectException(UnknownAnalyticsDomain::class);
         $this->expectExceptionMessage('baz.example.com is not a valid analytics domain');
 
-        $this->service->recordEvent('pageview', $request, $response);
+        $this->service->recordEventFromDetails($this->analyticsDetails);
     }
 
-    #[TestDox('successfully records the event when no additional tags are provided')]
-    public function testRecordEventWithoutTags(): void
+    #[TestDox('recordEventFromWebContext() throws UnknownAnalyticsDomain exception when domain is not in the list')]
+    public function testRecordEventFromWebContextWhenDomainNotInList(): void
     {
+        $this->plausibleApi->expects('recordEvent')->never();
+        $this->uri->allows('getPath')->andReturn('/path/to/content');
+        $this->uri->allows('getHost')->andReturn('qux.example.com');
+
+        $request = Request::create('https://baz.example.com');
+        $response = new Response();
+
+        $this->analyticsDetailsFactory
+            ->expects('createFromWebContext')
+            ->with('event', $request, $response, [])
+            ->andReturn($this->analyticsDetails);
+
+        $this->expectException(UnknownAnalyticsDomain::class);
+        $this->expectExceptionMessage('qux.example.com is not a valid analytics domain');
+
+        $this->service->recordEventFromWebContext('event', $request, $response, []);
+    }
+
+    #[TestDox('recordEventFromDetails() successfully records the event')]
+    public function testFromDetails(): void
+    {
+        $url = 'https://foo.example.com/path/to/page';
         $ip = $this->faker->ipv4();
         $referrer = $this->faker->url();
+        $userAgent = $this->faker->userAgent();
+
+        $analyticsDetails = new AnalyticsDetails(
+            eventName: 'pageview',
+            url: (new UriFactory())->createUri($url),
+            ipAddress: $ip,
+            referrer: (new UriFactory())->createUri($referrer),
+            tags: ['http_method' => 'GET', 'status_code' => 200],
+            userAgent: $userAgent,
+        );
 
         $this->plausibleApi->expects('recordEvent')->with(
             'foo.example.com',
             'pageview',
-            'https://foo.example.com/path/to/page',
-            'MyUserAgent/1.0',
+            $url,
+            $userAgent,
             $ip,
             $referrer,
             [
-                'http_method' => 'GET',
                 'http_referer' => $referrer,
-                'status_code' => 200,
                 'redirect_uri' => null,
-            ],
-            null,
-        );
-
-        $request = Request::create(
-            uri: 'https://foo.example.com/path/to/page',
-            method: 'GET',
-            server: [
-                'HTTP_USER_AGENT' => 'MyUserAgent/1.0',
-                'HTTP_REFERER' => $referrer,
-                'REMOTE_ADDR' => $ip,
+                'http_method' => 'GET',
+                'status_code' => 200,
             ],
         );
 
-        $response = new Response();
-
-        $this->service->recordEvent('pageview', $request, $response);
+        $this->service->recordEventFromDetails($analyticsDetails);
     }
 
-    #[TestDox('successfully records the event when additional tags are provided')]
-    public function testRecordEventWithTags(): void
+    #[TestDox('recordEventFromDetails() skips path')]
+    #[TestWith(['/health?foo=bar'])]
+    public function testFromDetailsSkipsPath(string $path): void
     {
+        $url = 'https://foo.example.com' . $path;
+
+        $analyticsDetails = new AnalyticsDetails(
+            eventName: 'pageview',
+            url: (new UriFactory())->createUri($url),
+        );
+
+        $this->plausibleApi->expects('recordEvent')->never();
+
+        $this->service->recordEventFromDetails($analyticsDetails);
+    }
+
+    #[TestDox('recordEventFromWebContext() successfully records the event')]
+    public function testFromWebContext(): void
+    {
+        $url = 'https://bar.example.com/path/to/page';
         $ip = $this->faker->ipv4();
-        $currency = $this->faker->currencyCode();
         $redirectUri = $this->faker->url();
+        $userAgent = $this->faker->userAgent();
+
+        $analyticsDetails = new AnalyticsDetails(
+            eventName: 'custom-event',
+            url: (new UriFactory())->createUri($url),
+            ipAddress: $ip,
+            redirectUrl: (new UriFactory())->createUri($redirectUri),
+            tags: ['http_method' => 'POST', 'status_code' => 302, 'extra_prop' => true],
+            userAgent: $userAgent,
+        );
 
         $this->plausibleApi->expects('recordEvent')->with(
             'bar.example.com',
             'custom-event',
-            'https://bar.example.com/path/to/page',
-            'MyUserAgent/2.0',
+            $url,
+            $userAgent,
             $ip,
             null,
             [
-                'http_method' => 'POST',
                 'http_referer' => null,
-                'status_code' => 302,
                 'redirect_uri' => $redirectUri,
+                'http_method' => 'POST',
+                'status_code' => 302,
                 'extra_prop' => true,
             ],
-            [
-                'currency' => $currency,
-                'amount' => 315.42,
-            ],
         );
 
-        $request = Request::create(
-            uri: 'https://bar.example.com/path/to/page',
-            method: 'POST',
-            server: [
-                'HTTP_USER_AGENT' => 'MyUserAgent/2.0',
-                'REMOTE_ADDR' => $ip,
-            ],
-        );
-
-        $response = new Response(status: 302, headers: ['location' => $redirectUri]);
-
-        $this->service->recordEvent('custom-event', $request, $response, [
-            'extra_prop' => true,
-            'revenue' => [
-                'currency' => $currency,
-                'amount' => 315.42,
-            ],
-        ]);
-    }
-
-    #[TestDox('uses do-connecting-ip header for IP address, if present')]
-    public function testRecordEventUsingDigitalOceanConnectingIpHeader(): void
-    {
-        $doConnectingIp = $this->faker->ipv4();
-        $referrer = $this->faker->url();
-
-        $this->plausibleApi->expects('recordEvent')->with(
-            'foo.example.com',
-            'pageview',
-            'https://foo.example.com/path/to/page',
-            'MyUserAgent/1.0',
-            $doConnectingIp,
-            $referrer,
-            [
-                'http_method' => 'GET',
-                'http_referer' => $referrer,
-                'status_code' => 200,
-                'redirect_uri' => null,
-            ],
-            null,
-        );
-
-        $request = Request::create(
-            uri: 'https://foo.example.com/path/to/page',
-            method: 'GET',
-            server: [
-                'HTTP_USER_AGENT' => 'MyUserAgent/1.0',
-                'HTTP_REFERER' => $referrer,
-                'HTTP_DO_CONNECTING_IP' => $doConnectingIp,
-                'REMOTE_ADDR' => 'should_not_be_accessed',
-            ],
-        );
-
+        $request = Request::create($url);
         $response = new Response();
 
-        $this->service->recordEvent('pageview', $request, $response);
+        $this->analyticsDetailsFactory
+            ->expects('createFromWebContext')
+            ->with('custom-event', $request, $response, ['extra_prop' => true])
+            ->andReturn($analyticsDetails);
+
+        $this->service->recordEventFromWebContext('custom-event', $request, $response, ['extra_prop' => true]);
     }
 
-    #[TestDox('escapes the :// in Archive.org redirect URLs to avoid problems in the analytics service')]
-    #[TestWith(['https://archive/web/http%3A%2F%2Fexample.com/foo', 'https://archive/web/http://example.com/foo'])]
-    #[TestWith(['https://archive/web/https%3A%2F%2Fexample.com/foo', 'https://archive/web/https://example.com/foo'])]
-    #[TestWith(['http://archive/web/http%3A%2F%2Fexample.com/foo', 'http://archive/web/http://example.com/foo'])]
-    #[TestWith(['http://archive/web/https%3A%2F%2Fexample.com/foo', 'http://archive/web/https://example.com/foo'])]
-    public function testRecordEventWhenRedirectUriIsForArchiveDotOrg(
-        string $expectedRedirectUri,
-        string $redirectUri,
-    ): void {
+    #[TestDox('recordEventFromWebContext() skips path')]
+    #[TestWith(['/health'])]
+    public function testFromWebContextSkipsPath(string $path): void
+    {
+        $url = 'https://bar.example.com' . $path;
+
+        $this->plausibleApi->expects('recordEvent')->never();
+        $this->analyticsDetailsFactory->expects('createFromWebContext')->never();
+
+        $request = Request::create($url);
+        $response = new Response();
+
+        $this->service->recordEventFromWebContext('custom-event', $request, $response, []);
+    }
+
+    #[TestDox('logs an error when failing to send data to Plausible')]
+    public function testLogsFailureToRecord(): void
+    {
+        $url = 'https://foo.example.com/path/to/page';
         $ip = $this->faker->ipv4();
+        $userAgent = $this->faker->userAgent();
+
+        $analyticsDetails = new AnalyticsDetails(
+            eventName: 'pageview',
+            url: (new UriFactory())->createUri($url),
+            ipAddress: $ip,
+            userAgent: $userAgent,
+        );
 
         $this->plausibleApi->expects('recordEvent')->with(
             'foo.example.com',
             'pageview',
-            'https://foo.example.com/path/to/page',
-            'MyUserAgent/1.0',
+            $url,
+            $userAgent,
             $ip,
             null,
             [
-                'http_method' => 'GET',
                 'http_referer' => null,
-                'status_code' => 307,
-                'redirect_uri' => $expectedRedirectUri,
+                'redirect_uri' => null,
             ],
-            null,
-        );
+        )->andThrow(new class extends RuntimeException implements ClientExceptionInterface {
+        });
 
-        $request = Request::create(
-            uri: 'https://foo.example.com/path/to/page',
-            method: 'GET',
-            server: [
-                'HTTP_USER_AGENT' => 'MyUserAgent/1.0',
-                'REMOTE_ADDR' => $ip,
-            ],
-        );
+        $this->service->recordEventFromDetails($analyticsDetails);
 
-        $response = new Response(
-            status: 307,
-            headers: ['location' => $redirectUri],
-        );
-
-        $this->service->recordEvent('pageview', $request, $response);
+        $this->assertTrue($this->testHandler->hasErrorThatContains('Unable to send analytics to Plausible:'));
     }
 }

@@ -35,9 +35,19 @@ interface AnalyticsService
      * @param string $eventName The name of the event to record
      * @param Request $request The request for this context
      * @param Response $response The response for this context
-     * @param array<string, array<string, scalar> | scalar | null> | null $tags Additional tags to record with the event
+     * @param array<string, scalar | null> | null $tags Additional tags to record with the event
      *
      * @throws UnknownAnalyticsDomain
      */
-    public function recordEvent(string $eventName, Request $request, Response $response, ?array $tags = null): void;
+    public function recordEventFromWebContext(
+        string $eventName,
+        Request $request,
+        Response $response,
+        ?array $tags = null,
+    ): void;
+
+    /**
+     * @throws UnknownAnalyticsDomain
+     */
+    public function recordEventFromDetails(AnalyticsDetails $details): void;
 }

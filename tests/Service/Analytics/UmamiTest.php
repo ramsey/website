@@ -4,18 +4,26 @@ declare(strict_types=1);
 
 namespace App\Tests\Service\Analytics;
 
+use App\Service\Analytics\AnalyticsDetails;
+use App\Service\Analytics\AnalyticsDetailsFactory;
 use App\Service\Analytics\Umami;
 use App\Service\Analytics\UnknownAnalyticsDomain;
 use Faker\Factory;
 use Faker\Generator;
+use Laminas\Diactoros\UriFactory;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\UriInterface;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[TestDox('Umami analytics service')]
@@ -23,14 +31,24 @@ class UmamiTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
+    private AnalyticsDetails $analyticsDetails;
+    private AnalyticsDetailsFactory & MockInterface $analyticsDetailsFactory;
     private Generator $faker;
     private HttpClientInterface & MockInterface $httpClient;
     private Umami $service;
+    private TestHandler $testHandler;
+    private UriInterface & MockInterface $uri;
 
     protected function setUp(): void
     {
+        $this->analyticsDetailsFactory = Mockery::mock(AnalyticsDetailsFactory::class);
         $this->faker = Factory::create();
         $this->httpClient = Mockery::mock(HttpClientInterface::class);
+        $this->uri = Mockery::mock(UriInterface::class);
+
+        $this->testHandler = new TestHandler();
+        $logger = new Logger('test', [$this->testHandler]);
+
         $this->service = new Umami(
             'an_api_key',
             'https://umami.example.com/api/',
@@ -45,28 +63,67 @@ class UmamiTest extends TestCase
                 ],
             ],
             $this->httpClient,
+            $this->analyticsDetailsFactory,
+            $logger,
+        );
+
+        $this->analyticsDetails = new AnalyticsDetails(
+            eventName: 'anEvent',
+            url: $this->uri,
         );
     }
 
-    #[TestDox('throws UnknownAnalyticsDomain exception when domain is not in the list')]
+    #[TestDox('recordEventFromWebContext() throws UnknownAnalyticsDomain exception when domain is not in the list')]
     public function testRecordEventWhenDomainNotInList(): void
     {
         $this->httpClient->expects('request')->never();
-
-        $request = Request::create('https://baz.example.com/path/to/page', 'GET');
-        $response = new Response();
+        $this->uri->allows('getPath')->andReturn('/path/to/content');
+        $this->uri->allows('getHost')->andReturn('baz.example.com');
 
         $this->expectException(UnknownAnalyticsDomain::class);
         $this->expectExceptionMessage('baz.example.com is not a valid analytics domain');
 
-        $this->service->recordEvent('pageview', $request, $response);
+        $this->service->recordEventFromDetails($this->analyticsDetails);
     }
 
-    #[TestDox('successfully records the event when no additional tags are provided')]
-    public function testRecordEventWithoutTags(): void
+    #[TestDox('recordEventFromWebContext() throws UnknownAnalyticsDomain exception when domain is not in the list')]
+    public function testRecordEventFromWebContextWhenDomainNotInList(): void
     {
+        $this->httpClient->expects('request')->never();
+        $this->uri->allows('getPath')->andReturn('/path/to/content');
+        $this->uri->allows('getHost')->andReturn('qux.example.com');
+
+        $request = Request::create('https://baz.example.com');
+        $response = new Response();
+
+        $this->analyticsDetailsFactory
+            ->expects('createFromWebContext')
+            ->with('event', $request, $response, [])
+            ->andReturn($this->analyticsDetails);
+
+        $this->expectException(UnknownAnalyticsDomain::class);
+        $this->expectExceptionMessage('qux.example.com is not a valid analytics domain');
+
+        $this->service->recordEventFromWebContext('event', $request, $response, []);
+    }
+
+    #[TestDox('recordEventFromDetails() successfully records the event')]
+    public function testFromDetails(): void
+    {
+        $url = 'https://bar.example.com/path/to/page';
         $ip = $this->faker->ipv4();
         $referrer = $this->faker->url();
+        $userAgent = $this->faker->userAgent();
+
+        $analyticsDetails = new AnalyticsDetails(
+            eventName: 'pageview',
+            url: (new UriFactory())->createUri($url),
+            ipAddress: $ip,
+            locale: 'en-US',
+            referrer: (new UriFactory())->createUri($referrer),
+            tags: ['http_method' => 'GET', 'status_code' => 200],
+            userAgent: $userAgent,
+        );
 
         $this->httpClient->expects('request')->with(
             'POST',
@@ -74,25 +131,12 @@ class UmamiTest extends TestCase
             Mockery::capture($data),
         );
 
-        $request = Request::create(
-            uri: 'https://bar.example.com/path/to/page',
-            method: 'GET',
-            server: [
-                'HTTP_USER_AGENT' => 'MyUserAgent/1.0',
-                'HTTP_REFERER' => $referrer,
-                'REMOTE_ADDR' => $ip,
-            ],
-        );
-        $request->setLocale('en-US');
-
-        $response = new Response();
-
-        $this->service->recordEvent('pageview', $request, $response);
+        $this->service->recordEventFromDetails($analyticsDetails);
 
         $this->assertSame(
             [
                 'headers' => [
-                    'user-agent' => 'MyUserAgent/1.0',
+                    'user-agent' => $userAgent,
                     'x-forwarded-for' => $ip,
                     'x-umami-api-key' => 'an_api_key',
                 ],
@@ -102,14 +146,12 @@ class UmamiTest extends TestCase
                         'hostname' => 'bar.example.com',
                         'language' => 'en-US',
                         'referrer' => $referrer,
-                        'url' => 'https://bar.example.com/path/to/page',
+                        'url' => $url,
                         'website' => 'bar_website_id',
                         'name' => 'pageview',
                         'data' => [
                             'http_method' => 'GET',
-                            'http_referer' => $referrer,
                             'status_code' => 200,
-                            'redirect_uri' => null,
                         ],
                     ],
                 ],
@@ -118,11 +160,39 @@ class UmamiTest extends TestCase
         );
     }
 
-    #[TestDox('successfully records the event when additional tags are provided')]
-    public function testRecordEventWithTags(): void
+    #[TestDox('recordEventFromDetails() skips path')]
+    #[TestWith(['/health/'])]
+    public function testFromDetailsSkipsPath(string $path): void
     {
+        $url = 'https://foo.example.com' . $path;
+
+        $analyticsDetails = new AnalyticsDetails(
+            eventName: 'pageview',
+            url: (new UriFactory())->createUri($url),
+        );
+
+        $this->httpClient->expects('request')->never();
+
+        $this->service->recordEventFromDetails($analyticsDetails);
+    }
+
+    #[TestDox('recordEventFromWebContext() successfully records the event')]
+    public function testFromWebContext(): void
+    {
+        $url = 'https://foo.example.com/path/to/page';
         $ip = $this->faker->ipv4();
         $redirectUri = $this->faker->url();
+        $userAgent = $this->faker->userAgent();
+
+        $analyticsDetails = new AnalyticsDetails(
+            eventName: 'custom-event',
+            url: (new UriFactory())->createUri($url),
+            ipAddress: $ip,
+            locale: 'en-US',
+            redirectUrl: (new UriFactory())->createUri($redirectUri),
+            tags: ['http_method' => 'POST', 'status_code' => 302, 'extra_prop' => true],
+            userAgent: $userAgent,
+        );
 
         $this->httpClient->expects('request')->with(
             'POST',
@@ -130,29 +200,20 @@ class UmamiTest extends TestCase
             Mockery::capture($data),
         );
 
-        $request = Request::create(
-            uri: 'https://foo.example.com/path/to/page',
-            method: 'POST',
-            server: [
-                'HTTP_USER_AGENT' => 'MyUserAgent/2.0',
-                'REMOTE_ADDR' => $ip,
-            ],
-        );
-        $request->setLocale('es-MX');
+        $request = Request::create($url);
+        $response = new Response();
 
-        $response = new Response(status: 302, headers: ['location' => $redirectUri]);
+        $this->analyticsDetailsFactory
+            ->expects('createFromWebContext')
+            ->with('custom-event', $request, $response, ['extra_prop' => true])
+            ->andReturn($analyticsDetails);
 
-        $this->service->recordEvent('custom-event', $request, $response, [
-            'extra_prop' => true,
-
-            // This should override the http_referer value.
-            'http_referer' => 'an_http_referer',
-        ]);
+        $this->service->recordEventFromWebContext('custom-event', $request, $response, ['extra_prop' => true]);
 
         $this->assertSame(
             [
                 'headers' => [
-                    'user-agent' => 'MyUserAgent/2.0',
+                    'user-agent' => $userAgent,
                     'x-forwarded-for' => $ip,
                     'x-umami-api-key' => 'an_api_key',
                 ],
@@ -160,15 +221,13 @@ class UmamiTest extends TestCase
                     'type' => 'event',
                     'payload' => [
                         'hostname' => 'foo.example.com',
-                        'language' => 'es-MX',
-                        'url' => 'https://foo.example.com/path/to/page',
+                        'language' => 'en-US',
+                        'url' => $url,
                         'website' => 'foo_website_id',
                         'name' => 'pageview',
                         'data' => [
                             'http_method' => 'POST',
-                            'http_referer' => 'an_http_referer',
                             'status_code' => 302,
-                            'redirect_uri' => $redirectUri,
                             'extra_prop' => true,
                         ],
                     ],
@@ -178,119 +237,44 @@ class UmamiTest extends TestCase
         );
     }
 
-    #[TestDox('uses do-connecting-ip header for IP address, if present')]
-    public function testRecordEventUsingDigitalOceanConnectingIpHeader(): void
+    #[TestDox('recordEventFromWebContext() skips path')]
+    #[TestWith(['/health/foo'])]
+    public function testFromWebContextSkipsPath(string $path): void
     {
-        $doConnectingIp = $this->faker->ipv4();
+        $url = 'https://bar.example.com' . $path;
 
-        $this->httpClient->expects('request')->with(
-            'POST',
-            'https://umami.example.com/api/send',
-            Mockery::capture($data),
-        );
+        $this->httpClient->expects('request')->never();
+        $this->analyticsDetailsFactory->expects('createFromWebContext')->never();
 
-        $request = Request::create(
-            uri: 'https://foo.example.com/path/to/page',
-            method: 'GET',
-            server: [
-                'HTTP_USER_AGENT' => 'MyUserAgent/1.0',
-                'HTTP_DO_CONNECTING_IP' => $doConnectingIp,
-                'REMOTE_ADDR' => 'should_not_be_accessed',
-            ],
-        );
-        $request->setLocale('en');
-
+        $request = Request::create($url);
         $response = new Response();
 
-        $this->service->recordEvent('pageview', $request, $response);
-
-        $this->assertSame(
-            [
-                'headers' => [
-                    'user-agent' => 'MyUserAgent/1.0',
-                    'x-forwarded-for' => $doConnectingIp,
-                    'x-umami-api-key' => 'an_api_key',
-                ],
-                'json' => [
-                    'type' => 'event',
-                    'payload' => [
-                        'hostname' => 'foo.example.com',
-                        'language' => 'en',
-                        'url' => 'https://foo.example.com/path/to/page',
-                        'website' => 'foo_website_id',
-                        'name' => 'pageview',
-                        'data' => [
-                            'http_method' => 'GET',
-                            'http_referer' => null,
-                            'status_code' => 200,
-                            'redirect_uri' => null,
-                        ],
-                    ],
-                ],
-            ],
-            $data,
-        );
+        $this->service->recordEventFromWebContext('custom-event', $request, $response, []);
     }
 
-    #[TestDox('escapes the :// in Archive.org redirect URLs to avoid problems in the analytics service')]
-    #[TestWith(['https://archive/web/http%3A%2F%2Fexample.com/foo', 'https://archive/web/http://example.com/foo'])]
-    #[TestWith(['https://archive/web/https%3A%2F%2Fexample.com/foo', 'https://archive/web/https://example.com/foo'])]
-    #[TestWith(['http://archive/web/http%3A%2F%2Fexample.com/foo', 'http://archive/web/http://example.com/foo'])]
-    #[TestWith(['http://archive/web/https%3A%2F%2Fexample.com/foo', 'http://archive/web/https://example.com/foo'])]
-    public function testRecordEventWhenRedirectUriIsForArchiveDotOrg(
-        string $expectedRedirectUri,
-        string $redirectUri,
-    ): void {
+    #[TestDox('logs an error when failing to send data to Umami')]
+    public function testLogsFailureToRecord(): void
+    {
+        $url = 'https://foo.example.com/path/to/page';
         $ip = $this->faker->ipv4();
+        $userAgent = $this->faker->userAgent();
+
+        $analyticsDetails = new AnalyticsDetails(
+            eventName: 'pageview',
+            url: (new UriFactory())->createUri($url),
+            ipAddress: $ip,
+            userAgent: $userAgent,
+        );
 
         $this->httpClient->expects('request')->with(
             'POST',
             'https://umami.example.com/api/send',
             Mockery::capture($data),
-        );
+        )->andThrow(new class extends RuntimeException implements TransportExceptionInterface {
+        });
 
-        $request = Request::create(
-            uri: 'https://foo.example.com/path/to/page',
-            method: 'GET',
-            server: [
-                'HTTP_USER_AGENT' => 'MyUserAgent/1.0',
-                'REMOTE_ADDR' => $ip,
-            ],
-        );
-        $request->setLocale('en-US');
+        $this->service->recordEventFromDetails($analyticsDetails);
 
-        $response = new Response(
-            status: 307,
-            headers: ['location' => $redirectUri],
-        );
-
-        $this->service->recordEvent('pageview', $request, $response);
-
-        $this->assertSame(
-            [
-                'headers' => [
-                    'user-agent' => 'MyUserAgent/1.0',
-                    'x-forwarded-for' => $ip,
-                    'x-umami-api-key' => 'an_api_key',
-                ],
-                'json' => [
-                    'type' => 'event',
-                    'payload' => [
-                        'hostname' => 'foo.example.com',
-                        'language' => 'en-US',
-                        'url' => 'https://foo.example.com/path/to/page',
-                        'website' => 'foo_website_id',
-                        'name' => 'pageview',
-                        'data' => [
-                            'http_method' => 'GET',
-                            'http_referer' => null,
-                            'status_code' => 307,
-                            'redirect_uri' => $expectedRedirectUri,
-                        ],
-                    ],
-                ],
-            ],
-            $data,
-        );
+        $this->assertTrue($this->testHandler->hasErrorThatContains('Unable to send analytics to Umami:'));
     }
 }

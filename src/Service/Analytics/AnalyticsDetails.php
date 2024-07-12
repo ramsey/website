@@ -23,19 +23,30 @@ declare(strict_types=1);
 
 namespace App\Service\Analytics;
 
+use Psr\Http\Message\UriInterface;
+
 final readonly class AnalyticsDetails
 {
     /**
-     * @param array<string, array<string, scalar> | scalar | null> $tags Additional tags to record with the event
+     * @param array<string, scalar> $serverEnvironment
+     * @param array<string, scalar | null> $tags Additional tags to record with the event
      */
     public function __construct(
         public string $eventName,
-        public string $ipAddress,
-        public string $userAgent,
-        public string $url,
-        public ?string $referrer,
-        public ?string $redirectUrl,
-        public array $tags,
+        public UriInterface $url,
+        public ?string $geoCity = null,
+        public ?string $geoCountryCode = null,
+        public ?float $geoLatitude = null,
+        public ?float $geoLongitude = null,
+        public ?string $geoSubdivisionCode = null,
+        public string $ipAddress = '',
+        public string $ipAddressUserAgentHash = '',
+        public ?string $locale = null,
+        public ?UriInterface $redirectUrl = null,
+        public ?UriInterface $referrer = null,
+        public array $serverEnvironment = [],
+        public array $tags = [],
+        public string $userAgent = '',
     ) {
     }
 }

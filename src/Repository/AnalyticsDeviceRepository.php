@@ -21,26 +21,21 @@
 
 declare(strict_types=1);
 
-namespace App\EventListener;
+namespace App\Repository;
 
-use App\Service\Analytics\AnalyticsService;
-use App\Service\Analytics\UnknownAnalyticsDomain;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Symfony\Component\HttpKernel\Event\TerminateEvent;
+use App\Entity\AnalyticsDevice;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
-#[AsEventListener(event: 'kernel.terminate', priority: 20)]
-final readonly class PageViewAnalyticsListener
+/**
+ * A repository for analytics device entities
+ *
+ * @extends ServiceEntityRepository<AnalyticsDevice>
+ */
+class AnalyticsDeviceRepository extends ServiceEntityRepository
 {
-    public function __construct(private AnalyticsService $analytics)
+    public function __construct(ManagerRegistry $registry)
     {
-    }
-
-    public function __invoke(TerminateEvent $event): void
-    {
-        try {
-            $this->analytics->recordEventFromWebContext('pageview', $event->getRequest(), $event->getResponse());
-        } catch (UnknownAnalyticsDomain) {
-            // Ignore the exception.
-        }
+        parent::__construct($registry, AnalyticsDevice::class);
     }
 }

@@ -8,6 +8,7 @@ parameters:
     app.data.changed_website_uri: '%app.data_dir%/changed_website_uri.php'
     app.data.openpgp_web_key: '%app.data_dir%/openpgp_web_key.php'
     app.data.webfinger_account: '%app.data_dir%/webfinger_account.php'
+    app.service.analytics.secret_key: '%env(resolve:ANALYTICS_SECRET_KEY)%'
     app.service.plausible.api_token: '%env(resolve:PLAUSIBLE_API_TOKEN)%'
     app.service.plausible.base_uri: 'https://plausible.io/api/'
     app.service.plausible.domains:
@@ -43,12 +44,15 @@ services:
     App\Service\Analytics\AnalyticsService: '@App\Service\Analytics\MultiProvider'
     App\Service\Analytics\MultiProvider:
         arguments:
+            - '@App\Service\Analytics\AnalyticsDetailsFactory'
+            - '@App\Service\Analytics\AppDatabase'
             - '@App\Service\Analytics\Plausible'
             - '@App\Service\Analytics\Umami'
     Devarts\PlausiblePHP\PlausibleAPI:
         arguments:
             - '%app.service.plausible.api_token%'
             - '%app.service.plausible.base_uri%'
+    GeoIp2\ProviderInterface: '@geoip2.database.default_reader'
     Laminas\Diactoros\UriFactory: ~
     Psr\Http\Message\UriFactoryInterface: '@Laminas\Diactoros\UriFactory'
 
@@ -68,9 +72,14 @@ when@test: &services_test
 
         App\Tests\DataFixtures\:
             resource: '../tests/DataFixtures'
+        
+        App\Service\Analytics\AnalyticsService: '@App\Service\Analytics\NoOpProvider'
 
 when@test_no_db: *services_test
 
 when@dev:
     parameters:
         app.shortener.base_url: 'https://localhost:8000/su/'
+
+    services:
+        App\Service\Analytics\AnalyticsService: '@App\Service\Analytics\NoOpProvider'

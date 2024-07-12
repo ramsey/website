@@ -24,10 +24,13 @@ declare(strict_types=1);
 namespace App\Service\Analytics;
 
 use Devarts\PlausiblePHP\PlausibleAPI;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use function array_replace;
 use function in_array;
 
 /**
@@ -43,33 +46,54 @@ final readonly class Plausible implements AnalyticsService
     public function __construct(
         private PlausibleAPI $plausibleApi,
         #[Autowire('%app.service.plausible.domains%')] private array $domains,
+        private AnalyticsDetailsFactory $analyticsDetailsFactory,
+        private LoggerInterface $logger,
     ) {
     }
 
-    public function recordEvent(string $eventName, Request $request, Response $response, ?array $tags = null): void
-    {
-        if (!in_array($request->getHost(), $this->domains)) {
-            throw new UnknownAnalyticsDomain("{$request->getHost()} is not a valid analytics domain");
+    public function recordEventFromWebContext(
+        string $eventName,
+        Request $request,
+        Response $response,
+        ?array $tags = null,
+    ): void {
+        if ($this->skipPath($request->getRequestUri())) {
+            return;
         }
 
-        $details = $this->getAnalyticsDetails($eventName, $request, $response, $tags);
+        $details = $this->analyticsDetailsFactory->createFromWebContext($eventName, $request, $response, $tags);
+        $this->recordEventFromDetails($details);
+    }
 
-        /** @var array{currency: string, amount: float | string} | null $revenue */
-        $revenue = $details->tags['revenue'] ?? null;
+    public function recordEventFromDetails(AnalyticsDetails $details): void
+    {
+        if ($this->skipPath($details->url->getPath())) {
+            return;
+        }
 
-        /** @var array<string, scalar | null> $tagsWithoutRevenue */
-        $tagsWithoutRevenue = $details->tags;
-        unset($tagsWithoutRevenue['revenue']);
+        if (!in_array($details->url->getHost(), $this->domains)) {
+            throw new UnknownAnalyticsDomain("{$details->url->getHost()} is not a valid analytics domain");
+        }
 
-        $this->plausibleApi->recordEvent(
-            site_id: $request->getHost(),
-            event_name: $details->eventName,
-            url: $details->url,
-            user_agent: $details->userAgent,
-            ip_address: $details->ipAddress,
-            referrer: $details->referrer,
-            properties: $tagsWithoutRevenue,
-            revenue: $revenue,
-        );
+        $properties = array_replace([
+            'http_referer' => $details->referrer?->__toString(),
+            'redirect_uri' => $details->redirectUrl?->__toString(),
+        ], $details->tags ?? []);
+
+        try {
+            $this->plausibleApi->recordEvent(
+                site_id: $details->url->getHost(),
+                event_name: $details->eventName,
+                url: $details->url->__toString(),
+                user_agent: $details->userAgent,
+                ip_address: $details->ipAddress,
+                referrer: $details->referrer?->__toString(),
+                properties: $properties,
+            );
+        } catch (ClientExceptionInterface $exception) {
+            $this->logger->error('Unable to send analytics to Plausible: {message}', [
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
 }

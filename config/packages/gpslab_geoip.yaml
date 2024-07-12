@@ -1,0 +1,5 @@
+# Read the README file for more detailed configuration information
+# https://github.com/gpslab/geoip2
+gpslab_geoip:
+    license: '%env(resolve:MAXMIND_LICENSE_KEY)%'
+    edition: 'GeoLite2-City'

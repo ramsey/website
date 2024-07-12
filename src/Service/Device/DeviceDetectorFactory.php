@@ -21,26 +21,14 @@
 
 declare(strict_types=1);
 
-namespace App\EventListener;
+namespace App\Service\Device;
 
-use App\Service\Analytics\AnalyticsService;
-use App\Service\Analytics\UnknownAnalyticsDomain;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Symfony\Component\HttpKernel\Event\TerminateEvent;
+use DeviceDetector\DeviceDetector;
 
-#[AsEventListener(event: 'kernel.terminate', priority: 20)]
-final readonly class PageViewAnalyticsListener
+interface DeviceDetectorFactory
 {
-    public function __construct(private AnalyticsService $analytics)
-    {
-    }
-
-    public function __invoke(TerminateEvent $event): void
-    {
-        try {
-            $this->analytics->recordEventFromWebContext('pageview', $event->getRequest(), $event->getResponse());
-        } catch (UnknownAnalyticsDomain) {
-            // Ignore the exception.
-        }
-    }
+    /**
+     * @param array<string, scalar> $serverEnvironment
+     */
+    public function createFromServerEnvironment(array $serverEnvironment): DeviceDetector;
 }

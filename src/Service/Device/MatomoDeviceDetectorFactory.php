@@ -21,26 +21,23 @@
 
 declare(strict_types=1);
 
-namespace App\EventListener;
+namespace App\Service\Device;
 
-use App\Service\Analytics\AnalyticsService;
-use App\Service\Analytics\UnknownAnalyticsDomain;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Symfony\Component\HttpKernel\Event\TerminateEvent;
+use DeviceDetector\ClientHints;
+use DeviceDetector\DeviceDetector;
 
-#[AsEventListener(event: 'kernel.terminate', priority: 20)]
-final readonly class PageViewAnalyticsListener
+final readonly class MatomoDeviceDetectorFactory implements DeviceDetectorFactory
 {
-    public function __construct(private AnalyticsService $analytics)
+    /**
+     * @inheritDoc
+     */
+    public function createFromServerEnvironment(array $serverEnvironment): DeviceDetector
     {
-    }
+        $clientHints = ClientHints::factory($serverEnvironment);
 
-    public function __invoke(TerminateEvent $event): void
-    {
-        try {
-            $this->analytics->recordEventFromWebContext('pageview', $event->getRequest(), $event->getResponse());
-        } catch (UnknownAnalyticsDomain) {
-            // Ignore the exception.
-        }
+        /** @var string $userAgent */
+        $userAgent = $serverEnvironment['HTTP_USER_AGENT'] ?? '';
+
+        return new DeviceDetector($userAgent, $clientHints);
     }
 }

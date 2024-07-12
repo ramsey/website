@@ -21,26 +21,20 @@
 
 declare(strict_types=1);
 
-namespace App\EventListener;
+namespace App\Service\Analytics;
 
-use App\Service\Analytics\AnalyticsService;
-use App\Service\Analytics\UnknownAnalyticsDomain;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Symfony\Component\HttpKernel\Event\TerminateEvent;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-#[AsEventListener(event: 'kernel.terminate', priority: 20)]
-final readonly class PageViewAnalyticsListener
+interface AnalyticsDetailsFactory
 {
-    public function __construct(private AnalyticsService $analytics)
-    {
-    }
-
-    public function __invoke(TerminateEvent $event): void
-    {
-        try {
-            $this->analytics->recordEventFromWebContext('pageview', $event->getRequest(), $event->getResponse());
-        } catch (UnknownAnalyticsDomain) {
-            // Ignore the exception.
-        }
-    }
+    /**
+     * @param array<string, scalar | null> | null $tags Additional tags to record with the event
+     */
+    public function createFromWebContext(
+        string $eventName,
+        Request $request,
+        Response $response,
+        ?array $tags = null,
+    ): AnalyticsDetails;
 }

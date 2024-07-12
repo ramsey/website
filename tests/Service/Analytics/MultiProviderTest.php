@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Tests\Service\Analytics;
 
+use App\Service\Analytics\AnalyticsDetails;
+use App\Service\Analytics\AnalyticsDetailsFactory;
 use App\Service\Analytics\AnalyticsService;
 use App\Service\Analytics\MultiProvider;
 use App\Service\Analytics\UnknownAnalyticsDomain;
+use Laminas\Diactoros\UriFactory;
 use LogicException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -20,7 +23,17 @@ class MultiProviderTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    #[TestDox('calls recordEvent() on each service')]
+    private AnalyticsDetails $analyticsDetails;
+
+    protected function setUp(): void
+    {
+        $this->analyticsDetails = new AnalyticsDetails(
+            eventName: 'anEvent',
+            url: (new UriFactory())->createUri('https://example.com'),
+        );
+    }
+
+    #[TestDox('calls recordEventFromDetails() on each service')]
     public function testMultiProvider(): void
     {
         $eventName = 'pageview';
@@ -28,17 +41,23 @@ class MultiProviderTest extends TestCase
         $response = new Response();
         $tags = ['foo' => 'bar'];
 
+        $factory = Mockery::mock(AnalyticsDetailsFactory::class);
+        $factory
+            ->expects('createFromWebContext')
+            ->with($eventName, $request, $response, $tags)
+            ->andReturn($this->analyticsDetails);
+
         $service1 = Mockery::mock(AnalyticsService::class);
-        $service1->expects('recordEvent')->with($eventName, $request, $response, $tags);
+        $service1->expects('recordEventFromDetails')->with($this->analyticsDetails);
 
         $service2 = Mockery::mock(AnalyticsService::class);
-        $service2->expects('recordEvent')->with($eventName, $request, $response, $tags);
+        $service2->expects('recordEventFromDetails')->with($this->analyticsDetails);
 
         $service3 = Mockery::mock(AnalyticsService::class);
-        $service3->expects('recordEvent')->with($eventName, $request, $response, $tags);
+        $service3->expects('recordEventFromDetails')->with($this->analyticsDetails);
 
-        $multiProvider = new MultiProvider($service1, $service2, $service3);
-        $multiProvider->recordEvent($eventName, $request, $response, $tags);
+        $multiProvider = new MultiProvider($factory, $service1, $service2, $service3);
+        $multiProvider->recordEventFromWebContext($eventName, $request, $response, $tags);
     }
 
     #[TestDox('handles UnknownAnalyticsDomain exceptions')]
@@ -49,20 +68,26 @@ class MultiProviderTest extends TestCase
         $response = new Response();
         $tags = ['foo' => 'bar'];
 
+        $factory = Mockery::mock(AnalyticsDetailsFactory::class);
+        $factory
+            ->expects('createFromWebContext')
+            ->with($eventName, $request, $response, $tags)
+            ->andReturn($this->analyticsDetails);
+
         $service1 = Mockery::mock(AnalyticsService::class);
-        $service1->expects('recordEvent')->with($eventName, $request, $response, $tags);
+        $service1->expects('recordEventFromDetails')->with($this->analyticsDetails);
 
         $service2 = Mockery::mock(AnalyticsService::class);
         $service2
-            ->expects('recordEvent')
-            ->with($eventName, $request, $response, $tags)
+            ->expects('recordEventFromDetails')
+            ->with($this->analyticsDetails)
             ->andThrow(new UnknownAnalyticsDomain());
 
         $service3 = Mockery::mock(AnalyticsService::class);
-        $service3->expects('recordEvent')->with($eventName, $request, $response, $tags);
+        $service3->expects('recordEventFromDetails')->with($this->analyticsDetails);
 
-        $multiProvider = new MultiProvider($service1, $service2, $service3);
-        $multiProvider->recordEvent($eventName, $request, $response, $tags);
+        $multiProvider = new MultiProvider($factory, $service1, $service2, $service3);
+        $multiProvider->recordEventFromWebContext($eventName, $request, $response, $tags);
     }
 
     #[TestDox('does not handle other exceptions')]
@@ -73,22 +98,28 @@ class MultiProviderTest extends TestCase
         $response = new Response();
         $tags = ['foo' => 'bar'];
 
+        $factory = Mockery::mock(AnalyticsDetailsFactory::class);
+        $factory
+            ->expects('createFromWebContext')
+            ->with($eventName, $request, $response, $tags)
+            ->andReturn($this->analyticsDetails);
+
         $service1 = Mockery::mock(AnalyticsService::class);
-        $service1->expects('recordEvent')->with($eventName, $request, $response, $tags);
+        $service1->expects('recordEventFromDetails')->with($this->analyticsDetails);
 
         $service2 = Mockery::mock(AnalyticsService::class);
         $service2
-            ->expects('recordEvent')
-            ->with($eventName, $request, $response, $tags)
+            ->expects('recordEventFromDetails')
+            ->with($this->analyticsDetails)
             ->andThrow(new LogicException());
 
         $service3 = Mockery::mock(AnalyticsService::class);
-        $service3->expects('recordEvent')->never();
+        $service3->expects('recordEventFromDetails')->never();
 
-        $multiProvider = new MultiProvider($service1, $service2, $service3);
+        $multiProvider = new MultiProvider($factory, $service1, $service2, $service3);
 
         $this->expectException(LogicException::class);
 
-        $multiProvider->recordEvent($eventName, $request, $response, $tags);
+        $multiProvider->recordEventFromWebContext($eventName, $request, $response, $tags);
     }
 }

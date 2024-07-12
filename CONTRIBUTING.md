@@ -110,6 +110,16 @@ This project uses the [Symfony](https://symfony.com) framework. For more
 information about Symfony and the tools it provides, check out the
 [Symfony Documentation](https://symfony.com/doc).
 
+Use the [Symfony CLI](https://symfony.com/doc/current/setup/symfony_server.html)
+to run the local web server.
+
+``` bash
+symfony server:start
+```
+
+Then, use `symfony open:local` to open a web browser and load the website for
+local development.
+
 #### CaptainHook
 
 This project uses [CaptainHook](https://github.com/CaptainHookPhp/captainhook)

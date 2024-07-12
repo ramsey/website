@@ -23,9 +23,11 @@ declare(strict_types=1);
 
 namespace App\Service\Analytics;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 use function array_filter;
@@ -42,35 +44,60 @@ final readonly class Umami implements AnalyticsService
         #[Autowire('%app.service.umami.base_uri%')] private string $umamiBaseUri,
         #[Autowire('%app.service.umami.domains%')] private array $domains,
         private HttpClientInterface $httpClient,
+        private AnalyticsDetailsFactory $analyticsDetailsFactory,
+        private LoggerInterface $logger,
     ) {
     }
 
-    public function recordEvent(string $eventName, Request $request, Response $response, ?array $tags = null): void
-    {
-        $websiteId = $this->getWebsiteId($request->getHost());
-        $details = $this->getAnalyticsDetails($eventName, $request, $response, $tags);
+    public function recordEventFromWebContext(
+        string $eventName,
+        Request $request,
+        Response $response,
+        ?array $tags = null,
+    ): void {
+        if ($this->skipPath($request->getRequestUri())) {
+            return;
+        }
 
-        $this->httpClient->request('POST', $this->umamiBaseUri . 'send', [
-            'headers' => array_filter([
-                'user-agent' => $details->userAgent,
-                'x-forwarded-for' => $details->ipAddress,
-                'x-umami-api-key' => $this->umamiApiKey,
-            ]),
-            'json' => [
-                'type' => 'event',
-                'payload' => array_filter([
-                    'hostname' => $request->getHost(),
-                    'language' => $request->getLocale(),
-                    'referrer' => $details->referrer,
-                    'screen' => '',
-                    'title' => '',
-                    'url' => $request->getUri(),
-                    'website' => $websiteId,
-                    'name' => 'pageview',
-                    'data' => $details->tags,
+        $details = $this->analyticsDetailsFactory->createFromWebContext($eventName, $request, $response, $tags);
+        $this->recordEventFromDetails($details);
+    }
+
+    public function recordEventFromDetails(AnalyticsDetails $details): void
+    {
+        if ($this->skipPath($details->url->getPath())) {
+            return;
+        }
+
+        $websiteId = $this->getWebsiteId($details->url->getHost());
+
+        try {
+            $this->httpClient->request('POST', $this->umamiBaseUri . 'send', [
+                'headers' => array_filter([
+                    'user-agent' => $details->userAgent,
+                    'x-forwarded-for' => $details->ipAddress,
+                    'x-umami-api-key' => $this->umamiApiKey,
                 ]),
-            ],
-        ]);
+                'json' => [
+                    'type' => 'event',
+                    'payload' => array_filter([
+                        'hostname' => $details->url->getHost(),
+                        'language' => $details->locale,
+                        'referrer' => $details->referrer?->__toString(),
+                        'screen' => '',
+                        'title' => '',
+                        'url' => $details->url->__toString(),
+                        'website' => $websiteId,
+                        'name' => 'pageview',
+                        'data' => $details->tags,
+                    ]),
+                ],
+            ]);
+        } catch (TransportExceptionInterface $exception) {
+            $this->logger->error('Unable to send analytics to Umami: {message}', [
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
 
     private function getWebsiteId(string $hostName): string

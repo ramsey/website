@@ -23,21 +23,24 @@ declare(strict_types=1);
 
 namespace App\Service\Analytics;
 
+use App\Service\AnalyticsEventService;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final readonly class MultiProvider implements AnalyticsService
+/**
+ * A service for recording analytics events in the application database
+ */
+final readonly class AppDatabase implements AnalyticsService
 {
-    /**
-     * @var array<AnalyticsService>
-     */
-    private array $providers;
-
     public function __construct(
+        private AnalyticsEventService $analyticsEventService,
+        private EntityManagerInterface $entityManager,
         private AnalyticsDetailsFactory $analyticsDetailsFactory,
-        AnalyticsService ...$providers,
+        private LoggerInterface $logger,
     ) {
-        $this->providers = $providers;
     }
 
     public function recordEventFromWebContext(
@@ -52,12 +55,19 @@ final readonly class MultiProvider implements AnalyticsService
 
     public function recordEventFromDetails(AnalyticsDetails $details): void
     {
-        foreach ($this->providers as $provider) {
-            try {
-                $provider->recordEventFromDetails($details);
-            } catch (UnknownAnalyticsDomain) {
-                // Ignore exception.
-            }
+        try {
+            $this->entityManager->wrapInTransaction(
+                function (EntityManagerInterface $entityManager) use ($details): void {
+                    $event = $this->analyticsEventService->createAnalyticsEventFromDetails($details);
+                    $entityManager->persist($event->getDevice());
+                    $entityManager->persist($event);
+                    $entityManager->flush();
+                },
+            );
+        } catch (ORMException $exception) {
+            $this->logger->error('Unable to write analytics to the database: {message}', [
+                'message' => $exception->getMessage(),
+            ]);
         }
     }
 }
