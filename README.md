@@ -12,6 +12,7 @@
     <a href="https://github.com/ramsey/website/blob/main/COPYING.examples"><img src="https://img.shields.io/badge/examples-CC0--1.0-darkcyan.svg?style=flat-square" alt="License for code examples in content"></a>
     <a href="https://github.com/ramsey/website/actions/workflows/continuous-integration.yml"><img src="https://img.shields.io/github/actions/workflow/status/ramsey/website/continuous-integration.yml?branch=main&style=flat-square&logo=github" alt="Build Status"></a>
     <a href="https://codecov.io/gh/ramsey/website"><img src="https://img.shields.io/codecov/c/gh/ramsey/website?label=codecov&logo=codecov&style=flat-square" alt="Codecov Code Coverage"></a>
+    <a href="https://uptime.betterstack.com/?utm_source=status_badge"><img src="https://uptime.betterstack.com/status-badges/v1/monitor/1g04j.svg" alt="Better Stack uptime"></a>
 </p>
 
 ## About
