@@ -107,4 +107,22 @@ class UrlShortenerListenerTest extends TestCase
         $listener = new UrlShortenerListener();
         $listener($event);
     }
+
+    #[TestDox("requests that are exactly the path '/robots.txt' pass through the listener")]
+    public function testUrlShortenerListenerForRobotsTxtPath(): void
+    {
+        $parameterBag = Mockery::mock(ParameterBag::class);
+        $parameterBag->expects('set')->never();
+
+        $request = Mockery::mock(Request::class);
+        $request->expects('getHost')->andReturn('ben.ramsey.dev');
+        $request->expects('getRequestUri')->andReturn('/robots.txt');
+        $request->attributes = $parameterBag;
+
+        $event = Mockery::mock(RequestEvent::class);
+        $event->expects('getRequest')->twice()->andReturn($request);
+
+        $listener = new UrlShortenerListener();
+        $listener($event);
+    }
 }

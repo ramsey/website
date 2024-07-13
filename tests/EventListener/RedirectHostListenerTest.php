@@ -53,6 +53,34 @@ class RedirectHostListenerTest extends TestCase
         $listener($event);
     }
 
+    #[TestDox('redirect listener simply returns for the /health route on any host')]
+    public function testRedirectHostListenerOnHealthRoute(): void
+    {
+        $event = Mockery::mock(RequestEvent::class);
+        $event->expects('getRequest->getHost')->andReturn('127.0.0.1');
+        $event->expects('getRequest->getRequestUri')->andReturn('/health');
+        $event->expects('setResponse')->never();
+
+        $twig = Mockery::mock(Environment::class);
+
+        $listener = new RedirectHostListener('prod', $twig);
+        $listener($event);
+    }
+
+    #[TestDox('redirect listener simply returns for the /robots.txt route on any host')]
+    public function testRedirectHostListenerOnRobotsTxtRoute(): void
+    {
+        $event = Mockery::mock(RequestEvent::class);
+        $event->expects('getRequest->getHost')->andReturn('127.0.0.1');
+        $event->expects('getRequest->getRequestUri')->andReturn('/robots.txt');
+        $event->expects('setResponse')->never();
+
+        $twig = Mockery::mock(Environment::class);
+
+        $listener = new RedirectHostListener('prod', $twig);
+        $listener($event);
+    }
+
     #[TestDox('redirect listener simply returns when on short URL host with correct controller')]
     public function testRedirectHostListenerOnShorUrlHost(): void
     {

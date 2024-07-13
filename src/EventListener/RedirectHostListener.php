@@ -68,8 +68,8 @@ final readonly class RedirectHostListener
         $path = $event->getRequest()->getRequestUri();
 
         // If we're already on ben.ramsey.dev, then everything is good, and
-        // do not redirect for the /health route.
-        if ($host === 'ben.ramsey.dev' || $path === '/health') {
+        // do not redirect for the /health or /robots.txt routes.
+        if ($host === 'ben.ramsey.dev' || $path === '/health' || $path === '/robots.txt') {
             return;
         }
 

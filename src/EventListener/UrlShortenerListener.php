@@ -49,6 +49,6 @@ final readonly class UrlShortenerListener
             return true;
         }
 
-        return $host === 'bram.se' && $path !== '/';
+        return $host === 'bram.se' && $path !== '/' && $path !== '/robots.txt';
     }
 }
