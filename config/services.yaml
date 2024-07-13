@@ -57,6 +57,7 @@ services:
     Logtail\Monolog\LogtailHandler:
         arguments:
             - '%app.service.better_stack.source_token%'
+            - 'info'
     Psr\Clock\ClockInterface $monotonicClock: '@Symfony\Component\Clock\MonotonicClock'
     Psr\Clock\ClockInterface: '@Symfony\Component\Clock\NativeClock'
     Psr\Http\Message\UriFactoryInterface: '@Laminas\Diactoros\UriFactory'

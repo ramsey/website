@@ -50,7 +50,7 @@ final readonly class RequestLogListener
             $execTime = number_format($clockTime - (float) $execTime, 6, '.', '');
         }
 
-        $this->logger->info('Request for {url}', [
+        $this->logger->info('Request for ' . $event->getRequest()->getUri(), [
             'url' => $event->getRequest()->getUri(),
             'request' => [
                 'method' => $event->getRequest()->getMethod(),
