@@ -9,6 +9,7 @@ parameters:
     app.data.openpgp_web_key: '%app.data_dir%/openpgp_web_key.php'
     app.data.webfinger_account: '%app.data_dir%/webfinger_account.php'
     app.service.analytics.secret_key: '%env(resolve:ANALYTICS_SECRET_KEY)%'
+    app.service.better_stack.source_token: '%env(resolve:BETTER_STACK_SOURCE_TOKEN)%'
     app.service.plausible.api_token: '%env(resolve:PLAUSIBLE_API_TOKEN)%'
     app.service.plausible.base_uri: 'https://plausible.io/api/'
     app.service.plausible.domains:
@@ -53,7 +54,14 @@ services:
             - '%app.service.plausible.base_uri%'
     GeoIp2\ProviderInterface: '@geoip2.database.default_reader'
     Laminas\Diactoros\UriFactory: ~
+    Logtail\Monolog\LogtailHandler:
+        arguments:
+            - '%app.service.better_stack.source_token%'
+    Psr\Clock\ClockInterface $monotonicClock: '@Symfony\Component\Clock\MonotonicClock'
+    Psr\Clock\ClockInterface: '@Symfony\Component\Clock\NativeClock'
     Psr\Http\Message\UriFactoryInterface: '@Laminas\Diactoros\UriFactory'
+    Symfony\Component\Clock\MonotonicClock: ~
+    Symfony\Component\Clock\NativeClock: ~
 
 when@test: &services_test
     parameters:

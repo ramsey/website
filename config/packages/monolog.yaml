@@ -42,15 +42,12 @@ when@prod:
         handlers:
             main:
                 type: fingers_crossed
-                action_level: error
-                handler: nested
-                excluded_http_codes: [404, 405]
-                buffer_size: 50 # How many messages should be saved? Prevent memory leaks
-            nested:
-                type: stream
-                path: php://stderr
-                level: debug
-                formatter: monolog.formatter.json
+                action_level: info
+                handler: logtail
+                buffer_size: 250
+            logtail:
+                type: service
+                id: '@Logtail\Monolog\LogtailHandler'
             console:
                 type: console
                 process_psr_3_messages: false
