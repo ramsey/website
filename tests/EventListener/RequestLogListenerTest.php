@@ -77,7 +77,7 @@ class RequestLogListenerTest extends TestCase
         $listener($event);
 
         $this->assertTrue($testHandler->hasInfoThatPasses(function (LogRecord $record) use ($userAgent): bool {
-            $this->assertSame('Request for https://foo.example.net/path/to/content', $record->message);
+            $this->assertSame('Responded 201 for PUT https://foo.example.net/path/to/content', $record->message);
             $this->assertSame(
                 [
                     'url' => 'https://foo.example.net/path/to/content',

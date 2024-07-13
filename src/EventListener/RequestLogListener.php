@@ -30,6 +30,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 
 use function number_format;
+use function sprintf;
 
 #[AsEventListener(event: 'kernel.terminate', priority: -1)]
 final readonly class RequestLogListener
@@ -50,14 +51,18 @@ final readonly class RequestLogListener
             $execTime = number_format($clockTime - (float) $execTime, 6, '.', '');
         }
 
-        $this->logger->info('Request for ' . $event->getRequest()->getUri(), [
-            'url' => $event->getRequest()->getUri(),
+        $method = $event->getRequest()->getMethod();
+        $url = $event->getRequest()->getUri();
+        $status = $event->getResponse()->getStatusCode();
+
+        $this->logger->info(sprintf('Responded %d for %s %s', $status, $method, $url), [
+            'url' => $url,
             'request' => [
-                'method' => $event->getRequest()->getMethod(),
+                'method' => $method,
                 'headers' => $event->getRequest()->headers->all(),
             ],
             'response' => [
-                'code' => $event->getResponse()->getStatusCode(),
+                'code' => $status,
                 'headers' => $event->getResponse()->headers->all(),
             ],
             'exec_time' => $execTime,
