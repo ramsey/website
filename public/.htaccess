@@ -1,3 +1,5 @@
+ProxyPassMatch "^/\/?(wp\-.*)$" "http://pandoras-pot:8080/$1"
+
 FallbackResource /index.php
 
 <FilesMatch "\.(css|gif|html|ico|jpg|js|pdf|png|svg|txt|woff2|xml)$">

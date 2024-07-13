@@ -2,6 +2,7 @@ Sitemap: https://ben.ramsey.dev/sitemap.xml
 
 User-agent: *
 Allow: /
+Disallow: /wp-
 
 # I do not block CCBot. It publishes a free, open repository for anyone to use.
 # <https://commoncrawl.org/ccbot>
