@@ -47,7 +47,7 @@ when@prod:
                 buffer_size: 250
             logtail:
                 type: service
-                id: '@Logtail\Monolog\LogtailHandler'
+                id: 'Logtail\Monolog\LogtailHandler'
             console:
                 type: console
                 process_psr_3_messages: false
