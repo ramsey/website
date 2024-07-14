@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Tests\EventListener;
 
 use App\EventListener\RequestLogListener;
+use App\Service\Analytics\AnalyticsDetails;
+use App\Service\Analytics\AnalyticsDetailsFactory;
 use DateTimeImmutable;
 use Faker\Factory;
+use Laminas\Diactoros\UriFactory;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Monolog\Handler\TestHandler;
@@ -32,28 +35,32 @@ class RequestLogListenerTest extends TestCase
     public function testLogsRequestResponseData(): void
     {
         $faker = Factory::create();
-        $userAgent = $faker->userAgent();
+
+        $analyticsDetails = new AnalyticsDetails(
+            eventName: 'anEvent',
+            url: (new UriFactory())->createUri($faker->url()),
+            geoCity: $faker->city(),
+            geoCountryCode: $faker->countryCode(),
+            geoLatitude: $faker->latitude(),
+            geoLongitude: $faker->longitude(),
+            geoSubdivisionCode: $faker->stateAbbr(), // @phpstan-ignore method.notFound
+            ipAddress: $faker->ipv4(),
+            redirectUrl: (new UriFactory())->createUri($faker->url()),
+            referrer: (new UriFactory())->createUri($faker->url()),
+            userAgent: $faker->userAgent(),
+        );
 
         $requestTime = new DateTimeImmutable('@1720843500.863559');
         $clock = static::mockTime(new DateTimeImmutable('@1720843501.386580'));
 
         $testHandler = new TestHandler();
-        $logger = new Logger('test', [$testHandler]);
+        $appHealthLogger = new Logger('test_health', [$testHandler]);
+        $appRequestLogger = new Logger('test_request', [$testHandler]);
 
         $request = Request::create(
             uri: 'https://foo.example.net/path/to/content',
             method: 'PUT',
-            cookies: [
-                'testCookie' => 'this cookie should not appear in the logs',
-            ],
             server: [
-                'CONTENT_TYPE' => 'application/json',
-                'HTTP_HOST' => 'foo.example.net',
-                'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'HTTP_ACCEPT_CHARSET' => 'utf-8',
-                'HTTP_ACCEPT_ENCODING' => 'gzip, deflate, br',
-                'HTTP_ACCEPT_LANGUAGE' => 'es-MX',
-                'HTTP_USER_AGENT' => $userAgent,
                 'REQUEST_TIME_FLOAT' => $requestTime->format('U.u'),
             ],
             content: (string) json_encode(['foo' => 'bar']),
@@ -62,47 +69,43 @@ class RequestLogListenerTest extends TestCase
         $response = new Response(
             content: 'Body of response.',
             status: 201,
-            headers: [
-                'cache-control' => 'no-cache, private',
-                'content-type' => 'text/plain; charset=utf-8',
-                'link' => '<https://example.com/path/to/alt/content>; rel=alternate',
-                'date' => 'Sat, 13 Jul 2024 04:17:53 GMT',
-            ],
         );
+
+        $factory = Mockery::mock(AnalyticsDetailsFactory::class);
+        $factory
+            ->expects('createFromWebContext')
+            ->with('request_complete', $request, $response)
+            ->andReturn($analyticsDetails);
 
         $kernel = Mockery::mock(HttpKernelInterface::class);
 
-        $listener = new RequestLogListener($logger, $clock);
+        $listener = new RequestLogListener($factory, $appHealthLogger, $appRequestLogger, $clock);
         $event = new TerminateEvent($kernel, $request, $response);
         $listener($event);
 
-        $this->assertTrue($testHandler->hasInfoThatPasses(function (LogRecord $record) use ($userAgent): bool {
-            $this->assertSame('Responded 201 for PUT https://foo.example.net/path/to/content', $record->message);
+        $this->assertTrue($testHandler->hasInfoThatPasses(function (LogRecord $record) use ($analyticsDetails): bool {
+            $this->assertSame(
+                'Responded 201 for PUT ' . $analyticsDetails->url,
+                $record->message,
+            );
             $this->assertSame(
                 [
-                    'url' => 'https://foo.example.net/path/to/content',
-                    'request' => [
-                        'method' => 'PUT',
-                        'headers' => [
-                            'host' => ['foo.example.net'],
-                            'user-agent' => [$userAgent],
-                            'accept' => ['text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'],
-                            'accept-language' => ['es-MX'],
-                            'accept-charset' => ['utf-8'],
-                            'content-type' => ['application/json'],
-                            'accept-encoding' => ['gzip, deflate, br'],
-                        ],
-                    ],
-                    'response' => [
-                        'code' => 201,
-                        'headers' => [
-                            'cache-control' => ['no-cache, private'],
-                            'content-type' => ['text/plain; charset=utf-8'],
-                            'link' => ['<https://example.com/path/to/alt/content>; rel=alternate'],
-                            'date' => ['Sat, 13 Jul 2024 04:17:53 GMT'],
-                        ],
-                    ],
                     'exec_time' => '0.523021',
+                    'geo' => [
+                        'city' => $analyticsDetails->geoCity,
+                        'country_code' => $analyticsDetails->geoCountryCode,
+                        'latitude' => $analyticsDetails->geoLatitude,
+                        'longitude' => $analyticsDetails->geoLongitude,
+                        'subdivision_code' => $analyticsDetails->geoSubdivisionCode,
+                    ],
+                    'host' => $analyticsDetails->url->getHost(),
+                    'redirect_url' => $analyticsDetails->redirectUrl?->__toString(),
+                    'referrer' => $analyticsDetails->referrer?->__toString(),
+                    'request_method' => 'PUT',
+                    'status_code' => 201,
+                    'url' => $analyticsDetails->url->__toString(),
+                    'user_agent' => $analyticsDetails->userAgent,
+                    'ip' => $analyticsDetails->ipAddress,
                 ],
                 $record->context,
             );

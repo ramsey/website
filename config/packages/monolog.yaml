@@ -1,5 +1,7 @@
 monolog:
     channels:
+        - app_health # Dedicated logger for requests to the /health endpoint.
+        - app_request # Dedicated channel for standard request logs, separate from Symfony's built-in "request" channel.
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
 
 when@dev:

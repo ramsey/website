@@ -82,6 +82,7 @@ when@test: &services_test
             resource: '../tests/DataFixtures'
         
         App\Service\Analytics\AnalyticsService: '@App\Service\Analytics\NoOpProvider'
+        GeoIp2\ProviderInterface: '@App\Service\GeoIp2\NoOpProvider'
 
 when@test_no_db: *services_test
 
@@ -91,3 +92,4 @@ when@dev:
 
     services:
         App\Service\Analytics\AnalyticsService: '@App\Service\Analytics\NoOpProvider'
+        GeoIp2\ProviderInterface: '@App\Service\GeoIp2\NoOpProvider'

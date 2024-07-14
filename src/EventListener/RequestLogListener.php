@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\EventListener;
 
+use App\Service\Analytics\AnalyticsDetailsFactory;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -35,8 +36,14 @@ use function sprintf;
 #[AsEventListener(event: 'kernel.terminate', priority: -1)]
 final readonly class RequestLogListener
 {
+    /**
+     * @param LoggerInterface $appHealthLogger Dedicated log channel for requests to /health
+     * @param LoggerInterface $appRequestLogger Dedicated log channel for all app requests
+     */
     public function __construct(
-        private LoggerInterface $logger,
+        private AnalyticsDetailsFactory $analyticsDetailsFactory,
+        private LoggerInterface $appHealthLogger,
+        private LoggerInterface $appRequestLogger,
         #[Target('monotonicClock')] private ClockInterface $clock,
     ) {
     }
@@ -52,20 +59,36 @@ final readonly class RequestLogListener
         }
 
         $method = $event->getRequest()->getMethod();
-        $url = $event->getRequest()->getUri();
-        $status = $event->getResponse()->getStatusCode();
+        $statusCode = $event->getResponse()->getStatusCode();
 
-        $this->logger->info(sprintf('Responded %d for %s %s', $status, $method, $url), [
-            'url' => $url,
-            'request' => [
-                'method' => $method,
-                'headers' => $event->getRequest()->headers->all(),
-            ],
-            'response' => [
-                'code' => $status,
-                'headers' => $event->getResponse()->headers->all(),
-            ],
+        $details = $this->analyticsDetailsFactory->createFromWebContext(
+            'request_complete',
+            $event->getRequest(),
+            $event->getResponse(),
+        );
+
+        $logger = match ($event->getRequest()->getRequestUri()) {
+            '/health' => $this->appHealthLogger,
+            default => $this->appRequestLogger,
+        };
+
+        $logger->info(sprintf('Responded %d for %s %s', $statusCode, $method, $details->url), [
             'exec_time' => $execTime,
+            'geo' => [
+                'city' => $details->geoCity,
+                'country_code' => $details->geoCountryCode,
+                'latitude' => $details->geoLatitude,
+                'longitude' => $details->geoLongitude,
+                'subdivision_code' => $details->geoSubdivisionCode,
+            ],
+            'host' => $details->url->getHost(),
+            'redirect_url' => $details->redirectUrl?->__toString(),
+            'referrer' => $details->referrer?->__toString(),
+            'request_method' => $method,
+            'status_code' => $statusCode,
+            'url' => $details->url->__toString(),
+            'user_agent' => $details->userAgent,
+            'ip' => $details->ipAddress,
         ]);
     }
 }
