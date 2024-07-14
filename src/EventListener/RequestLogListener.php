@@ -51,14 +51,6 @@ final readonly class RequestLogListener
 
     public function __invoke(TerminateEvent $event): void
     {
-        /** @var float | string | null $execTime */
-        $execTime = $event->getRequest()->server->get('REQUEST_TIME_FLOAT');
-
-        if ($execTime !== null) {
-            $clockTime = (float) $this->clock->now()->format('U.u');
-            $execTime = number_format($clockTime - (float) $execTime, 6, '.', '');
-        }
-
         $method = $event->getRequest()->getMethod();
         $statusCode = $event->getResponse()->getStatusCode();
 
@@ -72,6 +64,14 @@ final readonly class RequestLogListener
             '/health' => $this->appHealthLogger,
             default => $this->appRequestLogger,
         };
+
+        /** @var float | string | null $execTime */
+        $execTime = $event->getRequest()->server->get('REQUEST_TIME_FLOAT');
+
+        if ($execTime !== null) {
+            $clockTime = (float) $this->clock->now()->format('U.u');
+            $execTime = number_format($clockTime - (float) $execTime, 6, '.', '');
+        }
 
         $logger->info(sprintf('Responded %d for %s %s', $statusCode, $method, $details->url), [
             'exec_time' => $execTime,
