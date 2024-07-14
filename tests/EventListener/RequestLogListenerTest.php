@@ -23,7 +23,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
+use function bin2hex;
 use function json_encode;
+use function md5;
 
 #[TestDox('RequestLogListener')]
 class RequestLogListenerTest extends TestCase
@@ -35,6 +37,8 @@ class RequestLogListenerTest extends TestCase
     public function testLogsRequestResponseData(): void
     {
         $faker = Factory::create();
+        $ip = $faker->ipv4();
+        $userAgent = $faker->userAgent();
 
         $analyticsDetails = new AnalyticsDetails(
             eventName: 'anEvent',
@@ -44,10 +48,11 @@ class RequestLogListenerTest extends TestCase
             geoLatitude: $faker->latitude(),
             geoLongitude: $faker->longitude(),
             geoSubdivisionCode: $faker->stateAbbr(), // @phpstan-ignore method.notFound
-            ipAddress: $faker->ipv4(),
+            ipAddress: $ip,
+            ipAddressUserAgentHash: md5($ip . $userAgent, true),
             redirectUrl: (new UriFactory())->createUri($faker->url()),
             referrer: (new UriFactory())->createUri($faker->url()),
-            userAgent: $faker->userAgent(),
+            userAgent: $userAgent,
         );
 
         $requestTime = new DateTimeImmutable('@1720843500.863559');
@@ -99,13 +104,14 @@ class RequestLogListenerTest extends TestCase
                         'subdivision_code' => $analyticsDetails->geoSubdivisionCode,
                     ],
                     'host' => $analyticsDetails->url->getHost(),
+                    'ip' => $analyticsDetails->ipAddress,
                     'redirect_url' => $analyticsDetails->redirectUrl?->__toString(),
                     'referrer' => $analyticsDetails->referrer?->__toString(),
                     'request_method' => 'PUT',
                     'status_code' => 201,
                     'url' => $analyticsDetails->url->__toString(),
                     'user_agent' => $analyticsDetails->userAgent,
-                    'ip' => $analyticsDetails->ipAddress,
+                    'visitor_hash' => bin2hex($analyticsDetails->ipAddressUserAgentHash),
                 ],
                 $record->context,
             );

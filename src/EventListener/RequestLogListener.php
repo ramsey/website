@@ -30,6 +30,7 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 
+use function bin2hex;
 use function number_format;
 use function sprintf;
 
@@ -82,13 +83,14 @@ final readonly class RequestLogListener
                 'subdivision_code' => $details->geoSubdivisionCode,
             ],
             'host' => $details->url->getHost(),
+            'ip' => $details->ipAddress,
             'redirect_url' => $details->redirectUrl?->__toString(),
             'referrer' => $details->referrer?->__toString(),
             'request_method' => $method,
             'status_code' => $statusCode,
             'url' => $details->url->__toString(),
             'user_agent' => $details->userAgent,
-            'ip' => $details->ipAddress,
+            'visitor_hash' => bin2hex($details->ipAddressUserAgentHash),
         ]);
     }
 }
