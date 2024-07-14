@@ -30,6 +30,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidV7Generator;
 use Ramsey\Uuid\UuidInterface;
 
+use function strtolower;
+
 /**
  * A device (i.e., client), as recorded by an analytics event
  */
@@ -109,7 +111,7 @@ class AnalyticsDevice
      */
     public function setCategory(?string $category): static
     {
-        $this->category = $category;
+        $this->category = $category ? strtolower($category) : null;
 
         return $this;
     }

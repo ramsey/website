@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\EventListener;
 
+use App\Entity\AnalyticsDevice;
 use App\EventListener\RequestLogListener;
 use App\Service\Analytics\AnalyticsDetails;
 use App\Service\Analytics\AnalyticsDetailsFactory;
+use App\Service\Device\DeviceService;
 use DateTimeImmutable;
 use Faker\Factory;
 use Laminas\Diactoros\UriFactory;
@@ -52,6 +54,7 @@ class RequestLogListenerTest extends TestCase
             ipAddressUserAgentHash: md5($ip . $userAgent, true),
             redirectUrl: (new UriFactory())->createUri($faker->url()),
             referrer: (new UriFactory())->createUri($faker->url()),
+            serverEnvironment: ['foo' => 'bar'],
             userAgent: $userAgent,
         );
 
@@ -82,9 +85,22 @@ class RequestLogListenerTest extends TestCase
             ->with('request_complete', $request, $response)
             ->andReturn($analyticsDetails);
 
+        $device = new AnalyticsDevice();
+        $device->setCategory('Web Browser');
+        $device->setDevice('desktop');
+        $device->setFamily('Test Family');
+        $device->setName('A Test Browser');
+        $device->setOsFamily('An Operating System');
+
+        $deviceService = Mockery::mock(DeviceService::class);
+        $deviceService
+            ->expects('getDevice')
+            ->with($analyticsDetails->userAgent, $analyticsDetails->serverEnvironment)
+            ->andReturn($device);
+
         $kernel = Mockery::mock(HttpKernelInterface::class);
 
-        $listener = new RequestLogListener($factory, $appHealthLogger, $appRequestLogger, $clock);
+        $listener = new RequestLogListener($factory, $appHealthLogger, $appRequestLogger, $deviceService, $clock);
         $event = new TerminateEvent($kernel, $request, $response);
         $listener($event);
 
@@ -96,6 +112,13 @@ class RequestLogListenerTest extends TestCase
             $this->assertSame(
                 [
                     'exec_time' => '0.523021',
+                    'device' => [
+                        'category' => 'web browser',
+                        'family' => 'Test Family',
+                        'name' => 'A Test Browser',
+                        'os' => 'An Operating System',
+                        'type' => 'desktop',
+                    ],
                     'geo' => [
                         'city' => $analyticsDetails->geoCity,
                         'country_code' => $analyticsDetails->geoCountryCode,

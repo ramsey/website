@@ -24,10 +24,11 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\Service\Analytics\AnalyticsDetailsFactory;
+use App\Service\Device\DeviceService;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 
 use function bin2hex;
@@ -45,7 +46,8 @@ final readonly class RequestLogListener
         private AnalyticsDetailsFactory $analyticsDetailsFactory,
         private LoggerInterface $appHealthLogger,
         private LoggerInterface $appRequestLogger,
-        #[Target('monotonicClock')] private ClockInterface $clock,
+        private DeviceService $deviceService,
+        private ClockInterface $monotonicClock,
     ) {
     }
 
@@ -53,6 +55,11 @@ final readonly class RequestLogListener
     {
         $method = $event->getRequest()->getMethod();
         $statusCode = $event->getResponse()->getStatusCode();
+        $requestUri = $event->getRequest()->getRequestUri();
+
+        if ($requestUri === '/health' && $statusCode === Response::HTTP_SERVICE_UNAVAILABLE) {
+            return;
+        }
 
         $details = $this->analyticsDetailsFactory->createFromWebContext(
             'request_complete',
@@ -60,7 +67,9 @@ final readonly class RequestLogListener
             $event->getResponse(),
         );
 
-        $logger = match ($event->getRequest()->getRequestUri()) {
+        $device = $this->deviceService->getDevice($details->userAgent, $details->serverEnvironment);
+
+        $logger = match ($requestUri) {
             '/health' => $this->appHealthLogger,
             default => $this->appRequestLogger,
         };
@@ -69,12 +78,19 @@ final readonly class RequestLogListener
         $execTime = $event->getRequest()->server->get('REQUEST_TIME_FLOAT');
 
         if ($execTime !== null) {
-            $clockTime = (float) $this->clock->now()->format('U.u');
+            $clockTime = (float) $this->monotonicClock->now()->format('U.u');
             $execTime = number_format($clockTime - (float) $execTime, 6, '.', '');
         }
 
         $logger->info(sprintf('Responded %d for %s %s', $statusCode, $method, $details->url), [
             'exec_time' => $execTime,
+            'device' => [
+                'category' => $device->getCategory(),
+                'family' => $device->getFamily(),
+                'name' => $device->getName(),
+                'os' => $device->getOsFamily(),
+                'type' => $device->getDevice(),
+            ],
             'geo' => [
                 'city' => $details->geoCity,
                 'country_code' => $details->geoCountryCode,
