@@ -3,6 +3,7 @@ Sitemap: https://ben.ramsey.dev/sitemap.xml
 User-agent: *
 Allow: /
 Disallow: /*.php
+Disallow: /*wlwmanifest.xml$
 Disallow: /.env
 Disallow: /.git
 Disallow: /wp-
