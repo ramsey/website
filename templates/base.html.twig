@@ -51,7 +51,7 @@
             <meta name="keywords" content="Ben Ramsey,PHP,open source,coding,coder,author,writer,speaker,web development,web developer">
         {% endblock %}
 
-        <link rel="preload" href="{{ preload(asset('styles/app.scss'), { as: 'style', importance: 'high' }) }}">
+        <link rel="preload" href="{{ preload(asset('styles/app.scss'), { as: 'style', importance: 'high' }) }}" as="style">
 
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('styles/app.scss') }}">
