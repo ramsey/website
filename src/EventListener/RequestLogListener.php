@@ -24,7 +24,7 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\Service\Analytics\AnalyticsDetailsFactory;
-use App\Service\AnalyticsDeviceService;
+use App\Service\Device\DeviceDetailsFactory;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -46,7 +46,7 @@ final readonly class RequestLogListener
         private AnalyticsDetailsFactory $analyticsDetailsFactory,
         private LoggerInterface $appHealthLogger,
         private LoggerInterface $appRequestLogger,
-        private AnalyticsDeviceService $deviceService,
+        private DeviceDetailsFactory $deviceDetailsFactory,
         private ClockInterface $monotonicClock,
     ) {
     }
@@ -61,13 +61,13 @@ final readonly class RequestLogListener
             return;
         }
 
-        $details = $this->analyticsDetailsFactory->createFromWebContext(
+        $analyticsDetails = $this->analyticsDetailsFactory->createFromWebContext(
             'request_complete',
             $event->getRequest(),
             $event->getResponse(),
         );
 
-        $device = $this->deviceService->getDevice($details->serverEnvironment);
+        $deviceDetails = $this->deviceDetailsFactory->createFromServerEnvironment($analyticsDetails->serverEnvironment);
 
         $logger = match ($requestUri) {
             '/health' => $this->appHealthLogger,
@@ -82,31 +82,31 @@ final readonly class RequestLogListener
             $execTime = number_format($clockTime - (float) $execTime, 6, '.', '');
         }
 
-        $logger->info(sprintf('Responded %d for %s %s', $statusCode, $method, $details->url), [
+        $logger->info(sprintf('Responded %d for %s %s', $statusCode, $method, $analyticsDetails->url), [
             'exec_time' => $execTime,
             'device' => [
-                'category' => $device->getCategory(),
-                'family' => $device->getFamily(),
-                'name' => $device->getName(),
-                'os' => $device->getOsFamily(),
-                'type' => $device->getDevice(),
+                'category' => $deviceDetails->category,
+                'family' => $deviceDetails->family,
+                'name' => $deviceDetails->name,
+                'os' => $deviceDetails->osFamily,
+                'type' => $deviceDetails->type,
             ],
             'geo' => [
-                'city' => $details->geoCity,
-                'country_code' => $details->geoCountryCode,
-                'latitude' => $details->geoLatitude,
-                'longitude' => $details->geoLongitude,
-                'subdivision_code' => $details->geoSubdivisionCode,
+                'city' => $analyticsDetails->geoCity,
+                'country_code' => $analyticsDetails->geoCountryCode,
+                'latitude' => $analyticsDetails->geoLatitude,
+                'longitude' => $analyticsDetails->geoLongitude,
+                'subdivision_code' => $analyticsDetails->geoSubdivisionCode,
             ],
-            'host' => $details->url->getHost(),
-            'ip' => $details->ipAddress,
-            'redirect_url' => $details->redirectUrl?->__toString(),
-            'referrer' => $details->referrer?->__toString(),
+            'host' => $analyticsDetails->url->getHost(),
+            'ip' => $analyticsDetails->ipAddress,
+            'redirect_url' => $analyticsDetails->redirectUrl?->__toString(),
+            'referrer' => $analyticsDetails->referrer?->__toString(),
             'request_method' => $method,
             'status_code' => $statusCode,
-            'url' => $details->url->__toString(),
-            'user_agent' => $details->userAgent,
-            'visitor_hash' => bin2hex($details->ipAddressUserAgentHash),
+            'url' => $analyticsDetails->url->__toString(),
+            'user_agent' => $analyticsDetails->userAgent,
+            'visitor_hash' => bin2hex($analyticsDetails->ipAddressUserAgentHash),
         ]);
     }
 }

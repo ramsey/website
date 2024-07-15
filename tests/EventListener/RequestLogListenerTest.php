@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\EventListener;
 
-use App\Entity\AnalyticsDevice;
 use App\EventListener\RequestLogListener;
 use App\Service\Analytics\AnalyticsDetails;
 use App\Service\Analytics\AnalyticsDetailsFactory;
-use App\Service\AnalyticsDeviceService;
+use App\Service\Device\DeviceDetails;
+use App\Service\Device\DeviceDetailsFactory;
 use DateTimeImmutable;
 use Faker\Factory;
 use Laminas\Diactoros\UriFactory;
@@ -79,28 +79,36 @@ class RequestLogListenerTest extends TestCase
             status: 201,
         );
 
-        $factory = Mockery::mock(AnalyticsDetailsFactory::class);
-        $factory
+        $analyticsDetailsFactory = Mockery::mock(AnalyticsDetailsFactory::class);
+        $analyticsDetailsFactory
             ->expects('createFromWebContext')
             ->with('request_complete', $request, $response)
             ->andReturn($analyticsDetails);
 
-        $device = new AnalyticsDevice();
-        $device->setCategory('Web Browser');
-        $device->setDevice('desktop');
-        $device->setFamily('Test Family');
-        $device->setName('A Test Browser');
-        $device->setOsFamily('An Operating System');
+        $deviceDetails = new DeviceDetails(
+            name: 'A Test Browser',
+            type: 'desktop',
+            category: 'web browser',
+            family: 'Test Family',
+            osFamily: 'An Operating System',
+        );
 
-        $deviceService = Mockery::mock(AnalyticsDeviceService::class);
-        $deviceService
-            ->expects('getDevice')
+        $deviceDetailsFactory = Mockery::mock(DeviceDetailsFactory::class);
+        $deviceDetailsFactory
+            ->expects('createFromServerEnvironment')
             ->with($analyticsDetails->serverEnvironment)
-            ->andReturn($device);
+            ->andReturn($deviceDetails);
 
         $kernel = Mockery::mock(HttpKernelInterface::class);
 
-        $listener = new RequestLogListener($factory, $appHealthLogger, $appRequestLogger, $deviceService, $clock);
+        $listener = new RequestLogListener(
+            $analyticsDetailsFactory,
+            $appHealthLogger,
+            $appRequestLogger,
+            $deviceDetailsFactory,
+            $clock,
+        );
+
         $event = new TerminateEvent($kernel, $request, $response);
         $listener($event);
 
