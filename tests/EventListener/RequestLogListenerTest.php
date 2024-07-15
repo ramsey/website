@@ -138,6 +138,7 @@ class RequestLogListenerTest extends TestCase
                     'ip' => $analyticsDetails->ipAddress,
                     'redirect_url' => $analyticsDetails->redirectUrl?->__toString(),
                     'referrer' => $analyticsDetails->referrer?->__toString(),
+                    'referrer_host' => $analyticsDetails->referrer?->getHost(),
                     'request_method' => 'PUT',
                     'status_code' => 201,
                     'url' => $analyticsDetails->url->__toString(),

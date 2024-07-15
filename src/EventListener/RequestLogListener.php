@@ -102,6 +102,7 @@ final readonly class RequestLogListener
             'ip' => $analyticsDetails->ipAddress,
             'redirect_url' => $analyticsDetails->redirectUrl?->__toString(),
             'referrer' => $analyticsDetails->referrer?->__toString(),
+            'referrer_host' => $analyticsDetails->referrer?->getHost(),
             'request_method' => $method,
             'status_code' => $statusCode,
             'url' => $analyticsDetails->url->__toString(),
