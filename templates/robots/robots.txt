@@ -2,6 +2,7 @@ Sitemap: https://ben.ramsey.dev/sitemap.xml
 
 User-agent: *
 Allow: /
+Disallow: /*.ashx$
 Disallow: /*.php
 Disallow: /*wlwmanifest.xml$
 Disallow: /.env
