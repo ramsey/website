@@ -94,8 +94,6 @@ final readonly class RequestLogListener
             'geo' => [
                 'city' => $analyticsDetails->geoCity,
                 'country_code' => $analyticsDetails->geoCountryCode,
-                'latitude' => $analyticsDetails->geoLatitude,
-                'longitude' => $analyticsDetails->geoLongitude,
                 'subdivision_code' => $analyticsDetails->geoSubdivisionCode,
             ],
             'host' => $analyticsDetails->url->getHost(),
