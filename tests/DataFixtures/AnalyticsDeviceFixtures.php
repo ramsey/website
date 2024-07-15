@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\DataFixtures;
 
-use App\Service\Device\DeviceService;
+use App\Service\AnalyticsDeviceService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -84,14 +84,14 @@ final class AnalyticsDeviceFixtures extends Fixture
         ],
     ];
 
-    public function __construct(private readonly DeviceService $deviceService)
+    public function __construct(private readonly AnalyticsDeviceService $deviceService)
     {
     }
 
     public function load(ObjectManager $manager): void
     {
         foreach (self::DEVICES as $name => $server) {
-            $device = $this->deviceService->getDevice($server['HTTP_USER_AGENT'], $server);
+            $device = $this->deviceService->getDevice($server);
             $manager->persist($device);
             $this->addReference($name, $device);
         }

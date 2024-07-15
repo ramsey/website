@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Service\Device;
+namespace App\Tests\Service\Device\Matomo;
 
-use App\Service\Device\MatomoDeviceDetectorFactory;
+use App\Service\Device\Matomo\MatomoDeviceDetectorFactory;
 use DeviceDetector\DeviceDetector;
 use PHPUnit\Framework\TestCase;
 

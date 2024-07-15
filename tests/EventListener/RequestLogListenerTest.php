@@ -8,7 +8,7 @@ use App\Entity\AnalyticsDevice;
 use App\EventListener\RequestLogListener;
 use App\Service\Analytics\AnalyticsDetails;
 use App\Service\Analytics\AnalyticsDetailsFactory;
-use App\Service\Device\DeviceService;
+use App\Service\AnalyticsDeviceService;
 use DateTimeImmutable;
 use Faker\Factory;
 use Laminas\Diactoros\UriFactory;
@@ -92,10 +92,10 @@ class RequestLogListenerTest extends TestCase
         $device->setName('A Test Browser');
         $device->setOsFamily('An Operating System');
 
-        $deviceService = Mockery::mock(DeviceService::class);
+        $deviceService = Mockery::mock(AnalyticsDeviceService::class);
         $deviceService
             ->expects('getDevice')
-            ->with($analyticsDetails->userAgent, $analyticsDetails->serverEnvironment)
+            ->with($analyticsDetails->serverEnvironment)
             ->andReturn($device);
 
         $kernel = Mockery::mock(HttpKernelInterface::class);

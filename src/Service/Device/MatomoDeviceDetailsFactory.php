@@ -23,68 +23,47 @@ declare(strict_types=1);
 
 namespace App\Service\Device;
 
-use App\Entity\AnalyticsDevice;
-use App\Repository\AnalyticsDeviceRepository;
-use DateTimeImmutable;
+use App\Service\Device\Matomo\DeviceDetectorFactory;
 use DeviceDetector\DeviceDetector;
 
+use function strtolower;
 use function trim;
 
 /**
  * Uses {@link https://github.com/matomo-org/device-detector matomo/device-detector}
- * to fetch or create an {@see AnalyticsDevice}
+ * to create {@see DeviceDetails}
  *
  * @link http://devicedetector.net Device Detector
  */
-final readonly class MatomoDeviceDetector implements DeviceService
+final readonly class MatomoDeviceDetailsFactory implements DeviceDetailsFactory
 {
     private const string BOT = 'bot';
     private const string LIBRARY = 'library';
     private const string UNK = 'UNK';
     private const string UNKNOWN = 'unknown';
 
-    public function __construct(
-        private AnalyticsDeviceRepository $repository,
-        private DeviceDetectorFactory $deviceDetectorFactory,
-    ) {
+    public function __construct(private DeviceDetectorFactory $deviceDetectorFactory)
+    {
     }
 
     /**
      * @inheritDoc
      */
-    public function getDevice(string $userAgent, array $server): AnalyticsDevice
+    public function createFromServerEnvironment(array $serverEnvironment): DeviceDetails
     {
-        $detector = $this->deviceDetectorFactory->createFromServerEnvironment($server);
+        $detector = $this->deviceDetectorFactory->createFromServerEnvironment($serverEnvironment);
         $detector->parse();
 
-        $properties = [
-            'brandName' => $this->getBrandName($detector),
-            'category' => $this->getCategory($detector),
-            'device' => $this->getDeviceType($detector),
-            'engine' => $this->getEngine($detector),
-            'family' => $this->getFamily($detector),
-            'name' => $this->getName($detector),
-            'osFamily' => $this->getOsFamily($detector),
-        ];
-
-        // If we already have a matching device in the database, use it.
-        $device = $this->repository->findOneBy($properties);
-        if ($device instanceof AnalyticsDevice) {
-            return $device;
-        }
-
-        // If we didn't find a matching device, create a new one.
-        return (new AnalyticsDevice())
-            ->setBrandName($properties['brandName'])
-            ->setCategory($properties['category'])
-            ->setDevice($properties['device'])
-            ->setEngine($properties['engine'])
-            ->setFamily($properties['family'])
-            ->setBot($detector->isBot())
-            ->setName($properties['name'])
-            ->setOsFamily($properties['osFamily'])
-            ->setCreatedAt(new DateTimeImmutable())
-            ->setUpdatedAt(new DateTimeImmutable());
+        return new DeviceDetails(
+            name: $this->getName($detector),
+            type: $this->getDeviceType($detector),
+            brandName: $this->getBrandName($detector),
+            category: $this->getCategory($detector),
+            engine: $this->getEngine($detector),
+            family: $this->getFamily($detector),
+            isBot: $detector->isBot(),
+            osFamily: $this->getOsFamily($detector),
+        );
     }
 
     private function getBrandName(DeviceDetector $detector): ?string
@@ -110,7 +89,7 @@ final readonly class MatomoDeviceDetector implements DeviceService
             return null;
         }
 
-        return $category;
+        return strtolower($category);
     }
 
     private function getDeviceType(DeviceDetector $detector): string

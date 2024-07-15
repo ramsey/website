@@ -25,7 +25,6 @@ namespace App\Service;
 
 use App\Entity\AnalyticsEvent;
 use App\Service\Analytics\AnalyticsDetails;
-use App\Service\Device\DeviceService;
 use DateTimeImmutable;
 
 /**
@@ -34,14 +33,14 @@ use DateTimeImmutable;
 final readonly class AnalyticsEventManager implements AnalyticsEventService
 {
     public function __construct(
-        private DeviceService $deviceService,
+        private AnalyticsDeviceService $deviceService,
     ) {
     }
 
     public function createAnalyticsEventFromDetails(AnalyticsDetails $details): AnalyticsEvent
     {
         return (new AnalyticsEvent())
-            ->setDevice($this->deviceService->getDevice($details->userAgent, $details->serverEnvironment))
+            ->setDevice($this->deviceService->getDevice($details->serverEnvironment))
             ->setGeoCity($details->geoCity)
             ->setGeoCountryCode($details->geoCountryCode)
             ->setGeoLatitude($details->geoLatitude)

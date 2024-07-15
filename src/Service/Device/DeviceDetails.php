@@ -23,18 +23,17 @@ declare(strict_types=1);
 
 namespace App\Service\Device;
 
-use App\Entity\AnalyticsDevice;
-
-/**
- * A service for introspecting client devices interacting with the website
- */
-interface DeviceService
+final readonly class DeviceDetails
 {
-    /**
-     * Returns an {@see AnalyticsDevice} created from the `User-Agent` header
-     * and {@link https://developer.mozilla.org/en-US/docs/Web/HTTP/Client_hints HTTP client hints}
-     *
-     * @param array<string, scalar> $server
-     */
-    public function getDevice(string $userAgent, array $server): AnalyticsDevice;
+    public function __construct(
+        public string $name,
+        public string $type,
+        public ?string $brandName = null,
+        public ?string $category = null,
+        public ?string $engine = null,
+        public ?string $family = null,
+        public bool $isBot = false,
+        public ?string $osFamily = null,
+    ) {
+    }
 }

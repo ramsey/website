@@ -6,8 +6,8 @@ namespace App\Tests\Service;
 
 use App\Entity\AnalyticsDevice;
 use App\Service\Analytics\AnalyticsDetails;
+use App\Service\AnalyticsDeviceService;
 use App\Service\AnalyticsEventManager;
-use App\Service\Device\DeviceService;
 use DateTimeImmutable;
 use Laminas\Diactoros\UriFactory;
 use Mockery;
@@ -25,10 +25,10 @@ class AnalyticsEventManagerTest extends TestCase
     {
         $device = new AnalyticsDevice();
 
-        $deviceService = Mockery::mock(DeviceService::class);
+        $deviceService = Mockery::mock(AnalyticsDeviceService::class);
         $deviceService
             ->expects('getDevice')
-            ->with('MyAgent/123.456.789', ['HTTP_SOME_HEADER' => 'header value'])
+            ->with(['HTTP_SOME_HEADER' => 'header value'])
             ->andReturn($device);
 
         $details = new AnalyticsDetails(

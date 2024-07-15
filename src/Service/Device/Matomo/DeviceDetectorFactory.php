@@ -21,23 +21,18 @@
 
 declare(strict_types=1);
 
-namespace App\Service\Device;
+namespace App\Service\Device\Matomo;
 
-use DeviceDetector\ClientHints;
 use DeviceDetector\DeviceDetector;
 
-final readonly class MatomoDeviceDetectorFactory implements DeviceDetectorFactory
+/**
+ * Describes an interface that may be used to create a DeviceDetector instance
+ * for accessing the data in the matomo/device-detector library
+ */
+interface DeviceDetectorFactory
 {
     /**
-     * @inheritDoc
+     * @param array<string, scalar> $serverEnvironment
      */
-    public function createFromServerEnvironment(array $serverEnvironment): DeviceDetector
-    {
-        $clientHints = ClientHints::factory($serverEnvironment);
-
-        /** @var string $userAgent */
-        $userAgent = $serverEnvironment['HTTP_USER_AGENT'] ?? '';
-
-        return new DeviceDetector($userAgent, $clientHints);
-    }
+    public function createFromServerEnvironment(array $serverEnvironment): DeviceDetector;
 }

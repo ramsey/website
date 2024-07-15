@@ -24,7 +24,7 @@ declare(strict_types=1);
 namespace App\EventListener;
 
 use App\Service\Analytics\AnalyticsDetailsFactory;
-use App\Service\Device\DeviceService;
+use App\Service\AnalyticsDeviceService;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -46,7 +46,7 @@ final readonly class RequestLogListener
         private AnalyticsDetailsFactory $analyticsDetailsFactory,
         private LoggerInterface $appHealthLogger,
         private LoggerInterface $appRequestLogger,
-        private DeviceService $deviceService,
+        private AnalyticsDeviceService $deviceService,
         private ClockInterface $monotonicClock,
     ) {
     }
@@ -67,7 +67,7 @@ final readonly class RequestLogListener
             $event->getResponse(),
         );
 
-        $device = $this->deviceService->getDevice($details->userAgent, $details->serverEnvironment);
+        $device = $this->deviceService->getDevice($details->serverEnvironment);
 
         $logger = match ($requestUri) {
             '/health' => $this->appHealthLogger,
