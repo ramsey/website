@@ -42,7 +42,7 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    App\Service\Analytics\AnalyticsService: '@App\Service\Analytics\MultiProvider'
+    App\Service\Analytics\AnalyticsService: '@App\Service\Analytics\NoOpProvider'
     App\Service\Analytics\MultiProvider:
         arguments:
             - '@App\Service\Analytics\AnalyticsDetailsFactory'
