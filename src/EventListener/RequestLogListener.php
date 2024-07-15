@@ -99,7 +99,6 @@ final readonly class RequestLogListener
                 'subdivision_code' => $analyticsDetails->geoSubdivisionCode,
             ],
             'host' => $analyticsDetails->url->getHost(),
-            'ip' => $analyticsDetails->ipAddress,
             'redirect_url' => $analyticsDetails->redirectUrl?->__toString(),
             'referrer' => $analyticsDetails->referrer?->__toString(),
             'referrer_host' => $analyticsDetails->referrer?->getHost(),
