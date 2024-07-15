@@ -36,11 +36,6 @@ services:
     # please note that last definitions always *replace* previous ones
 
     App\Service\Analytics\AnalyticsService: '@App\Service\Analytics\NoOpProvider'
-    App\Service\Analytics\MultiProvider:
-        arguments:
-            - '@App\Service\Analytics\AnalyticsDetailsFactory'
-            - '@App\Service\Analytics\AppDatabase'
-            - '@App\Service\Analytics\Plausible'
     Devarts\PlausiblePHP\PlausibleAPI:
         arguments:
             - '%app.service.plausible.api_token%'
