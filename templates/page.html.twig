@@ -3,9 +3,9 @@
 {% set pageClass = 'page ' ~ pageClass %}
 
 {% block body %}
-    <div id="container" class="h-card">
+    <div id="container">
         <nav>
-            <p><a href="{{ path('app_home') }}" rel="prev" aria-labelledby="go-home"><span class="icon home" aria-hidden="true"></span><span class="sr" id="go-home">Go to my home page</span></a></p>
+            <p><a href="{{ path('app_home') }}" rel="index" aria-labelledby="go-home"><span class="icon home" aria-hidden="true"></span><span class="sr" id="go-home">Go to my home page</span></a></p>
         </nav>
         <main>
             <article>

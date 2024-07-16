@@ -392,7 +392,6 @@ return [
     '/projects/php-project' => ['httpStatusCode' => 302, 'redirectUri' => 'https://web.archive.org/web/202309/https://benramsey.com/projects/php-project/'],
     '/projects/ramsey-uuid' => ['httpStatusCode' => 302, 'redirectUri' => 'https://web.archive.org/web/202309/https://benramsey.com/projects/ramsey-uuid/'],
     '/projects/virtphp' => ['httpStatusCode' => 302, 'redirectUri' => 'https://web.archive.org/web/202309/https://benramsey.com/projects/virtphp/'],
-    '/purpose' => ['httpStatusCode' => 302, 'redirectUri' => 'https://web.archive.org/web/202309/https://benramsey.com/purpose/'],
     '/talks' => ['httpStatusCode' => 302, 'redirectUri' => 'https://web.archive.org/web/202309/https://benramsey.com/talks/'],
     '/talks/2005/05/ipcse-frameworks' => ['httpStatusCode' => 302, 'redirectUri' => 'https://web.archive.org/web/202309/https://benramsey.com/talks/2005/05/ipcse-frameworks/'],
     '/talks/2005/05/ipcse-php-gtk' => ['httpStatusCode' => 302, 'redirectUri' => 'https://web.archive.org/web/202309/https://benramsey.com/talks/2005/05/ipcse-php-gtk/'],
