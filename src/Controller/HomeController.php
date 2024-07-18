@@ -42,6 +42,6 @@ final readonly class HomeController
 
     public function __invoke(Request $request): Response
     {
-        return new Response($this->twig->render('home.html.twig'));
+        return new Response($this->twig->render('home/home.html.twig'));
     }
 }

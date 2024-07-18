@@ -42,7 +42,7 @@ final readonly class SecurityController
     public function __invoke(): Response
     {
         return new Response(
-            content: $this->twig->render('security.txt'),
+            content: $this->twig->render('security/security.txt'),
             headers: ['content-type' => 'text/plain; charset=utf-8'],
         );
     }

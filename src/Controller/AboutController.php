@@ -42,6 +42,6 @@ final readonly class AboutController
 
     public function __invoke(Request $request): Response
     {
-        return new Response($this->twig->render('about.html.twig'));
+        return new Response($this->twig->render('about/about.html.twig'));
     }
 }

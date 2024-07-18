@@ -42,6 +42,6 @@ final readonly class CopyrightController
 
     public function __invoke(Request $request): Response
     {
-        return new Response($this->twig->render('copyright.html.twig'));
+        return new Response($this->twig->render('copyright/copyright.html.twig'));
     }
 }
