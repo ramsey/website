@@ -15,6 +15,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 final class UserFixtures extends Fixture
 {
     public const string SUPER_ADMIN_USER = 'super-admin-user';
+    public const string USER = 'user';
 
     private Generator $faker;
 
@@ -65,5 +66,6 @@ final class UserFixtures extends Fixture
         $manager->flush();
 
         $this->addReference(self::SUPER_ADMIN_USER, $superAdminUser);
+        $this->addReference(self::USER, $user);
     }
 }

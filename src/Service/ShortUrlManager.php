@@ -66,6 +66,11 @@ final readonly class ShortUrlManager implements ShortUrlService
         return $this->updateShortUrl($shortUrl, $user, $customSlug);
     }
 
+    public function getRepository(): ShortUrlRepository
+    {
+        return $this->repository;
+    }
+
     public function updateShortUrl(ShortUrl $shortUrl, User $user, ?string $customSlug = null): ShortUrl
     {
         $this->checkCustomSlug($customSlug);

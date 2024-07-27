@@ -29,8 +29,10 @@ use Psr\Http\Message\UriInterface;
 
 /**
  * A service for interacting with short URLs
+ *
+ * @extends Service<int, ShortUrl>
  */
-interface ShortUrlService
+interface ShortUrlService extends Service
 {
     /**
      * Returns a UriInterface for the given ShortUrl entity

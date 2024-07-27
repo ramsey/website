@@ -152,4 +152,10 @@ final class ShortUrlManagerTest extends TestCase
         $this->assertInstanceOf(DateTimeImmutable::class, $shortUrl->getDeletedAt());
         $this->assertSame($user, $shortUrl->getUpdatedBy());
     }
+
+    #[TestDox('::getRepository() returns a ShortUrlRepository')]
+    public function testGetRepository(): void
+    {
+        $this->assertSame($this->repository, $this->manager->getRepository());
+    }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Entity;
 
+use App\Entity\Post;
 use App\Entity\User;
 use DateTime;
 use DateTimeImmutable;
@@ -133,5 +134,40 @@ class UserTest extends KernelTestCase
         $this->assertNotSame($date, $user->getDeletedAt());
         $this->assertInstanceOf(DatetimeImmutable::class, $user->getDeletedAt());
         $this->assertSame($date->format('c'), $user->getDeletedAt()->format('c'));
+    }
+
+    #[TestDox('adds and removes posts, which also adds/removes the authors to/from the posts')]
+    public function testAssociatingPostsWithTags(): void
+    {
+        $post1 = new Post();
+        $post2 = new Post();
+        $post3 = new Post();
+        $user = new User();
+
+        $this->assertTrue($user->getPosts()->isEmpty());
+        $this->assertSame($user, $user->addPost($post1));
+        $this->assertSame($user, $user->addPost($post2));
+        $this->assertSame($user, $user->addPost($post3));
+
+        // Attempting to add the same post is a no-op.
+        $this->assertSame($user, $user->addPost($post2));
+
+        $this->assertCount(3, $user->getPosts());
+        $this->assertTrue($user->getPosts()->contains($post1));
+        $this->assertTrue($user->getPosts()->contains($post2));
+        $this->assertTrue($user->getPosts()->contains($post3));
+
+        // All posts should have the author added to them.
+        $this->assertSame($user, $post1->getAuthor());
+        $this->assertSame($user, $post2->getAuthor());
+        $this->assertSame($user, $post3->getAuthor());
+
+        // Attempt to remove a post.
+        $this->assertSame($user, $user->removePost($post2));
+        $this->assertCount(2, $user->getPosts());
+        $this->assertTrue($user->getPosts()->contains($post1));
+        $this->assertFalse($user->getPosts()->contains($post2));
+        $this->assertTrue($user->getPosts()->contains($post3));
+        $this->assertNull($post2->getAuthor());
     }
 }
