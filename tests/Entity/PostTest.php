@@ -23,7 +23,7 @@ use Ramsey\Uuid\UuidInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 use function assert;
-use function implode;
+use function json_encode;
 use function strlen;
 
 class PostTest extends KernelTestCase
@@ -58,8 +58,8 @@ class PostTest extends KernelTestCase
         $this->assertSame([PostCategory::Blog], $post->getCategory());
         $this->assertIsString($post->getDescription());
         $this->assertGreaterThan(0, strlen($post->getDescription()));
-        $this->assertIsString($post->getKeywords());
-        $this->assertGreaterThan(0, strlen($post->getKeywords()));
+        $this->assertIsArray($post->getKeywords());
+        $this->assertContainsOnly('string', $post->getKeywords());
         $this->assertIsString($post->getFeedId());
         $this->assertGreaterThan(0, strlen($post->getFeedId()));
         $this->assertSame(PostBodyType::Html, $post->getBodyType());
@@ -72,6 +72,10 @@ class PostTest extends KernelTestCase
         $this->assertInstanceOf(DateTimeImmutable::class, $post->getCreatedAt());
         $this->assertInstanceOf(DateTimeImmutable::class, $post->getUpdatedAt());
         $this->assertNull($post->getDeletedAt());
+        $this->assertJsonStringEqualsJsonString(
+            (string) json_encode(['foo' => 1234, 'bar' => 'abcd', 'baz' => null]),
+            (string) json_encode($post->getMetadata()),
+        );
     }
 
     #[TestDox('sets the author')]
@@ -185,7 +189,7 @@ class PostTest extends KernelTestCase
     #[TestDox('sets keywords')]
     public function testSetKeywords(): void
     {
-        $keywords = implode(',', (array) $this->faker->words());
+        $keywords = (array) $this->faker->words();
         $post = new Post();
 
         $this->assertSame($post, $post->setKeywords($keywords));
@@ -264,5 +268,15 @@ class PostTest extends KernelTestCase
         $this->assertCount(1, $post->getShortUrls());
         $this->assertFalse($post->getShortUrls()->contains($shortUrl1));
         $this->assertTrue($post->getShortUrls()->contains($shortUrl2));
+    }
+
+    #[TestDox('sets metadata')]
+    public function testSetMetadata(): void
+    {
+        $metadata = ['foo' => 1234, 'bar' => 'abcd', 'baz' => null];
+        $post = new Post();
+
+        $this->assertSame($post, $post->setMetadata($metadata));
+        $this->assertSame($metadata, $post->getMetadata());
     }
 }

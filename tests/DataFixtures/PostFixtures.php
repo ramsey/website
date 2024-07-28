@@ -18,8 +18,6 @@ use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Faker\Generator;
 
-use function implode;
-
 final class PostFixtures extends Fixture implements DependentFixtureInterface
 {
     public const string SLUG1 = 'a-beautiful-day-in-the-neighborhood';
@@ -65,7 +63,7 @@ final class PostFixtures extends Fixture implements DependentFixtureInterface
             ->addTag($tag1)
             ->addTag($tag2)
             ->setDescription($this->faker->sentence())
-            ->setKeywords(implode(',', (array) $this->faker->words(5)))
+            ->setKeywords((array) $this->faker->words(5))
             ->setBodyType(PostBodyType::Html)
             ->setBody($this->faker->text())
             ->setExcerpt($this->faker->sentence())
@@ -74,7 +72,8 @@ final class PostFixtures extends Fixture implements DependentFixtureInterface
             ->setCreatedAt(new DateTimeImmutable())
             ->setCreatedBy($user)
             ->setUpdatedAt(new DateTimeImmutable())
-            ->setUpdatedBy($user);
+            ->setUpdatedBy($user)
+            ->setMetadata(['foo' => 1234, 'bar' => 'abcd', 'baz' => null]);
 
         $manager->persist($post1);
 

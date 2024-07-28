@@ -67,8 +67,11 @@ class Post
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $keywords = null;
+    /**
+     * @var list<string>
+     */
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
+    private array $keywords = [];
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $feedId = null;
@@ -97,6 +100,12 @@ class Post
     #[ORM\JoinTable(name: 'posts_post_tags')]
     #[ORM\ManyToMany(targetEntity: PostTag::class, inversedBy: 'posts')]
     private Collection $tags;
+
+    /**
+     * @var array<string, mixed[] | scalar | null> Additional metadata related to the post
+     */
+    #[ORM\Column(nullable: true, options: ['jsonb' => true])]
+    private array $metadata = [];
 
     public function __construct()
     {
@@ -231,14 +240,38 @@ class Post
         return $this;
     }
 
-    public function getKeywords(): ?string
+    /**
+     * @return list<string>
+     */
+    public function getKeywords(): array
     {
         return $this->keywords;
     }
 
-    public function setKeywords(?string $keywords): static
+    /**
+     * @param list<string> $keywords
+     */
+    public function setKeywords(array $keywords): static
     {
         $this->keywords = $keywords;
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, mixed[] | scalar | null>
+     */
+    public function getMetadata(): array
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @param array<string, mixed[] | scalar | null> $metadata
+     */
+    public function setMetadata(array $metadata): static
+    {
+        $this->metadata = $metadata;
 
         return $this;
     }
