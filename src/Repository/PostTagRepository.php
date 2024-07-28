@@ -36,4 +36,14 @@ class PostTagRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, PostTag::class);
     }
+
+    public function findOneByName(string $name): ?PostTag
+    {
+        /** @var PostTag | null */
+        return $this->createQueryBuilder('pt')
+            ->andWhere('pt.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
