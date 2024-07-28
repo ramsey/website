@@ -25,14 +25,19 @@ namespace App\Service;
 
 use App\Entity\Post;
 use App\Entity\PostBodyType;
+use App\Entity\ShortUrl;
 use App\Entity\User;
 use App\Repository\PostRepository;
+use App\Service\Blog\ParsedPost;
 use DateTimeImmutable;
 
 final readonly class PostManager implements PostService
 {
-    public function __construct(private PostRepository $repository)
-    {
+    public function __construct(
+        private PostRepository $repository,
+        private PostTagService $postTagService,
+        private ShortUrlService $shortUrlService,
+    ) {
     }
 
     /**
@@ -47,6 +52,8 @@ final readonly class PostManager implements PostService
         User $author,
         array $tags = [],
     ): Post {
+        $createdAt = new DateTimeImmutable();
+
         $post = (new Post())
             ->setTitle($title)
             ->setSlug($slug)
@@ -54,9 +61,9 @@ final readonly class PostManager implements PostService
             ->setBodyType($bodyType)
             ->setAuthor($author)
             ->setCategory($category)
-            ->setCreatedAt(new DateTimeImmutable())
+            ->setCreatedAt($createdAt)
             ->setCreatedBy($author)
-            ->setUpdatedAt(new DateTimeImmutable())
+            ->setUpdatedAt($createdAt)
             ->setUpdatedBy($author);
 
         foreach ($tags as $tag) {
@@ -66,8 +73,54 @@ final readonly class PostManager implements PostService
         return $post;
     }
 
+    public function createFromParsedPost(ParsedPost $parsedPost, User $author): Post
+    {
+        /** @var array{shorturl?: string} $additional */
+        $additional = $parsedPost->metadata->additional;
+
+        $post = (new Post())
+            ->setId($parsedPost->metadata->id)
+            ->setTitle($parsedPost->metadata->title)
+            ->setSlug($parsedPost->metadata->slug)
+            ->setBody($parsedPost->content)
+            ->setBodyType($parsedPost->metadata->contentType)
+            ->setDescription($parsedPost->metadata->description)
+            ->setKeywords($parsedPost->metadata->keywords)
+            ->setExcerpt($parsedPost->metadata->excerpt)
+            ->setFeedId($parsedPost->metadata->feedId)
+            ->setMetadata($additional)
+            ->setAuthor($author)
+            ->setCategory($parsedPost->metadata->categories)
+            ->setCreatedAt($parsedPost->metadata->createdAt)
+            ->setCreatedBy($author)
+            ->setUpdatedAt($parsedPost->metadata->updatedAt ?? $parsedPost->metadata->createdAt)
+            ->setUpdatedBy($author);
+
+        foreach ($parsedPost->metadata->tags as $tagName) {
+            $tag = $this->postTagService->getRepository()->findOneByName($tagName)
+                ?? $this->postTagService->createTag($tagName);
+            $post->addTag($tag);
+        }
+
+        $shortUrl = $this->getShortUrl($additional['shorturl'] ?? null);
+        if ($shortUrl !== null) {
+            $post->addShortUrl($shortUrl);
+        }
+
+        return $post;
+    }
+
     public function getRepository(): PostRepository
     {
         return $this->repository;
+    }
+
+    private function getShortUrl(?string $url): ?ShortUrl
+    {
+        if ($url === null) {
+            return null;
+        }
+
+        return $this->shortUrlService->getRepository()->getShortUrlForShortUrl($url);
     }
 }

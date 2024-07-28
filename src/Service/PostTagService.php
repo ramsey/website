@@ -24,6 +24,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\PostTag;
+use App\Repository\PostTagRepository;
 
 /**
  * A service for interacting with post tags
@@ -36,4 +37,6 @@ interface PostTagService extends Service
      * Creates a PostTag entity
      */
     public function createTag(string $tag): PostTag;
+
+    public function getRepository(): PostTagRepository;
 }
