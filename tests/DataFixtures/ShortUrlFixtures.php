@@ -44,7 +44,8 @@ final class ShortUrlFixtures extends Fixture implements DependentFixtureInterfac
 
         $shortUrl2 = $this->shortUrlManager
             ->createShortUrl('https://example.com/this-is-a-long-url', $superAdminUser)
-            ->setSlug('F0084R');
+            ->setSlug('F0084R')
+            ->setCustomSlug('this-is-a-custom-slug');
         $manager->persist($shortUrl2);
 
         $shortUrl3 = $this->shortUrlManager

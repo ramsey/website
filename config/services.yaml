@@ -16,6 +16,7 @@ parameters:
         - 'ben.ramsey.dev'
         - 'bram.se'
     app.shortener.base_url: 'https://bram.se/'
+    app.shortener.hostname: 'bram.se'
 
 services:
     # default configuration for services in *this* file

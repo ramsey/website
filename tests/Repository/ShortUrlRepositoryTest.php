@@ -9,7 +9,9 @@ use App\Repository\ShortUrlRepository;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
+use Laminas\Diactoros\Uri;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestDox;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -77,5 +79,35 @@ class ShortUrlRepositoryTest extends KernelTestCase
         $this->assertSame('https://example.com/this-is-a-long-url', (string) $shortUrl?->getDestinationUrl());
         $this->assertSame($shortUrls[0]?->getSlug(), $shortUrl?->getSlug());
         $this->assertInstanceOf(UuidInterface::class, $shortUrl?->getId());
+    }
+
+    #[TestDox('returns null when the short URL host name does not match')]
+    public function testGetShortUrlForShortUrlWhenHostnameNotMatch(): void
+    {
+        $this->assertNull($this->repository->getShortUrlForShortUrl('https://example.com/foo'));
+    }
+
+    #[TestDox('returns null when a ShortUrl is not found for the given short URL')]
+    public function testGetShortUrlForShortUrlWhenNotFound(): void
+    {
+        $url = new Uri('https://bram.se/this-is-not-in-the-database');
+
+        $this->assertNull($this->repository->getShortUrlForShortUrl($url));
+    }
+
+    #[TestDox('returns null when a ShortUrl is found for a custom slug')]
+    public function testGetShortUrlForShortUrlWithCustomSlug(): void
+    {
+        $url = new Uri('https://bram.se/this-is-a-custom-slug');
+
+        $this->assertInstanceOf(ShortUrl::class, $this->repository->getShortUrlForShortUrl($url));
+    }
+
+    #[TestDox('returns null when a ShortUrl is found for a randomized slug')]
+    public function testGetShortUrlForShortUrlWithRandomizedSlug(): void
+    {
+        $url = new Uri('https://bram.se/F0084R');
+
+        $this->assertInstanceOf(ShortUrl::class, $this->repository->getShortUrlForShortUrl($url));
     }
 }

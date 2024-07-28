@@ -26,14 +26,22 @@ namespace App\Repository;
 use App\Entity\ShortUrl;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Message\UriInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
+use function trim;
 
 /**
  * @extends ServiceEntityRepository<ShortUrl>
  */
 class ShortUrlRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly UriFactoryInterface $uriFactory,
+        #[Autowire('%app.shortener.hostname%')] private readonly string $hostname,
+    ) {
         parent::__construct($registry, ShortUrl::class);
     }
 
@@ -57,5 +65,25 @@ class ShortUrlRepository extends ServiceEntityRepository
             ->setParameter('slug', $slug)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * Finds the ShortUrl entity matching the given short URL string or UriInterface instance
+     *
+     * @param UriInterface | string $shortUrl A string short URL used to look up a ShortUrl entity
+     */
+    public function getShortUrlForShortUrl(UriInterface | string $shortUrl): ?ShortUrl
+    {
+        if (!$shortUrl instanceof UriInterface) {
+            $shortUrl = $this->uriFactory->createUri($shortUrl);
+        }
+
+        if ($shortUrl->getHost() !== $this->hostname) {
+            return null;
+        }
+
+        $path = trim($shortUrl->getPath(), '/');
+
+        return $this->findOneByCustomSlug($path) ?? $this->findOneBySlug($path);
     }
 }

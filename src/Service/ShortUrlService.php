@@ -25,6 +25,7 @@ namespace App\Service;
 
 use App\Entity\ShortUrl;
 use App\Entity\User;
+use App\Repository\ShortUrlRepository;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -43,6 +44,8 @@ interface ShortUrlService extends Service
      * Creates a ShortUrl entity for the given URL and user and (optionally) a custom slug
      */
     public function createShortUrl(string $url, User $user, ?string $customSlug = null): ShortUrl;
+
+    public function getRepository(): ShortUrlRepository;
 
     /**
      * Updates a ShortUrl entity with the given user and (optionally) a custom slug
