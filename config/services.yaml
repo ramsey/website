@@ -51,6 +51,9 @@ services:
     Psr\Http\Message\UriFactoryInterface: '@Laminas\Diactoros\UriFactory'
     Symfony\Component\Clock\MonotonicClock: ~
     Symfony\Component\Clock\NativeClock: ~
+    Symfony\Component\Filesystem\Filesystem: ~
+    Webuni\FrontMatter\FrontMatterInterface:
+        factory: ['Webuni\FrontMatter\FrontMatterChain', 'create']
 
 when@test: &services_test
     parameters:
