@@ -31,6 +31,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use InvalidArgumentException;
 use Ramsey\Uuid\Doctrine\UuidV7Generator;
 use Ramsey\Uuid\UuidInterface;
 
@@ -217,6 +218,17 @@ class Post
     public function getId(): UuidInterface
     {
         return $this->id;
+    }
+
+    public function setId(UuidInterface $id): static
+    {
+        if (isset($this->id) && $this->id->getBytes() !== $id->getBytes()) {
+            throw new InvalidArgumentException('Cannot overwrite an existing ID with a different ID');
+        }
+
+        $this->id = $id;
+
+        return $this;
     }
 
     public function getKeywords(): ?string

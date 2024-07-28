@@ -15,8 +15,10 @@ use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Faker\Factory;
 use Faker\Generator;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -138,6 +140,46 @@ class PostTest extends KernelTestCase
 
         $this->assertSame($post, $post->setFeedId($feedId));
         $this->assertSame($feedId, $post->getFeedId());
+    }
+
+    #[TestDox('sets the ID')]
+    public function testSetId(): void
+    {
+        $id = Uuid::uuid7();
+        $post = new Post();
+
+        $this->assertSame($post, $post->setId($id));
+        $this->assertSame($id, $post->getId());
+    }
+
+    #[TestDox('allows "overwriting" an existing ID with the same ID')]
+    public function testOverwritingId(): void
+    {
+        $id1 = Uuid::uuid7();
+        $id2 = Uuid::fromBytes($id1->getBytes());
+        $post = new Post();
+
+        $this->assertSame($post, $post->setId($id1));
+        $this->assertSame($id1, $post->getId());
+        $this->assertSame($post, $post->setId($id2));
+        $this->assertNotSame($id1, $post->getId());
+        $this->assertSame($id2, $post->getId());
+    }
+
+    #[TestDox('throws an exception when attempting to overwrite an existing ID')]
+    public function testThrowsWhenOverwritingId(): void
+    {
+        $id1 = Uuid::uuid7();
+        $id2 = Uuid::uuid7();
+        $post = new Post();
+
+        $this->assertSame($post, $post->setId($id1));
+        $this->assertSame($id1, $post->getId());
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot overwrite an existing ID with a different ID');
+
+        $post->setId($id2);
     }
 
     #[TestDox('sets keywords')]
