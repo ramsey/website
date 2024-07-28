@@ -21,7 +21,7 @@
 
 declare(strict_types=1);
 
-namespace App\Command;
+namespace App\Command\User;
 
 use App\Entity\User;
 use DateTimeImmutable;
@@ -42,7 +42,7 @@ use function sprintf;
  * Creates a user entity and persists it to the database
  */
 #[AsCommand(name: 'app:user:create', description: 'Create a new user')]
-final class CreateUserCommand extends Command
+final class CreateCommand extends Command
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,

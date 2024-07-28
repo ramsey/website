@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Command;
+namespace App\Tests\Command\User;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
@@ -22,7 +22,7 @@ use function assert;
 #[Group('commands')]
 #[Group('db')]
 #[TestDox('Command app:user:create')]
-final class CreateUserCommandTest extends KernelTestCase
+final class CreateCommandTest extends KernelTestCase
 {
     private CommandTester $commandTester;
     private Generator $faker;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Command;
+namespace App\Tests\Command\ShortUrl;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -17,7 +17,7 @@ use function assert;
 #[Group('commands')]
 #[Group('db')]
 #[TestDox('Command app:short-url:create')]
-final class CreateShortUrlCommandTest extends KernelTestCase
+final class CreateCommandTest extends KernelTestCase
 {
     private CommandTester $commandTester;
 

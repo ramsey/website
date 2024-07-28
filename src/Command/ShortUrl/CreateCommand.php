@@ -21,7 +21,7 @@
 
 declare(strict_types=1);
 
-namespace App\Command;
+namespace App\Command\ShortUrl;
 
 use App\Repository\UserRepository;
 use App\Service\ShortUrlManager;
@@ -38,7 +38,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Creates a short URL and persists it to the database
  */
 #[AsCommand(name: 'app:short-url:create', description: 'Add a new short URL to the database')]
-final class CreateShortUrlCommand extends Command
+final class CreateCommand extends Command
 {
     public function __construct(
         private readonly ShortUrlManager $shortUrlManager,
