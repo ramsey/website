@@ -55,4 +55,9 @@ interface PostService extends Service
      * Creates a Post entity from a ParsedPost
      */
     public function createFromParsedPost(ParsedPost $parsedPost): Post;
+
+    /**
+     * Updates a Post entity from a ParsedPost
+     */
+    public function updateFromParsedPost(Post $post, ParsedPost $parsedPost): Post;
 }

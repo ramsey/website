@@ -31,7 +31,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
-use Ramsey\Uuid\Doctrine\UuidV7Generator;
 use Ramsey\Uuid\UuidInterface;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
@@ -43,8 +42,6 @@ class Post
 
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: UuidV7Generator::class)]
     private UuidInterface $id;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]

@@ -26,6 +26,7 @@ namespace App\Repository;
 use App\Entity\ShortUrl;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use InvalidArgumentException;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -84,6 +85,8 @@ class ShortUrlRepository extends ServiceEntityRepository
 
         $path = trim($shortUrl->getPath(), '/');
 
-        return $this->findOneByCustomSlug($path) ?? $this->findOneBySlug($path);
+        return $this->findOneByCustomSlug($path)
+            ?? $this->findOneBySlug($path)
+            ?? throw new InvalidArgumentException("Short URL $shortUrl does not exist");
     }
 }

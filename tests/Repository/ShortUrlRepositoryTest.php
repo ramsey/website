@@ -9,6 +9,7 @@ use App\Repository\ShortUrlRepository;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
+use InvalidArgumentException;
 use Laminas\Diactoros\Uri;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -87,12 +88,15 @@ class ShortUrlRepositoryTest extends KernelTestCase
         $this->assertNull($this->repository->getShortUrlForShortUrl('https://example.com/foo'));
     }
 
-    #[TestDox('returns null when a ShortUrl is not found for the given short URL')]
+    #[TestDox('throws exception when a ShortUrl is not found for the given short URL')]
     public function testGetShortUrlForShortUrlWhenNotFound(): void
     {
         $url = new Uri('https://bram.se/this-is-not-in-the-database');
 
-        $this->assertNull($this->repository->getShortUrlForShortUrl($url));
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Short URL https://bram.se/this-is-not-in-the-database does not exist');
+
+        $this->repository->getShortUrlForShortUrl($url);
     }
 
     #[TestDox('returns null when a ShortUrl is found for a custom slug')]

@@ -17,6 +17,7 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Faker\Generator;
+use Ramsey\Uuid\Uuid;
 
 final class PostFixtures extends Fixture implements DependentFixtureInterface
 {
@@ -56,6 +57,7 @@ final class PostFixtures extends Fixture implements DependentFixtureInterface
         $shortUrl = $this->getReference(ShortUrlFixtures::SHORT_URL1);
 
         $post1 = (new Post())
+            ->setId(Uuid::uuid7())
             ->setAuthor($user)
             ->setTitle($this->faker->sentence())
             ->setSlug(self::SLUG1)

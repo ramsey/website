@@ -25,10 +25,10 @@ namespace App\Service;
 
 use App\Entity\Post;
 use App\Entity\PostBodyType;
-use App\Entity\ShortUrl;
 use App\Repository\PostRepository;
 use App\Service\Blog\ParsedPost;
 use DateTimeImmutable;
+use InvalidArgumentException;
 
 final readonly class PostManager implements PostService
 {
@@ -67,39 +67,12 @@ final readonly class PostManager implements PostService
 
     public function createFromParsedPost(ParsedPost $parsedPost): Post
     {
-        /** @var array{shorturl?: string} $additional */
-        $additional = $parsedPost->metadata->additional;
-
         $post = (new Post())
             ->setId($parsedPost->metadata->id)
-            ->setTitle($parsedPost->metadata->title)
             ->setSlug($parsedPost->metadata->slug)
-            ->setBody($parsedPost->content)
-            ->setBodyType($parsedPost->metadata->contentType)
-            ->setDescription($parsedPost->metadata->description)
-            ->setKeywords($parsedPost->metadata->keywords)
-            ->setExcerpt($parsedPost->metadata->excerpt)
-            ->setFeedId($parsedPost->metadata->feedId)
-            ->setMetadata($additional)
-            ->setCategory($parsedPost->metadata->categories)
             ->setCreatedAt($parsedPost->metadata->createdAt);
 
-        if ($parsedPost->metadata->updatedAt !== null) {
-            $post->setUpdatedAt($parsedPost->metadata->updatedAt);
-        }
-
-        foreach ($parsedPost->metadata->tags as $tagName) {
-            $tag = $this->postTagService->getRepository()->findOneByName($tagName)
-                ?? $this->postTagService->createTag($tagName);
-            $post->addTag($tag);
-        }
-
-        $shortUrl = $this->getShortUrl($additional['shorturl'] ?? null);
-        if ($shortUrl !== null) {
-            $post->addShortUrl($shortUrl);
-        }
-
-        return $post;
+        return $this->updateFromParsedPost($post, $parsedPost);
     }
 
     public function getRepository(): PostRepository
@@ -107,12 +80,65 @@ final readonly class PostManager implements PostService
         return $this->repository;
     }
 
-    private function getShortUrl(?string $url): ?ShortUrl
+    /**
+     * Updates a Post entity from a ParsedPost
+     */
+    public function updateFromParsedPost(Post $post, ParsedPost $parsedPost): Post
     {
-        if ($url === null) {
-            return null;
+        if ($post->getId()->getBytes() !== $parsedPost->metadata->id->getBytes()) {
+            throw new InvalidArgumentException('Unable to update post with parsed post having a different ID');
         }
 
-        return $this->shortUrlService->getRepository()->getShortUrlForShortUrl($url);
+        if ($post->getSlug() !== $parsedPost->metadata->slug) {
+            throw new InvalidArgumentException('Unable to update post with parsed post having a different slug');
+        }
+
+        if ($post->getCreatedAt()->format('U') !== $parsedPost->metadata->createdAt->format('U')) {
+            throw new InvalidArgumentException(
+                'Unable to update post with parsed post having a different creation date',
+            );
+        }
+
+        $post
+            ->setTitle($parsedPost->metadata->title)
+            ->setBody($parsedPost->content)
+            ->setBodyType($parsedPost->metadata->contentType)
+            ->setDescription($parsedPost->metadata->description)
+            ->setKeywords($parsedPost->metadata->keywords)
+            ->setExcerpt($parsedPost->metadata->excerpt)
+            ->setFeedId($parsedPost->metadata->feedId)
+            ->setMetadata($parsedPost->metadata->additional)
+            ->setCategory($parsedPost->metadata->categories);
+
+        if ($parsedPost->metadata->updatedAt !== null) {
+            $post->setUpdatedAt($parsedPost->metadata->updatedAt);
+        }
+
+        // Remove any tags and then add them back from the metadata.
+        $post->getTags()->clear();
+        foreach ($parsedPost->metadata->tags as $tagName) {
+            $tag = $this->postTagService->getRepository()->findOneByName($tagName)
+                ?? $this->postTagService->createTag($tagName);
+            $post->addTag($tag);
+        }
+
+        /** @var string | null $shortUrl */
+        $shortUrl = $parsedPost->metadata->additional['shorturl'] ?? null;
+        $this->associateShortUrl($post, $shortUrl);
+
+        return $post;
+    }
+
+    private function associateShortUrl(Post $post, ?string $url): void
+    {
+        if ($url === null) {
+            return;
+        }
+
+        $shortUrl = $this->shortUrlService->getRepository()->getShortUrlForShortUrl($url);
+
+        if ($shortUrl !== null) {
+            $post->addShortUrl($shortUrl);
+        }
     }
 }
