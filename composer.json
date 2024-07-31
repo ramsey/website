@@ -209,7 +209,13 @@
         "test:db:fixtures": [
             "bin/console --env=test doctrine:fixtures:load --no-interaction"
         ],
+        "test:db:rebuild": [
+            "@test:db:teardown",
+            "@test:db:setup",
+            "@test:db:fixtures"
+        ],
         "test:db:setup": [
+            "bin/console --env=test cache:clear",
             "bin/console --env=test doctrine:database:create",
             "bin/console --env=test doctrine:schema:create"
         ],
