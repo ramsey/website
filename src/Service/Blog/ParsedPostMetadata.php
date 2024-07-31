@@ -25,6 +25,7 @@ namespace App\Service\Blog;
 
 use App\Entity\PostBodyType;
 use App\Entity\PostCategory;
+use App\Entity\PostStatus;
 use DateTimeInterface;
 use Ramsey\Uuid\UuidInterface;
 
@@ -33,6 +34,7 @@ use Ramsey\Uuid\UuidInterface;
  *      id?: string,
  *      title?: string,
  *      slug?: string,
+ *      status?: 'deleted' | 'draft' | 'hidden' | 'published',
  *      categories?: list<string>,
  *      tags?: list<string>,
  *      description?: string,
@@ -56,6 +58,7 @@ final readonly class ParsedPostMetadata
         public PostBodyType $contentType,
         public string $title,
         public string $slug,
+        public PostStatus $status,
         public array $categories,
         public array $tags,
         public ?string $description,

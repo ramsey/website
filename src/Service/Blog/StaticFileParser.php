@@ -25,6 +25,7 @@ namespace App\Service\Blog;
 
 use App\Entity\PostBodyType;
 use App\Entity\PostCategory;
+use App\Entity\PostStatus;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
@@ -95,6 +96,8 @@ final readonly class StaticFileParser implements PostParser
             contentType: $type,
             title: $metadata['title'] ?? throw new InvalidArgumentException('Posts must have a title'),
             slug: $metadata['slug'] ?? throw new InvalidArgumentException('Posts must have a slug'),
+            status: PostStatus::tryFrom($metadata['status'] ?? 'undefined')
+                ?? throw new InvalidArgumentException('Posts must have a valid status'),
             categories: $categories,
             tags: $metadata['tags'] ?? [],
             description: $metadata['description'] ?? null,
@@ -120,6 +123,7 @@ final readonly class StaticFileParser implements PostParser
             $metadata['id'],
             $metadata['title'],
             $metadata['slug'],
+            $metadata['status'],
             $metadata['categories'],
             $metadata['tags'],
             $metadata['description'],

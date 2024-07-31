@@ -65,6 +65,7 @@ class StaticFileParserTest extends TestCase
     #[TestWith([__DIR__ . '/fixtures/invalid-updated.md', 'When provided, updated must be a valid date'])]
     #[TestWith([__DIR__ . '/fixtures/missing-title.md', 'Posts must have a title'])]
     #[TestWith([__DIR__ . '/fixtures/missing-slug.md', 'Posts must have a slug'])]
+    #[TestWith([__DIR__ . '/fixtures/missing-status.md', 'Posts must have a valid status'])]
     public function testValidation(string $path, string $expectedMessage): void
     {
         $filesystem = new Filesystem();

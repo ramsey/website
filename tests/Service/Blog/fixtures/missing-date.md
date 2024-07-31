@@ -1,6 +1,7 @@
 ---
 title: Lorem Ipsum Odor Amet
 slug: lorem-ipsum
+status: published
 ---
 
 # Lorem Ipsum

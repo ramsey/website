@@ -7,6 +7,7 @@ namespace App\Tests\Service;
 use App\Entity\Post;
 use App\Entity\PostBodyType;
 use App\Entity\PostCategory;
+use App\Entity\PostStatus;
 use App\Entity\PostTag;
 use App\Entity\ShortUrl;
 use App\Repository\PostRepository;
@@ -96,6 +97,7 @@ class PostManagerTest extends TestCase
                 contentType: PostBodyType::Markdown,
                 title: $this->faker->sentence(),
                 slug: $this->faker->slug(),
+                status: PostStatus::Published,
                 categories: [PostCategory::Blog],
                 tags: ['tag1', 'tag2'],
                 description: $this->faker->sentence(),
@@ -127,6 +129,7 @@ class PostManagerTest extends TestCase
         $this->assertSame($parsedPost->metadata->id, $post->getId());
         $this->assertSame($parsedPost->metadata->title, $post->getTitle());
         $this->assertSame($parsedPost->metadata->slug, $post->getSlug());
+        $this->assertSame($parsedPost->metadata->status, $post->getStatus());
         $this->assertSame($parsedPost->content, $post->getBody());
         $this->assertSame($parsedPost->metadata->contentType, $post->getBodyType());
         $this->assertSame($parsedPost->metadata->description, $post->getDescription());
@@ -151,6 +154,7 @@ class PostManagerTest extends TestCase
                 contentType: PostBodyType::Markdown,
                 title: $this->faker->sentence(),
                 slug: $this->faker->slug(),
+                status: PostStatus::Draft,
                 categories: [],
                 tags: [],
                 description: null,
@@ -173,6 +177,7 @@ class PostManagerTest extends TestCase
         $this->assertSame($parsedPost->metadata->id, $post->getId());
         $this->assertSame($parsedPost->metadata->title, $post->getTitle());
         $this->assertSame($parsedPost->metadata->slug, $post->getSlug());
+        $this->assertSame($parsedPost->metadata->status, $post->getStatus());
         $this->assertSame($parsedPost->content, $post->getBody());
         $this->assertSame($parsedPost->metadata->contentType, $post->getBodyType());
         $this->assertNull($post->getDescription());
@@ -196,6 +201,7 @@ class PostManagerTest extends TestCase
                 contentType: PostBodyType::Markdown,
                 title: $this->faker->sentence(),
                 slug: $this->faker->slug(),
+                status: PostStatus::Deleted,
                 categories: [PostCategory::Blog],
                 tags: ['tag1', 'tag2'],
                 description: $this->faker->sentence(),
@@ -232,6 +238,7 @@ class PostManagerTest extends TestCase
         $this->assertEquals($parsedPost->metadata->id, $post->getId());
         $this->assertSame($parsedPost->metadata->title, $post->getTitle());
         $this->assertSame($parsedPost->metadata->slug, $post->getSlug());
+        $this->assertSame($parsedPost->metadata->status, $post->getStatus());
         $this->assertSame($parsedPost->content, $post->getBody());
         $this->assertSame($parsedPost->metadata->contentType, $post->getBodyType());
         $this->assertSame($parsedPost->metadata->description, $post->getDescription());
@@ -256,6 +263,7 @@ class PostManagerTest extends TestCase
                 contentType: PostBodyType::Markdown,
                 title: $this->faker->sentence(),
                 slug: $this->faker->slug(),
+                status: PostStatus::Hidden,
                 categories: [],
                 tags: [],
                 description: null,
@@ -283,6 +291,7 @@ class PostManagerTest extends TestCase
         $this->assertEquals($parsedPost->metadata->id, $post->getId());
         $this->assertSame($parsedPost->metadata->title, $post->getTitle());
         $this->assertSame($parsedPost->metadata->slug, $post->getSlug());
+        $this->assertSame($parsedPost->metadata->status, $post->getStatus());
         $this->assertSame($parsedPost->content, $post->getBody());
         $this->assertSame($parsedPost->metadata->contentType, $post->getBodyType());
         $this->assertNull($post->getDescription());
@@ -306,6 +315,7 @@ class PostManagerTest extends TestCase
                 contentType: PostBodyType::Markdown,
                 title: $this->faker->sentence(),
                 slug: $this->faker->slug(),
+                status: PostStatus::Draft,
                 categories: [],
                 tags: [],
                 description: null,
@@ -338,6 +348,7 @@ class PostManagerTest extends TestCase
                 contentType: PostBodyType::Markdown,
                 title: $this->faker->sentence(),
                 slug: $this->faker->slug(),
+                status: PostStatus::Draft,
                 categories: [],
                 tags: [],
                 description: null,
@@ -372,6 +383,7 @@ class PostManagerTest extends TestCase
                 contentType: PostBodyType::Markdown,
                 title: $this->faker->sentence(),
                 slug: $this->faker->slug(),
+                status: PostStatus::Draft,
                 categories: [],
                 tags: [],
                 description: null,
@@ -414,6 +426,7 @@ class PostManagerTest extends TestCase
                 contentType: PostBodyType::Markdown,
                 title: $this->faker->sentence(),
                 slug: $slug,
+                status: PostStatus::Draft,
                 categories: [],
                 tags: [],
                 description: null,

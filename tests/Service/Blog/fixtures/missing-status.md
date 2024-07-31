@@ -2,8 +2,6 @@
 title: Lorem Ipsum Odor Amet
 date: 2004-02-22 06:00:52 -06:00
 slug: lorem-ipsum
-status: published
-updated: this is not a valid date
 ---
 
 # Lorem Ipsum

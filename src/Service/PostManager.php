@@ -96,6 +96,7 @@ final readonly class PostManager implements PostService
         $this->checkCreatedAt($post, $parsedPost->metadata->createdAt);
 
         $post
+            ->setStatus($parsedPost->metadata->status)
             ->setTitle($parsedPost->metadata->title)
             ->setBody($parsedPost->content)
             ->setBodyType($parsedPost->metadata->contentType)

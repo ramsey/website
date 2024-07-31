@@ -7,6 +7,7 @@ namespace App\Tests\Entity;
 use App\Entity\Post;
 use App\Entity\PostBodyType;
 use App\Entity\PostCategory;
+use App\Entity\PostStatus;
 use App\Entity\PostTag;
 use App\Entity\ShortUrl;
 use App\Entity\User;
@@ -56,6 +57,7 @@ class PostTest extends KernelTestCase
         $this->assertGreaterThan(0, strlen($post->getTitle()));
         $this->assertSame(PostFixtures::SLUG1, $post->getSlug());
         $this->assertSame([PostCategory::Blog], $post->getCategory());
+        $this->assertSame(PostStatus::Published, $post->getStatus());
         $this->assertIsString($post->getDescription());
         $this->assertGreaterThan(0, strlen($post->getDescription()));
         $this->assertIsArray($post->getKeywords());
@@ -278,5 +280,14 @@ class PostTest extends KernelTestCase
 
         $this->assertSame($post, $post->setMetadata($metadata));
         $this->assertSame($metadata, $post->getMetadata());
+    }
+
+    #[TestDox('sets status')]
+    public function testSetStatus(): void
+    {
+        $post = new Post();
+
+        $this->assertSame($post, $post->setStatus(PostStatus::Hidden));
+        $this->assertSame(PostStatus::Hidden, $post->getStatus());
     }
 }

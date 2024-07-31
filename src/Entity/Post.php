@@ -102,6 +102,9 @@ class Post
     #[ORM\Column(nullable: true, options: ['jsonb' => true])]
     private array $metadata = [];
 
+    #[ORM\Column(length: 20, nullable: true, enumType: PostStatus::class)]
+    private PostStatus $status = PostStatus::Draft;
+
     public function __construct()
     {
         $this->tags = new ArrayCollection();
@@ -287,6 +290,18 @@ class Post
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getStatus(): PostStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(PostStatus $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

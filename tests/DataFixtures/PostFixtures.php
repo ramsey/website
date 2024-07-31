@@ -7,6 +7,7 @@ namespace App\Tests\DataFixtures;
 use App\Entity\Post;
 use App\Entity\PostBodyType;
 use App\Entity\PostCategory;
+use App\Entity\PostStatus;
 use App\Entity\PostTag;
 use App\Entity\ShortUrl;
 use App\Entity\User;
@@ -62,6 +63,7 @@ final class PostFixtures extends Fixture implements DependentFixtureInterface
             ->setTitle($this->faker->sentence())
             ->setSlug(self::SLUG1)
             ->setCategory([PostCategory::Blog])
+            ->setStatus(PostStatus::Published)
             ->addTag($tag1)
             ->addTag($tag2)
             ->setDescription($this->faker->sentence())

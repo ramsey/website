@@ -6,6 +6,7 @@ categories: [blog]
 tags: [tests, latin]
 id: 00fadd19-6120-7332-8a74-e1821536b10e
 slug: lorem-ipsum
+status: published
 feed_id: https://example.com/feed-id/123
 description: A short description of this post.
 keywords: [latin, gibberish, testing]
