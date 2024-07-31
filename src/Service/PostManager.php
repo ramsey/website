@@ -28,10 +28,16 @@ use App\Entity\PostBodyType;
 use App\Repository\PostRepository;
 use App\Service\Blog\ParsedPost;
 use DateTimeImmutable;
+use DateTimeInterface;
 use InvalidArgumentException;
+use Ramsey\Uuid\UuidInterface;
+
+use function preg_match;
 
 final readonly class PostManager implements PostService
 {
+    private const string SLUG_PATTERN = '/^[a-zA-Z0-9\-]+$/';
+
     public function __construct(
         private PostRepository $repository,
         private PostTagService $postTagService,
@@ -85,19 +91,9 @@ final readonly class PostManager implements PostService
      */
     public function updateFromParsedPost(Post $post, ParsedPost $parsedPost): Post
     {
-        if ($post->getId()->getBytes() !== $parsedPost->metadata->id->getBytes()) {
-            throw new InvalidArgumentException('Unable to update post with parsed post having a different ID');
-        }
-
-        if ($post->getSlug() !== $parsedPost->metadata->slug) {
-            throw new InvalidArgumentException('Unable to update post with parsed post having a different slug');
-        }
-
-        if ($post->getCreatedAt()->format('U') !== $parsedPost->metadata->createdAt->format('U')) {
-            throw new InvalidArgumentException(
-                'Unable to update post with parsed post having a different creation date',
-            );
-        }
+        $this->checkId($post, $parsedPost->metadata->id);
+        $this->checkSlug($post, $parsedPost->metadata->slug);
+        $this->checkCreatedAt($post, $parsedPost->metadata->createdAt);
 
         $post
             ->setTitle($parsedPost->metadata->title)
@@ -139,6 +135,33 @@ final readonly class PostManager implements PostService
 
         if ($shortUrl !== null) {
             $post->addShortUrl($shortUrl);
+        }
+    }
+
+    private function checkCreatedAt(Post $post, DateTimeInterface $createdAt): void
+    {
+        if ($post->getCreatedAt()->format('U') !== $createdAt->format('U')) {
+            throw new InvalidArgumentException(
+                'Unable to update post with parsed post having a different creation date',
+            );
+        }
+    }
+
+    private function checkId(Post $post, UuidInterface $id): void
+    {
+        if ($post->getId()->getBytes() !== $id->getBytes()) {
+            throw new InvalidArgumentException('Unable to update post with parsed post having a different ID');
+        }
+    }
+
+    private function checkSlug(Post $post, string $slug): void
+    {
+        if ($post->getSlug() !== $slug) {
+            throw new InvalidArgumentException('Unable to update post with parsed post having a different slug');
+        }
+
+        if (!preg_match(self::SLUG_PATTERN, $slug)) {
+            throw new InvalidArgumentException("Slug is invalid: $slug");
         }
     }
 }

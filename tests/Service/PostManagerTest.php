@@ -24,6 +24,7 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
@@ -393,5 +394,42 @@ class PostManagerTest extends TestCase
         $this->expectExceptionMessage('Unable to update post with parsed post having a different creation date');
 
         $this->manager->updateFromParsedPost($post, $parsedPost);
+    }
+
+    #[TestWith(['cannot have spaces'])]
+    #[TestWith(["can't-have-apostrophes"])]
+    #[TestWith(['cannot.have.periods'])]
+    #[TestWith(['cannot_have_underscores'])]
+    #[TestWith(['cannot-have@symbols'])]
+    #[TestWith(['cannot-have$symbols'])]
+    #[TestWith(['cannot-have\symbols'])]
+    #[TestWith(['cannot-have/symbols'])]
+    #[TestWith(['cannot-have*symbols'])]
+    #[TestWith(['cannot-have%symbols'])]
+    public function testInvalidSlug(string $slug): void
+    {
+        $parsedPost = new ParsedPost(
+            new ParsedPostMetadata(
+                id: Uuid::uuid7(),
+                contentType: PostBodyType::Markdown,
+                title: $this->faker->sentence(),
+                slug: $slug,
+                categories: [],
+                tags: [],
+                description: null,
+                keywords: [],
+                excerpt: null,
+                feedId: null,
+                additional: [],
+                createdAt: new DateTimeImmutable(),
+                updatedAt: null,
+            ),
+            $this->faker->text(),
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Slug is invalid: $slug");
+
+        $this->manager->createFromParsedPost($parsedPost);
     }
 }
