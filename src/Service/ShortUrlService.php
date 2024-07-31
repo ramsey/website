@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\ShortUrl;
-use App\Entity\User;
 use App\Repository\ShortUrlRepository;
 use Psr\Http\Message\UriInterface;
 
@@ -41,19 +40,20 @@ interface ShortUrlService extends Service
     public function buildUrl(ShortUrl $shortUrl): ?UriInterface;
 
     /**
-     * Creates a ShortUrl entity for the given URL and user and (optionally) a custom slug
+     * Checks whether a slug exists on the short URL and, if not, randomly
+     * generates and sets a slug
      */
-    public function createShortUrl(string $url, User $user, ?string $customSlug = null): ShortUrl;
+    public function checkAndSetSlug(ShortUrl $shortUrl): ShortUrl;
+
+    /**
+     * Creates a ShortUrl entity and optionally sets a custom slug
+     */
+    public function createShortUrl(string $url, ?string $customSlug = null): ShortUrl;
 
     public function getRepository(): ShortUrlRepository;
 
     /**
-     * Updates a ShortUrl entity with the given user and (optionally) a custom slug
-     */
-    public function updateShortUrl(ShortUrl $shortUrl, User $user, ?string $customSlug = null): ShortUrl;
-
-    /**
      * Soft-deletes a ShortUrl entity with the given user
      */
-    public function softDeleteShortUrl(ShortUrl $shortUrl, User $user): ShortUrl;
+    public function softDeleteShortUrl(ShortUrl $shortUrl): ShortUrl;
 }

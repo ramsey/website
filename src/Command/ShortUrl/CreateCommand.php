@@ -23,12 +23,10 @@ declare(strict_types=1);
 
 namespace App\Command\ShortUrl;
 
-use App\Repository\UserRepository;
 use App\Service\ShortUrlManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -42,7 +40,6 @@ final class CreateCommand extends Command
 {
     public function __construct(
         private readonly ShortUrlManager $shortUrlManager,
-        private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct();
@@ -52,8 +49,7 @@ final class CreateCommand extends Command
     {
         $this
             ->addOption('custom-slug', 's', InputOption::VALUE_OPTIONAL, 'A custom short URL slug', null)
-            ->addArgument('url', InputArgument::REQUIRED, 'The URL to redirect to')
-            ->addArgument('email', InputArgument::REQUIRED, 'The email address of the user to associate as "creator"');
+            ->addArgument('url', InputArgument::REQUIRED, 'The URL to redirect to');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -61,19 +57,10 @@ final class CreateCommand extends Command
         /** @var string $url */
         $url = $input->getArgument('url');
 
-        /** @var string $email */
-        $email = $input->getArgument('email');
-
         /** @var string|null $slug */
         $slug = $input->getOption('custom-slug');
 
-        $user = $this->userRepository->findOneBy(['email' => $email]);
-
-        if ($user === null) {
-            throw new InvalidArgumentException("User with email '$email' does not exist");
-        }
-
-        $shortUrl = $this->shortUrlManager->createShortUrl($url, $user, $slug);
+        $shortUrl = $this->shortUrlManager->createShortUrl($url, $slug);
 
         $this->entityManager->persist($shortUrl);
         $this->entityManager->flush();

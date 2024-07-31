@@ -39,8 +39,6 @@ trait SoftDeleteable
     }
 
     /**
-     * @return $this
-     *
      * @phpstan-assert !null $this->getDeletedAt()
      */
     public function setDeletedAt(DateTimeInterface $deletedAt): static

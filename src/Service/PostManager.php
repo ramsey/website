@@ -26,7 +26,6 @@ namespace App\Service;
 use App\Entity\Post;
 use App\Entity\PostBodyType;
 use App\Entity\ShortUrl;
-use App\Entity\User;
 use App\Repository\PostRepository;
 use App\Service\Blog\ParsedPost;
 use DateTimeImmutable;
@@ -49,22 +48,15 @@ final readonly class PostManager implements PostService
         array $category,
         PostBodyType $bodyType,
         string $body,
-        User $author,
         array $tags = [],
     ): Post {
-        $createdAt = new DateTimeImmutable();
-
         $post = (new Post())
             ->setTitle($title)
             ->setSlug($slug)
             ->setBody($body)
             ->setBodyType($bodyType)
-            ->setAuthor($author)
             ->setCategory($category)
-            ->setCreatedAt($createdAt)
-            ->setCreatedBy($author)
-            ->setUpdatedAt($createdAt)
-            ->setUpdatedBy($author);
+            ->setCreatedAt(new DateTimeImmutable());
 
         foreach ($tags as $tag) {
             $post->addTag($tag);
@@ -73,7 +65,7 @@ final readonly class PostManager implements PostService
         return $post;
     }
 
-    public function createFromParsedPost(ParsedPost $parsedPost, User $author): Post
+    public function createFromParsedPost(ParsedPost $parsedPost): Post
     {
         /** @var array{shorturl?: string} $additional */
         $additional = $parsedPost->metadata->additional;
@@ -89,12 +81,12 @@ final readonly class PostManager implements PostService
             ->setExcerpt($parsedPost->metadata->excerpt)
             ->setFeedId($parsedPost->metadata->feedId)
             ->setMetadata($additional)
-            ->setAuthor($author)
             ->setCategory($parsedPost->metadata->categories)
-            ->setCreatedAt($parsedPost->metadata->createdAt)
-            ->setCreatedBy($author)
-            ->setUpdatedAt($parsedPost->metadata->updatedAt ?? $parsedPost->metadata->createdAt)
-            ->setUpdatedBy($author);
+            ->setCreatedAt($parsedPost->metadata->createdAt);
+
+        if ($parsedPost->metadata->updatedAt !== null) {
+            $post->setUpdatedAt($parsedPost->metadata->updatedAt);
+        }
 
         foreach ($parsedPost->metadata->tags as $tagName) {
             $tag = $this->postTagService->getRepository()->findOneByName($tagName)

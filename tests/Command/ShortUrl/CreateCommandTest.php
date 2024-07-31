@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -37,7 +36,6 @@ final class CreateCommandTest extends KernelTestCase
         $this->commandTester->execute([
             '--custom-slug' => 'url-from-command',
             'url' => 'https://example.com/create-short-url-from-console-command-with-custom-slug',
-            'email' => 'super-admin-user@example.com',
         ]);
 
         $this->commandTester->assertCommandIsSuccessful();
@@ -52,7 +50,6 @@ final class CreateCommandTest extends KernelTestCase
     {
         $this->commandTester->execute([
             'url' => 'https://example.com/create-short-url-from-console-command-without-custom-slug',
-            'email' => 'super-admin-user@example.com',
         ]);
 
         $this->commandTester->assertCommandIsSuccessful();
@@ -60,17 +57,5 @@ final class CreateCommandTest extends KernelTestCase
         $output = $this->commandTester->getDisplay();
 
         $this->assertStringContainsString('https://localhost/su/', $output);
-    }
-
-    #[TestDox('fails if user with email address does not exist')]
-    public function testExecuteWhenEmailDoesNotExist(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage("User with email 'email-does-not-exist@example.com' does not exist");
-
-        $this->commandTester->execute([
-            'url' => 'https://example.com/long-url',
-            'email' => 'email-does-not-exist@example.com',
-        ]);
     }
 }

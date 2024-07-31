@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Doctrine\Traits\Blamable;
 use App\Doctrine\Traits\SoftDeleteable;
 use App\Doctrine\Traits\Timestampable;
 use App\Repository\ShortUrlRepository;
@@ -39,7 +38,6 @@ use Ramsey\Uuid\UuidInterface;
 #[ORM\Index(fields: ['destinationUrl'])]
 class ShortUrl
 {
-    use Blamable;
     use Timestampable;
     use SoftDeleteable;
 

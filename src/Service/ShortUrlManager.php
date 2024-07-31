@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\ShortUrl;
-use App\Entity\User;
 use App\Repository\ShortUrlRepository;
 use App\Service\Codec\Base62Codec;
 use DateTimeImmutable;
@@ -59,11 +58,29 @@ final readonly class ShortUrlManager implements ShortUrlService
         return null;
     }
 
-    public function createShortUrl(string $url, User $user, ?string $customSlug = null): ShortUrl
+    public function checkAndSetSlug(ShortUrl $shortUrl): ShortUrl
     {
-        $shortUrl = (new ShortUrl())->setDestinationUrl($this->uriFactory->createUri($url));
+        if ($shortUrl->getSlug() === null) {
+            $shortUrl->setSlug($this->generateRandomSlug());
+        }
 
-        return $this->updateShortUrl($shortUrl, $user, $customSlug);
+        return $shortUrl;
+    }
+
+    public function createShortUrl(string $url, ?string $customSlug = null): ShortUrl
+    {
+        $shortUrl = (new ShortUrl())
+            ->setDestinationUrl($this->uriFactory->createUri($url))
+            ->setCreatedAt(new DateTimeImmutable());
+
+        if ($customSlug !== null) {
+            $this->checkCustomSlug($customSlug);
+            $shortUrl->setCustomSlug($customSlug);
+        }
+
+        $shortUrl->setSlug($this->generateRandomSlug());
+
+        return $shortUrl;
     }
 
     public function getRepository(): ShortUrlRepository
@@ -71,50 +88,19 @@ final readonly class ShortUrlManager implements ShortUrlService
         return $this->repository;
     }
 
-    public function updateShortUrl(ShortUrl $shortUrl, User $user, ?string $customSlug = null): ShortUrl
-    {
-        $this->checkCustomSlug($customSlug);
-
-        if ($shortUrl->getSlug() === null) {
-            $shortUrl->setSlug($this->generateRandomSlug());
-        }
-
-        if ($customSlug !== null) {
-            $shortUrl->setCustomSlug($customSlug);
-        }
-
-        if ($shortUrl->getCreatedAt() === null) {
-            $shortUrl->setCreatedAt(new DateTimeImmutable());
-        }
-
-        if ($shortUrl->getCreatedBy() === null) {
-            $shortUrl->setCreatedBy($user);
-        }
-
-        $shortUrl->setUpdatedAt(new DateTimeImmutable());
-        $shortUrl->setUpdatedBy($user);
-
-        return $shortUrl;
-    }
-
     /**
      * @phpstan-assert !null $shortUrl->getDeletedAt()
      * @phpstan-impure
      */
-    public function softDeleteShortUrl(ShortUrl $shortUrl, User $user): ShortUrl
+    public function softDeleteShortUrl(ShortUrl $shortUrl): ShortUrl
     {
         $shortUrl->setDeletedAt(new DateTimeImmutable());
-        $shortUrl->setUpdatedBy($user);
 
         return $shortUrl;
     }
 
-    private function checkCustomSlug(?string $customSlug): void
+    private function checkCustomSlug(string $customSlug): void
     {
-        if ($customSlug === null) {
-            return;
-        }
-
         if (!preg_match('/^[a-z0-9\-_.]+$/i', $customSlug)) {
             throw new InvalidArgumentException("Invalid custom slug: $customSlug");
         }

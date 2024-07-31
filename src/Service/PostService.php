@@ -27,7 +27,6 @@ use App\Entity\Post;
 use App\Entity\PostBodyType;
 use App\Entity\PostCategory;
 use App\Entity\PostTag;
-use App\Entity\User;
 use App\Service\Blog\ParsedPost;
 
 /**
@@ -49,12 +48,11 @@ interface PostService extends Service
         array $category,
         PostBodyType $bodyType,
         string $body,
-        User $author,
         array $tags = [],
     ): Post;
 
     /**
      * Creates a Post entity from a ParsedPost
      */
-    public function createFromParsedPost(ParsedPost $parsedPost, User $author): Post;
+    public function createFromParsedPost(ParsedPost $parsedPost): Post;
 }

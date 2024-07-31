@@ -8,7 +8,6 @@ use App\Entity\PostBodyType;
 use App\Entity\PostCategory;
 use App\Entity\PostTag;
 use App\Entity\ShortUrl;
-use App\Entity\User;
 use App\Repository\PostRepository;
 use App\Service\Blog\ParsedPost;
 use App\Service\Blog\ParsedPostMetadata;
@@ -52,24 +51,21 @@ class PostManagerTest extends TestCase
         $category = [PostCategory::Blog];
         $type = PostBodyType::Markdown;
         $body = $this->faker->text();
-        $user = new User();
 
         $tag1 = new PostTag();
         $tag2 = new PostTag();
         $tag3 = new PostTag();
 
-        $post = $this->manager->createPost($title, $slug, $category, $type, $body, $user, [$tag1, $tag2, $tag3]);
+        $post = $this->manager->createPost($title, $slug, $category, $type, $body, [$tag1, $tag2, $tag3]);
 
         $this->assertSame($title, $post->getTitle());
         $this->assertSame($slug, $post->getSlug());
         $this->assertSame($category, $post->getCategory());
         $this->assertSame($type, $post->getBodyType());
         $this->assertSame($body, $post->getBody());
-        $this->assertSame($user, $post->getAuthor());
+        $this->assertNull($post->getAuthor());
         $this->assertInstanceOf(DateTimeImmutable::class, $post->getCreatedAt());
-        $this->assertSame($user, $post->getCreatedBy());
-        $this->assertInstanceOf(DateTimeImmutable::class, $post->getUpdatedAt());
-        $this->assertSame($user, $post->getUpdatedBy());
+        $this->assertNull($post->getUpdatedAt());
         $this->assertNull($post->getDeletedAt());
         $this->assertCount(3, $post->getTags());
         $this->assertTrue($post->getTags()->contains($tag1));
@@ -109,8 +105,6 @@ class PostManagerTest extends TestCase
             $this->faker->text(),
         );
 
-        $user = new User();
-
         $tag1 = new PostTag();
         $tag2 = new PostTag();
         $shortUrl = new ShortUrl();
@@ -124,7 +118,7 @@ class PostManagerTest extends TestCase
             ->with('https://bram.se/short-url')
             ->andReturn($shortUrl);
 
-        $post = $this->manager->createFromParsedPost($parsedPost, $user);
+        $post = $this->manager->createFromParsedPost($parsedPost);
 
         $this->assertSame($parsedPost->metadata->id, $post->getId());
         $this->assertSame($parsedPost->metadata->title, $post->getTitle());
@@ -136,12 +130,10 @@ class PostManagerTest extends TestCase
         $this->assertSame($parsedPost->metadata->excerpt, $post->getExcerpt());
         $this->assertSame($parsedPost->metadata->feedId, $post->getFeedId());
         $this->assertSame($parsedPost->metadata->additional, $post->getMetadata());
-        $this->assertSame($user, $post->getAuthor());
+        $this->assertNull($post->getAuthor());
         $this->assertSame($parsedPost->metadata->categories, $post->getCategory());
         $this->assertEquals($parsedPost->metadata->createdAt, $post->getCreatedAt());
-        $this->assertSame($user, $post->getCreatedBy());
         $this->assertEquals($parsedPost->metadata->updatedAt, $post->getUpdatedAt());
-        $this->assertSame($user, $post->getUpdatedBy());
         $this->assertTrue($post->getTags()->contains($tag1));
         $this->assertTrue($post->getTags()->contains($tag2));
         $this->assertTrue($post->getShortUrls()->contains($shortUrl));
@@ -168,13 +160,11 @@ class PostManagerTest extends TestCase
             $this->faker->text(),
         );
 
-        $user = new User();
-
         $this->tagService->expects('getRepository->findOneByName')->never();
         $this->tagService->expects('createTag')->never();
         $this->shortUrlService->expects('getRepository->getShortUrlForShortUrl')->never();
 
-        $post = $this->manager->createFromParsedPost($parsedPost, $user);
+        $post = $this->manager->createFromParsedPost($parsedPost);
 
         $this->assertSame($parsedPost->metadata->id, $post->getId());
         $this->assertSame($parsedPost->metadata->title, $post->getTitle());
@@ -186,12 +176,10 @@ class PostManagerTest extends TestCase
         $this->assertNull($post->getExcerpt());
         $this->assertNull($post->getFeedId());
         $this->assertSame([], $post->getMetadata());
-        $this->assertSame($user, $post->getAuthor());
+        $this->assertNull($post->getAuthor());
         $this->assertSame([], $post->getCategory());
         $this->assertEquals($parsedPost->metadata->createdAt, $post->getCreatedAt());
-        $this->assertSame($user, $post->getCreatedBy());
-        $this->assertEquals($parsedPost->metadata->createdAt, $post->getUpdatedAt());
-        $this->assertSame($user, $post->getUpdatedBy());
+        $this->assertNull($post->getUpdatedAt());
         $this->assertTrue($post->getTags()->isEmpty());
         $this->assertTrue($post->getShortUrls()->isEmpty());
     }

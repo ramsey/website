@@ -47,7 +47,7 @@ class PostTagTest extends KernelTestCase
         $this->assertInstanceOf(UuidInterface::class, $tag->getId());
         $this->assertSame(PostTagFixtures::TAG1, $tag->getName());
         $this->assertInstanceOf(DateTimeImmutable::class, $tag->getCreatedAt());
-        $this->assertInstanceOf(DateTimeImmutable::class, $tag->getUpdatedAt());
+        $this->assertNull($tag->getUpdatedAt());
         $this->assertNull($tag->getDeletedAt());
     }
 

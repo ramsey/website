@@ -24,22 +24,17 @@ declare(strict_types=1);
 namespace App\EventSubscriber;
 
 use App\Entity\ShortUrl;
-use App\Entity\User;
 use App\Service\ShortUrlService;
+use DateTimeImmutable;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Event\EntityLifecycleEventInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use function assert;
 
 final readonly class AdminSubscriber implements EventSubscriberInterface
 {
-    public function __construct(
-        private ShortUrlService $shortUrlManager,
-        private Security $security,
-    ) {
+    public function __construct(private ShortUrlService $shortUrlManager)
+    {
     }
 
     /**
@@ -48,12 +43,12 @@ final readonly class AdminSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            BeforeEntityPersistedEvent::class => ['beforeShortUrlSaved'],
-            BeforeEntityUpdatedEvent::class => ['beforeShortUrlSaved'],
+            BeforeEntityPersistedEvent::class => ['beforeShortUrlPersisted'],
+            BeforeEntityUpdatedEvent::class => ['beforeShortUrlUpdated'],
         ];
     }
 
-    public function beforeShortUrlSaved(EntityLifecycleEventInterface $event): void
+    public function beforeShortUrlPersisted(EntityLifecycleEventInterface $event): void
     {
         $entity = $event->getEntityInstance();
 
@@ -61,9 +56,18 @@ final readonly class AdminSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $user = $this->security->getUser();
-        assert($user instanceof User);
+        $this->shortUrlManager->checkAndSetSlug($entity);
+        $entity->setCreatedAt(new DateTimeImmutable());
+    }
 
-        $this->shortUrlManager->updateShortUrl($entity, $user);
+    public function beforeShortUrlUpdated(EntityLifecycleEventInterface $event): void
+    {
+        $entity = $event->getEntityInstance();
+
+        if (!$entity instanceof ShortUrl) {
+            return;
+        }
+
+        $entity->setUpdatedAt(new DateTimeImmutable());
     }
 }

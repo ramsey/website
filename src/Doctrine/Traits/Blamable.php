@@ -24,26 +24,22 @@ declare(strict_types=1);
 namespace App\Doctrine\Traits;
 
 use App\Entity\User;
-use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping as ORM;
 
 trait Blamable
 {
-    #[ManyToOne(targetEntity: User::class)]
-    private ?User $createdBy = null;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    private User $createdBy;
 
-    #[ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\Column(nullable: true)]
     private ?User $updatedBy = null;
 
-    public function getCreatedBy(): ?User
+    public function getCreatedBy(): User
     {
         return $this->createdBy;
     }
 
-    /**
-     * @return $this
-     *
-     * @phpstan-assert !null $this->getCreatedBy()
-     */
     public function setCreatedBy(User $user): static
     {
         $this->createdBy = $user;
@@ -57,8 +53,6 @@ trait Blamable
     }
 
     /**
-     * @return $this
-     *
      * @phpstan-assert !null $this->getUpdatedBy()
      */
     public function setUpdatedBy(User $user): static

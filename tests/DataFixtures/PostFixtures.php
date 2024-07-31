@@ -70,9 +70,6 @@ final class PostFixtures extends Fixture implements DependentFixtureInterface
             ->addShortUrl($shortUrl)
             ->setFeedId($this->faker->uuid())
             ->setCreatedAt(new DateTimeImmutable())
-            ->setCreatedBy($user)
-            ->setUpdatedAt(new DateTimeImmutable())
-            ->setUpdatedBy($user)
             ->setMetadata(['foo' => 1234, 'bar' => 'abcd', 'baz' => null]);
 
         $manager->persist($post1);

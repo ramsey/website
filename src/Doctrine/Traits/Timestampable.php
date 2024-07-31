@@ -31,19 +31,21 @@ use Doctrine\ORM\Mapping as ORM;
 trait Timestampable
 {
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
-    private ?DateTimeImmutable $createdAt = null;
+    private DateTimeImmutable $createdAt;
 
-    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $updatedAt = null;
 
-    public function getCreatedAt(): ?DateTimeImmutable
+    public function getCreatedAt(): DateTimeImmutable
     {
         return $this->createdAt;
     }
 
     public function setCreatedAt(DateTimeInterface $createdAt): static
     {
-        $this->createdAt = DateTimeImmutable::createFromInterface($createdAt);
+        if (!isset($this->createdAt)) {
+            $this->createdAt = DateTimeImmutable::createFromInterface($createdAt);
+        }
 
         return $this;
     }
@@ -53,6 +55,9 @@ trait Timestampable
         return $this->updatedAt;
     }
 
+    /**
+     * @phpstan-assert !null $this->getUpdatedAt()
+     */
     public function setUpdatedAt(DateTimeInterface $updatedAt): static
     {
         $this->updatedAt = DateTimeImmutable::createFromInterface($updatedAt);

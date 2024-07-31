@@ -70,7 +70,7 @@ class PostTest extends KernelTestCase
         $this->assertFalse($post->getTags()->isEmpty());
         $this->assertGreaterThan(0, strlen($post->getExcerpt()));
         $this->assertInstanceOf(DateTimeImmutable::class, $post->getCreatedAt());
-        $this->assertInstanceOf(DateTimeImmutable::class, $post->getUpdatedAt());
+        $this->assertNull($post->getUpdatedAt());
         $this->assertNull($post->getDeletedAt());
         $this->assertJsonStringEqualsJsonString(
             (string) json_encode(['foo' => 1234, 'bar' => 'abcd', 'baz' => null]),
