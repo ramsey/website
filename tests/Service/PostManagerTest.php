@@ -68,7 +68,7 @@ class PostManagerTest extends TestCase
         $this->assertSame($category, $post->getCategory());
         $this->assertSame($type, $post->getBodyType());
         $this->assertSame($body, $post->getBody());
-        $this->assertNull($post->getAuthor());
+        $this->assertTrue($post->getAuthors()->isEmpty());
         $this->assertInstanceOf(DateTimeImmutable::class, $post->getCreatedAt());
         $this->assertNull($post->getUpdatedAt());
         $this->assertNull($post->getDeletedAt());
@@ -137,7 +137,7 @@ class PostManagerTest extends TestCase
         $this->assertSame($parsedPost->metadata->excerpt, $post->getExcerpt());
         $this->assertSame($parsedPost->metadata->feedId, $post->getFeedId());
         $this->assertSame($parsedPost->metadata->additional, $post->getMetadata());
-        $this->assertNull($post->getAuthor());
+        $this->assertTrue($post->getAuthors()->isEmpty());
         $this->assertSame($parsedPost->metadata->categories, $post->getCategory());
         $this->assertEquals($parsedPost->metadata->createdAt, $post->getCreatedAt());
         $this->assertEquals($parsedPost->metadata->updatedAt, $post->getUpdatedAt());
@@ -185,7 +185,7 @@ class PostManagerTest extends TestCase
         $this->assertNull($post->getExcerpt());
         $this->assertNull($post->getFeedId());
         $this->assertSame([], $post->getMetadata());
-        $this->assertNull($post->getAuthor());
+        $this->assertTrue($post->getAuthors()->isEmpty());
         $this->assertSame([], $post->getCategory());
         $this->assertEquals($parsedPost->metadata->createdAt, $post->getCreatedAt());
         $this->assertNull($post->getUpdatedAt());
@@ -246,7 +246,7 @@ class PostManagerTest extends TestCase
         $this->assertSame($parsedPost->metadata->excerpt, $post->getExcerpt());
         $this->assertSame($parsedPost->metadata->feedId, $post->getFeedId());
         $this->assertSame($parsedPost->metadata->additional, $post->getMetadata());
-        $this->assertNull($post->getAuthor());
+        $this->assertTrue($post->getAuthors()->isEmpty());
         $this->assertSame($parsedPost->metadata->categories, $post->getCategory());
         $this->assertEquals($parsedPost->metadata->createdAt, $post->getCreatedAt());
         $this->assertEquals($parsedPost->metadata->updatedAt, $post->getUpdatedAt());
@@ -299,7 +299,7 @@ class PostManagerTest extends TestCase
         $this->assertNull($post->getExcerpt());
         $this->assertNull($post->getFeedId());
         $this->assertSame([], $post->getMetadata());
-        $this->assertNull($post->getAuthor());
+        $this->assertTrue($post->getAuthors()->isEmpty());
         $this->assertSame([], $post->getCategory());
         $this->assertEquals($parsedPost->metadata->createdAt, $post->getCreatedAt());
         $this->assertNull($post->getUpdatedAt());

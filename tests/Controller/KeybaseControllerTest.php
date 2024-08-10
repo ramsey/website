@@ -26,6 +26,7 @@ class KeybaseControllerTest extends WebTestCase
     #[TestDox('Request to /.well-known/keybase.txt responds successfully')]
     #[TestWith(['ben.ramsey.dev', 'I am an admin of https://ben.ramsey.dev'])]
     #[TestWith(['benramsey.com', 'I am an admin of https://benramsey.com'])]
+    #[TestWith(['localhost', 'This is localhost or 127.0.0.1'])]
     public function testKeybaseSuccessfulResponse(string $host, string $testContent): void
     {
         $client = static::createClient();

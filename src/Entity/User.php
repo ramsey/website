@@ -26,8 +26,6 @@ namespace App\Entity;
 use App\Doctrine\Traits\SoftDeleteable;
 use App\Doctrine\Traits\Timestampable;
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Doctrine\UuidV7Generator;
 use Ramsey\Uuid\UuidInterface;
@@ -72,17 +70,6 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
      */
     #[ORM\Column(length: 255)]
     private string $password;
-
-    /**
-     * @var Collection<int, Post>
-     */
-    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'author')]
-    private Collection $posts;
-
-    public function __construct()
-    {
-        $this->posts = new ArrayCollection();
-    }
 
     /**
      * Returns the user's database identifier
@@ -188,35 +175,5 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
-    }
-
-    /**
-     * @return Collection<int, Post>
-     */
-    public function getPosts(): Collection
-    {
-        return $this->posts;
-    }
-
-    public function addPost(Post $post): static
-    {
-        if (!$this->posts->contains($post)) {
-            $this->posts->add($post);
-            $post->setAuthor($this);
-        }
-
-        return $this;
-    }
-
-    public function removePost(Post $post): static
-    {
-        if ($this->posts->removeElement($post)) {
-            // set the owning side to null (unless already changed)
-            if ($post->getAuthor() === $this) {
-                $post->setAuthor(null);
-            }
-        }
-
-        return $this;
     }
 }

@@ -44,8 +44,12 @@ class Post
     #[ORM\Column(type: 'uuid', unique: true)]
     private UuidInterface $id;
 
-    #[ORM\ManyToOne(inversedBy: 'posts')]
-    private ?User $author = null;
+    /**
+     * @var Collection<int, Author>
+     */
+    #[ORM\JoinTable(name: 'posts_authors')]
+    #[ORM\ManyToMany(targetEntity: Author::class, inversedBy: 'posts')]
+    private Collection $authors;
 
     #[ORM\Column(length: 255)]
     private string $title;
@@ -107,8 +111,22 @@ class Post
 
     public function __construct()
     {
+        $this->authors = new ArrayCollection();
         $this->tags = new ArrayCollection();
         $this->shortUrls = new ArrayCollection();
+    }
+
+    public function addAuthor(Author $author): static
+    {
+        if (!$this->authors->contains($author)) {
+            $this->authors->add($author);
+        }
+
+        if (!$author->getPosts()->contains($this)) {
+            $author->addPost($this);
+        }
+
+        return $this;
     }
 
     public function addShortUrl(ShortUrl $shortUrl): static
@@ -129,16 +147,12 @@ class Post
         return $this;
     }
 
-    public function getAuthor(): ?User
+    /**
+     * @return Collection<int, Author>
+     */
+    public function getAuthors(): Collection
     {
-        return $this->author;
-    }
-
-    public function setAuthor(?User $author): static
-    {
-        $this->author = $author;
-
-        return $this;
+        return $this->authors;
     }
 
     public function getBody(): string
@@ -322,6 +336,17 @@ class Post
     public function setTitle(string $title): static
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function removeAuthor(Author $author): static
+    {
+        $this->authors->removeElement($author);
+
+        if ($author->getPosts()->contains($this)) {
+            $author->removePost($this);
+        }
 
         return $this;
     }

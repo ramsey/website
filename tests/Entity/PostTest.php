@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Entity;
 
+use App\Entity\Author;
 use App\Entity\Post;
 use App\Entity\PostBodyType;
 use App\Entity\PostCategory;
 use App\Entity\PostStatus;
 use App\Entity\PostTag;
 use App\Entity\ShortUrl;
-use App\Entity\User;
 use App\Tests\DataFixtures\PostFixtures;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -52,7 +52,7 @@ class PostTest extends KernelTestCase
         assert($post instanceof Post);
 
         $this->assertInstanceOf(UuidInterface::class, $post->getId());
-        $this->assertInstanceOf(User::class, $post->getAuthor());
+        $this->assertContainsOnlyInstancesOf(Author::class, $post->getAuthors());
         $this->assertIsString($post->getTitle());
         $this->assertGreaterThan(0, strlen($post->getTitle()));
         $this->assertSame(PostFixtures::SLUG1, $post->getSlug());
@@ -80,14 +80,50 @@ class PostTest extends KernelTestCase
         );
     }
 
-    #[TestDox('sets the author')]
-    public function testSetName(): void
+    #[TestDox('adds an author')]
+    public function testAddAuthor(): void
     {
-        $user = new User();
+        $author = new Author();
         $post = new Post();
 
-        $this->assertSame($post, $post->setAuthor($user));
-        $this->assertSame($user, $post->getAuthor());
+        $this->assertSame($post, $post->addAuthor($author));
+        $this->assertTrue($post->getAuthors()->contains($author));
+        $this->assertTrue($author->getPosts()->contains($post));
+    }
+
+    #[TestDox('removes an author')]
+    public function testRemoveAuthor(): void
+    {
+        $author1 = new Author();
+        $author2 = new Author();
+        $author3 = new Author();
+
+        $post = new Post();
+
+        $post->addAuthor($author1)->addAuthor($author2)->addAuthor($author3);
+
+        // The post should contain all authors, and each author should contain the post.
+        $this->assertTrue($post->getAuthors()->contains($author1));
+        $this->assertTrue($author1->getPosts()->contains($post));
+        $this->assertTrue($post->getAuthors()->contains($author2));
+        $this->assertTrue($author2->getPosts()->contains($post));
+        $this->assertTrue($post->getAuthors()->contains($author3));
+        $this->assertTrue($author3->getPosts()->contains($post));
+
+        // Remove the second author from the post.
+        $this->assertSame($post, $post->removeAuthor($author2));
+
+        // The post should still contain author 1 and author 1 should contain the post.
+        $this->assertTrue($post->getAuthors()->contains($author1));
+        $this->assertTrue($author1->getPosts()->contains($post));
+
+        // The post should no longer contain author 2 and author 2 should not contain the post.
+        $this->assertFalse($post->getAuthors()->contains($author2));
+        $this->assertFalse($author2->getPosts()->contains($post));
+
+        // The post should still contain author 3 and author 3 should contain the post.
+        $this->assertTrue($post->getAuthors()->contains($author3));
+        $this->assertTrue($author3->getPosts()->contains($post));
     }
 
     #[TestDox('sets the body')]

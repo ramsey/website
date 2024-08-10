@@ -27,6 +27,7 @@ use App\Entity\Post;
 use App\Entity\PostBodyType;
 use App\Entity\PostCategory;
 use App\Entity\PostTag;
+use App\Repository\PostRepository;
 use App\Service\Blog\ParsedPost;
 
 /**
@@ -55,6 +56,8 @@ interface PostService extends Service
      * Creates a Post entity from a ParsedPost
      */
     public function createFromParsedPost(ParsedPost $parsedPost): Post;
+
+    public function getRepository(): PostRepository;
 
     /**
      * Updates a Post entity from a ParsedPost
