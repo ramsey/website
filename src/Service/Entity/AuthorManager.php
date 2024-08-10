@@ -21,22 +21,28 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Entity;
 
 use App\Entity\Author;
 use App\Repository\AuthorRepository;
+use DateTimeImmutable;
 
-/**
- * A service for interacting with authors
- *
- * @extends Service<int, Author>
- */
-interface AuthorService extends Service
+final readonly class AuthorManager implements AuthorService
 {
-    /**
-     * Creates an Author entity
-     */
-    public function createAuthor(): Author;
+    public function __construct(private AuthorRepository $repository)
+    {
+    }
 
-    public function getRepository(): AuthorRepository;
+    public function createAuthor(string $byline, string $email): Author
+    {
+        return (new Author())
+            ->setByline($byline)
+            ->setEmail($email)
+            ->setCreatedAt(new DateTimeImmutable());
+    }
+
+    public function getRepository(): AuthorRepository
+    {
+        return $this->repository;
+    }
 }

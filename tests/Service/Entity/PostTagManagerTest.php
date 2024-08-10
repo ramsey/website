@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Service;
+namespace App\Tests\Service\Entity;
 
 use App\Repository\PostTagRepository;
-use App\Service\PostTagManager;
+use App\Service\Entity\PostTagManager;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use Mockery;
@@ -36,7 +36,7 @@ class PostTagManagerTest extends TestCase
 
         $this->assertSame('test_tag', $tag->getName());
         $this->assertInstanceOf(DateTimeImmutable::class, $tag->getCreatedAt());
-        $this->assertInstanceOf(DateTimeImmutable::class, $tag->getUpdatedAt());
+        $this->assertNull($tag->getUpdatedAt());
         $this->assertNull($tag->getDeletedAt());
         $this->assertEmpty($tag->getPosts());
     }

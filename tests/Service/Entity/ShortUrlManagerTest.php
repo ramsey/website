@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Service;
+namespace App\Tests\Service\Entity;
 
 use App\Entity\ShortUrl;
 use App\Repository\ShortUrlRepository;
 use App\Service\Codec\Base62Codec;
-use App\Service\ShortUrlManager;
+use App\Service\Entity\ShortUrlManager;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use Laminas\Diactoros\UriFactory;
@@ -15,7 +15,10 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+
+use function strlen;
 
 #[TestDox('ShortUrlManager')]
 final class ShortUrlManagerTest extends TestCase
@@ -131,26 +134,14 @@ final class ShortUrlManagerTest extends TestCase
         $this->manager->createShortUrl($url, 'already-exists');
     }
 
-    #[TestDox('sets the deletedAt property to soft-delete a short URL')]
-    public function testSoftDeleteShortUrl(): void
-    {
-        $shortUrl = new ShortUrl();
-
-        $this->assertNull($shortUrl->getDeletedAt());
-
-        $this->manager->softDeleteShortUrl($shortUrl);
-
-        $this->assertInstanceOf(DateTimeImmutable::class, $shortUrl->getDeletedAt());
-    }
-
     #[TestDox('::getRepository() returns a ShortUrlRepository')]
     public function testGetRepository(): void
     {
         $this->assertSame($this->repository, $this->manager->getRepository());
     }
 
-    #[TestDox("generates a random slug for the ShortUrl, if it doesn't have one")]
-    public function testCheckAndSetSlugGeneratesRandomSlug(): void
+    #[TestDox('generates a random slug until it is unique')]
+    public function testGenerateSlug(): void
     {
         $this->repository
             ->expects('findOneBySlug')
@@ -158,24 +149,49 @@ final class ShortUrlManagerTest extends TestCase
             ->times(4)
             ->andReturn(new ShortUrl(), new ShortUrl(), new ShortUrl(), null);
 
-        $shortUrl = new ShortUrl();
+        $slug = $this->manager->generateSlug();
 
-        $this->assertNull($shortUrl->getSlug());
-        $this->assertSame($shortUrl, $this->manager->checkAndSetSlug($shortUrl));
-        $this->assertIsString($shortUrl->getSlug());
+        $this->assertIsString($slug);
+        $this->assertTrue(strlen($slug) > 0);
     }
 
-    #[TestDox('skips generating a random slug, if the ShortUrl already has one')]
-    public function testCheckAndSetSlugWhenShortUrlHasSlug(): void
+    #[TestDox('checks custom slug for validity and sets it')]
+    #[TestWith(['foo-bar-baz'])]
+    #[TestWith(['foo_BAR_baz'])]
+    #[TestWith(['foo123.456'])]
+    #[TestWith(['0123456789'])]
+    #[TestWith(['012.345-678_9'])]
+    public function testCheckAndSetCustomSlug(string $customSlug): void
     {
-        $slug = 'short-url-already-has-slug';
+        $this->repository->expects('findOneByCustomSlug')->andReturnNull();
 
-        $this->repository->expects('findOneBySlug')->never();
+        $shortUrl = new ShortUrl();
 
-        $shortUrl = (new ShortUrl())->setSlug($slug);
+        $this->assertSame($shortUrl, $this->manager->checkAndSetCustomSlug($shortUrl, $customSlug));
+    }
 
-        $this->assertSame($slug, $shortUrl->getSlug());
-        $this->assertSame($shortUrl, $this->manager->checkAndSetSlug($shortUrl));
-        $this->assertSame($slug, $shortUrl->getSlug());
+    #[TestWith(['foo bar baz'])]
+    #[TestWith(['foo_BAR$baz'])]
+    #[TestWith(['foo@BARbaz'])]
+    public function testCheckAndSetInvalidCustomSlug(string $customSlug): void
+    {
+        $shortUrl = new ShortUrl();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Invalid custom slug: $customSlug");
+
+        $this->manager->checkAndSetCustomSlug($shortUrl, $customSlug);
+    }
+
+    public function testCheckAndSetExistingCustomSlug(): void
+    {
+        $this->repository->expects('findOneByCustomSlug')->andReturn(new ShortUrl());
+
+        $shortUrl = new ShortUrl();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Custom slug already exists: custom-slug-already-exists');
+
+        $this->manager->checkAndSetCustomSlug($shortUrl, 'custom-slug-already-exists');
     }
 }

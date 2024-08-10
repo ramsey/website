@@ -21,7 +21,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Entity;
 
 use App\Entity\PostTag;
 use App\Repository\PostTagRepository;
@@ -29,9 +29,9 @@ use App\Repository\PostTagRepository;
 /**
  * A service for interacting with post tags
  *
- * @extends Service<int, PostTag>
+ * @extends EntityService<int, PostTag>
  */
-interface PostTagService extends Service
+interface PostTagService extends EntityService
 {
     /**
      * Creates a PostTag entity

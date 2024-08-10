@@ -21,18 +21,19 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Entity;
 
 use App\Entity\ShortUrl;
 use App\Repository\ShortUrlRepository;
+use InvalidArgumentException;
 use Psr\Http\Message\UriInterface;
 
 /**
  * A service for interacting with short URLs
  *
- * @extends Service<int, ShortUrl>
+ * @extends EntityService<int, ShortUrl>
  */
-interface ShortUrlService extends Service
+interface ShortUrlService extends EntityService
 {
     /**
      * Returns a UriInterface for the given ShortUrl entity
@@ -40,20 +41,24 @@ interface ShortUrlService extends Service
     public function buildUrl(ShortUrl $shortUrl): ?UriInterface;
 
     /**
-     * Checks whether a slug exists on the short URL and, if not, randomly
-     * generates and sets a slug
+     * Checks whether the given custom slug is valid, and if so, sets it on the
+     * short URL and returns the short URL
+     *
+     * @throws InvalidArgumentException if the custom slug is not valid
      */
-    public function checkAndSetSlug(ShortUrl $shortUrl): ShortUrl;
+    public function checkAndSetCustomSlug(ShortUrl $shortUrl, string $customSlug): ShortUrl;
 
     /**
      * Creates a ShortUrl entity and optionally sets a custom slug
+     *
+     * @throws InvalidArgumentException if the custom slug is not valid
      */
     public function createShortUrl(string $url, ?string $customSlug = null): ShortUrl;
 
-    public function getRepository(): ShortUrlRepository;
-
     /**
-     * Soft-deletes a ShortUrl entity with the given user
+     * Generates a random slug that may be used when creating a new short URL
      */
-    public function softDeleteShortUrl(ShortUrl $shortUrl): ShortUrl;
+    public function generateSlug(): string;
+
+    public function getRepository(): ShortUrlRepository;
 }

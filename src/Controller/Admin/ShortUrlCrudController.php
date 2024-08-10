@@ -24,7 +24,9 @@ declare(strict_types=1);
 namespace App\Controller\Admin;
 
 use App\Entity\ShortUrl;
-use App\Service\ShortUrlService;
+use App\Service\Entity\ShortUrlService;
+use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -34,6 +36,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
+
+use function assert;
+use function sprintf;
 
 final class ShortUrlCrudController extends AbstractCrudController
 {
@@ -70,18 +75,54 @@ final class ShortUrlCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         yield IdField::new('id')->onlyOnDetail();
-        yield TextField::new('slug')->hideOnIndex()->setDisabled();
+        yield TextField::new('slug')->onlyOnDetail();
         yield TextField::new('slug', 'Short URL')
             ->setSortable(false)
             ->formatValue(function (string $value, ShortUrl $entity): string {
                 $url = $this->shortUrlManager->buildUrl($entity);
 
-                return '<a href="' . $url . '" target="_blank" rel="noopener">' . $url . '</a>';
+                return sprintf('<a href="%s" target="_blank" rel="noopener">%s</a>', $url, $url);
             })
             ->hideOnForm();
         yield UrlField::new('destinationUrl', 'Destination URL');
         yield TextField::new('customSlug')->hideOnIndex();
         yield DateField::new('createdAt')->hideOnForm();
         yield DateField::new('updatedAt')->hideOnForm();
+    }
+
+    /**
+     * @param class-string<ShortUrl> $entityFqcn
+     */
+    public function createEntity(string $entityFqcn): ShortUrl
+    {
+        return (new $entityFqcn())
+            ->setSlug($this->shortUrlManager->generateSlug())
+            ->setCreatedAt(new DateTimeImmutable());
+    }
+
+    /**
+     * @param ShortUrl $entityInstance
+     */
+    // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $entityInstance->setUpdatedAt(new DateTimeImmutable());
+        $this->persistEntity($entityManager, $entityInstance);
+    }
+
+    /**
+     * @param ShortUrl $entityInstance
+     */
+    // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        assert($entityInstance instanceof ShortUrl);
+
+        if ($entityInstance->getCustomSlug() !== null) {
+            $this->shortUrlManager->checkAndSetCustomSlug($entityInstance, $entityInstance->getCustomSlug());
+        }
+
+        $entityManager->persist($entityInstance);
+        $entityManager->flush();
     }
 }

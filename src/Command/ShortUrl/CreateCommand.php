@@ -23,7 +23,7 @@ declare(strict_types=1);
 
 namespace App\Command\ShortUrl;
 
-use App\Service\ShortUrlManager;
+use App\Service\Entity\ShortUrlManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

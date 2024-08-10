@@ -21,13 +21,11 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Entity;
 
 use App\Entity\Post;
-use App\Entity\PostBodyType;
 use App\Repository\PostRepository;
 use App\Service\Blog\ParsedPost;
-use DateTimeImmutable;
 use DateTimeInterface;
 use InvalidArgumentException;
 use Ramsey\Uuid\UuidInterface;
@@ -43,32 +41,6 @@ final readonly class PostManager implements PostService
         private PostTagService $postTagService,
         private ShortUrlService $shortUrlService,
     ) {
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function createPost(
-        string $title,
-        string $slug,
-        array $category,
-        PostBodyType $bodyType,
-        string $body,
-        array $tags = [],
-    ): Post {
-        $post = (new Post())
-            ->setTitle($title)
-            ->setSlug($slug)
-            ->setBody($body)
-            ->setBodyType($bodyType)
-            ->setCategory($category)
-            ->setCreatedAt(new DateTimeImmutable());
-
-        foreach ($tags as $tag) {
-            $post->addTag($tag);
-        }
-
-        return $post;
     }
 
     public function createFromParsedPost(ParsedPost $parsedPost): Post

@@ -21,24 +21,22 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Entity;
 
 use App\Entity\Author;
 use App\Repository\AuthorRepository;
 
-final readonly class AuthorManager implements AuthorService
+/**
+ * A service for interacting with authors
+ *
+ * @extends EntityService<int, Author>
+ */
+interface AuthorService extends EntityService
 {
-    public function __construct(private AuthorRepository $repository)
-    {
-    }
+    /**
+     * Creates an Author entity
+     */
+    public function createAuthor(string $byline, string $email): Author;
 
-    public function createAuthor(): Author
-    {
-        return new Author();
-    }
-
-    public function getRepository(): AuthorRepository
-    {
-        return $this->repository;
-    }
+    public function getRepository(): AuthorRepository;
 }

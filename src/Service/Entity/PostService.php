@@ -21,37 +21,19 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Entity;
 
 use App\Entity\Post;
-use App\Entity\PostBodyType;
-use App\Entity\PostCategory;
-use App\Entity\PostTag;
 use App\Repository\PostRepository;
 use App\Service\Blog\ParsedPost;
 
 /**
  * A service for interacting with posts
  *
- * @extends Service<int, Post>
+ * @extends EntityService<int, Post>
  */
-interface PostService extends Service
+interface PostService extends EntityService
 {
-    /**
-     * Creates a Post entity
-     *
-     * @param PostCategory[] $category
-     * @param PostTag[] $tags
-     */
-    public function createPost(
-        string $title,
-        string $slug,
-        array $category,
-        PostBodyType $bodyType,
-        string $body,
-        array $tags = [],
-    ): Post;
-
     /**
      * Creates a Post entity from a ParsedPost
      */

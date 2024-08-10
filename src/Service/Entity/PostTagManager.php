@@ -21,7 +21,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Entity;
 
 use App\Entity\PostTag;
 use App\Repository\PostTagRepository;
@@ -44,8 +44,7 @@ final readonly class PostTagManager implements PostTagService
 
         return (new PostTag())
             ->setName($tag)
-            ->setCreatedAt(new DateTimeImmutable())
-            ->setUpdatedAt(new DateTimeImmutable());
+            ->setCreatedAt(new DateTimeImmutable());
     }
 
     public function getRepository(): PostTagRepository

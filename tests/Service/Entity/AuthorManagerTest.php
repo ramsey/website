@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Service;
+namespace App\Tests\Service\Entity;
 
 use App\Repository\AuthorRepository;
-use App\Service\AuthorManager;
+use App\Service\Entity\AuthorManager;
+use DateTimeImmutable;
+use Faker\Factory;
+use Faker\Generator;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
@@ -19,9 +22,11 @@ class AuthorManagerTest extends TestCase
 
     private AuthorRepository & MockInterface $repository;
     private AuthorManager $manager;
+    private Generator $faker;
 
     protected function setUp(): void
     {
+        $this->faker = Factory::create();
         $this->repository = Mockery::mock(AuthorRepository::class);
         $this->manager = new AuthorManager($this->repository);
     }
@@ -29,11 +34,17 @@ class AuthorManagerTest extends TestCase
     #[TestDox('creates an empty author instance')]
     public function testCreateEmptyAuthorInstance(): void
     {
-        $author = $this->manager->createAuthor();
+        $byline = $this->faker->name();
+        $email = $this->faker->safeEmail();
 
-        $this->assertNull($author->getUser());
+        $author = $this->manager->createAuthor($byline, $email);
+
+        $this->assertSame($byline, $author->getByline());
+        $this->assertSame($email, $author->getEmail());
+        $this->assertInstanceOf(DateTimeImmutable::class, $author->getCreatedAt());
         $this->assertNull($author->getUpdatedAt());
         $this->assertNull($author->getDeletedAt());
+        $this->assertNull($author->getUser());
         $this->assertEmpty($author->getPosts());
     }
 

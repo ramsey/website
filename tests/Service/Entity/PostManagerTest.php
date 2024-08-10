@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Service;
+namespace App\Tests\Service\Entity;
 
 use App\Entity\Post;
 use App\Entity\PostBodyType;
@@ -13,9 +13,9 @@ use App\Entity\ShortUrl;
 use App\Repository\PostRepository;
 use App\Service\Blog\ParsedPost;
 use App\Service\Blog\ParsedPostMetadata;
-use App\Service\PostManager;
-use App\Service\PostTagService;
-use App\Service\ShortUrlService;
+use App\Service\Entity\PostManager;
+use App\Service\Entity\PostTagService;
+use App\Service\Entity\ShortUrlService;
 use DateInterval;
 use DateTimeImmutable;
 use Faker\Factory;
@@ -46,41 +46,6 @@ class PostManagerTest extends TestCase
         $this->shortUrlService = Mockery::mock(ShortUrlService::class);
         $this->repository = Mockery::mock(PostRepository::class);
         $this->manager = new PostManager($this->repository, $this->tagService, $this->shortUrlService);
-    }
-
-    #[TestDox('creates a new post instance with the given values')]
-    public function testCreatePost(): void
-    {
-        $title = $this->faker->sentence();
-        $slug = $this->faker->slug();
-        $category = [PostCategory::Blog];
-        $type = PostBodyType::Markdown;
-        $body = $this->faker->text();
-
-        $tag1 = new PostTag();
-        $tag2 = new PostTag();
-        $tag3 = new PostTag();
-
-        $post = $this->manager->createPost($title, $slug, $category, $type, $body, [$tag1, $tag2, $tag3]);
-
-        $this->assertSame($title, $post->getTitle());
-        $this->assertSame($slug, $post->getSlug());
-        $this->assertSame($category, $post->getCategory());
-        $this->assertSame($type, $post->getBodyType());
-        $this->assertSame($body, $post->getBody());
-        $this->assertTrue($post->getAuthors()->isEmpty());
-        $this->assertInstanceOf(DateTimeImmutable::class, $post->getCreatedAt());
-        $this->assertNull($post->getUpdatedAt());
-        $this->assertNull($post->getDeletedAt());
-        $this->assertCount(3, $post->getTags());
-        $this->assertTrue($post->getTags()->contains($tag1));
-        $this->assertTrue($post->getTags()->contains($tag2));
-        $this->assertTrue($post->getTags()->contains($tag3));
-        $this->assertSame([], $post->getMetadata());
-        $this->assertSame([], $post->getKeywords());
-        $this->assertNull($post->getDescription());
-        $this->assertNull($post->getExcerpt());
-        $this->assertTrue($post->getShortUrls()->isEmpty());
     }
 
     #[TestDox('::getRepository() returns a PostRepository')]

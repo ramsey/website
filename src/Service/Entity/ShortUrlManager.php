@@ -21,7 +21,7 @@
 
 declare(strict_types=1);
 
-namespace App\Service;
+namespace App\Service\Entity;
 
 use App\Entity\ShortUrl;
 use App\Repository\ShortUrlRepository;
@@ -58,13 +58,17 @@ final readonly class ShortUrlManager implements ShortUrlService
         return null;
     }
 
-    public function checkAndSetSlug(ShortUrl $shortUrl): ShortUrl
+    public function checkAndSetCustomSlug(ShortUrl $shortUrl, string $customSlug): ShortUrl
     {
-        if ($shortUrl->getSlug() === null) {
-            $shortUrl->setSlug($this->generateRandomSlug());
+        if (!preg_match('/^[a-z0-9\-_.]+$/i', $customSlug)) {
+            throw new InvalidArgumentException("Invalid custom slug: $customSlug");
         }
 
-        return $shortUrl;
+        if ($this->repository->findOneByCustomSlug($customSlug) !== null) {
+            throw new InvalidArgumentException("Custom slug already exists: $customSlug");
+        }
+
+        return $shortUrl->setCustomSlug($customSlug);
     }
 
     public function createShortUrl(string $url, ?string $customSlug = null): ShortUrl
@@ -74,43 +78,13 @@ final readonly class ShortUrlManager implements ShortUrlService
             ->setCreatedAt(new DateTimeImmutable());
 
         if ($customSlug !== null) {
-            $this->checkCustomSlug($customSlug);
-            $shortUrl->setCustomSlug($customSlug);
+            $shortUrl = $this->checkAndSetCustomSlug($shortUrl, $customSlug);
         }
 
-        $shortUrl->setSlug($this->generateRandomSlug());
-
-        return $shortUrl;
+        return $shortUrl->setSlug($this->generateSlug());
     }
 
-    public function getRepository(): ShortUrlRepository
-    {
-        return $this->repository;
-    }
-
-    /**
-     * @phpstan-assert !null $shortUrl->getDeletedAt()
-     * @phpstan-impure
-     */
-    public function softDeleteShortUrl(ShortUrl $shortUrl): ShortUrl
-    {
-        $shortUrl->setDeletedAt(new DateTimeImmutable());
-
-        return $shortUrl;
-    }
-
-    private function checkCustomSlug(string $customSlug): void
-    {
-        if (!preg_match('/^[a-z0-9\-_.]+$/i', $customSlug)) {
-            throw new InvalidArgumentException("Invalid custom slug: $customSlug");
-        }
-
-        if ($this->repository->findOneByCustomSlug($customSlug) !== null) {
-            throw new InvalidArgumentException("Custom slug already exists: $customSlug");
-        }
-    }
-
-    private function generateRandomSlug(): string
+    public function generateSlug(): string
     {
         do {
             $randomSlug = $this->codec->encode(random_bytes(5));
@@ -118,5 +92,10 @@ final readonly class ShortUrlManager implements ShortUrlService
         } while ($shortUrl !== null);
 
         return $randomSlug;
+    }
+
+    public function getRepository(): ShortUrlRepository
+    {
+        return $this->repository;
     }
 }
