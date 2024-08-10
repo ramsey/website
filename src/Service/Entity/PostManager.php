@@ -40,6 +40,7 @@ final readonly class PostManager implements PostService
         private PostRepository $repository,
         private PostTagService $postTagService,
         private ShortUrlService $shortUrlService,
+        private AuthorService $authorService,
     ) {
     }
 
@@ -89,6 +90,14 @@ final readonly class PostManager implements PostService
             $tag = $this->postTagService->getRepository()->findOneByName($tagName)
                 ?? $this->postTagService->createTag($tagName);
             $post->addTag($tag);
+        }
+
+        // Remove any authors and add them back.
+        $post->getAuthors()->clear();
+        foreach ($parsedPost->authors as $authorData) {
+            $author = $this->authorService->getRepository()->findOneBy(['email' => $authorData->email])
+                ?? $this->authorService->createAuthor($authorData->byline, $authorData->email);
+            $post->addAuthor($author);
         }
 
         /** @var string | null $shortUrl */

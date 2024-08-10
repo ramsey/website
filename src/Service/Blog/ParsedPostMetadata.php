@@ -32,6 +32,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * @phpstan-type PostMetadata array{
  *      id?: string,
+ *      authors?: list<string> | string,
  *      title?: string,
  *      slug?: string,
  *      status?: 'deleted' | 'draft' | 'hidden' | 'published',

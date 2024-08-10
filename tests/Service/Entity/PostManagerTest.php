@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Service\Entity;
 
+use App\Entity\Author;
 use App\Entity\Post;
 use App\Entity\PostBodyType;
 use App\Entity\PostCategory;
@@ -12,7 +13,9 @@ use App\Entity\PostTag;
 use App\Entity\ShortUrl;
 use App\Repository\PostRepository;
 use App\Service\Blog\ParsedPost;
+use App\Service\Blog\ParsedPostAuthor;
 use App\Service\Blog\ParsedPostMetadata;
+use App\Service\Entity\AuthorService;
 use App\Service\Entity\PostManager;
 use App\Service\Entity\PostTagService;
 use App\Service\Entity\ShortUrlService;
@@ -33,6 +36,7 @@ class PostManagerTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
+    private AuthorService & MockInterface $authorService;
     private Generator $faker;
     private PostRepository & MockInterface $repository;
     private PostManager $manager;
@@ -41,11 +45,17 @@ class PostManagerTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->authorService = Mockery::mock(AuthorService::class);
         $this->faker = Factory::create();
         $this->tagService = Mockery::mock(PostTagService::class);
         $this->shortUrlService = Mockery::mock(ShortUrlService::class);
         $this->repository = Mockery::mock(PostRepository::class);
-        $this->manager = new PostManager($this->repository, $this->tagService, $this->shortUrlService);
+        $this->manager = new PostManager(
+            $this->repository,
+            $this->tagService,
+            $this->shortUrlService,
+            $this->authorService,
+        );
     }
 
     #[TestDox('::getRepository() returns a PostRepository')]
@@ -74,8 +84,14 @@ class PostManagerTest extends TestCase
                 updatedAt: new DateTimeImmutable(),
             ),
             $this->faker->text(),
+            [
+                new ParsedPostAuthor($this->faker->name(), $this->faker->safeEmail()),
+                new ParsedPostAuthor($this->faker->name(), $this->faker->safeEmail()),
+            ],
         );
 
+        $author1 = new Author();
+        $author2 = new Author();
         $tag1 = new PostTag();
         $tag2 = new PostTag();
         $shortUrl = new ShortUrl();
@@ -83,6 +99,19 @@ class PostManagerTest extends TestCase
         $this->tagService->expects('getRepository->findOneByName')->with('tag1')->andReturn($tag1);
         $this->tagService->expects('getRepository->findOneByName')->with('tag2')->andReturnNull();
         $this->tagService->expects('createTag')->with('tag2')->andReturn($tag2);
+
+        $this->authorService
+            ->expects('getRepository->findOneBy')
+            ->with(['email' => $parsedPost->authors[0]->email])
+            ->andReturn($author1);
+        $this->authorService
+            ->expects('getRepository->findOneBy')
+            ->with(['email' => $parsedPost->authors[1]->email])
+            ->andReturnNull();
+        $this->authorService
+            ->expects('createAuthor')
+            ->with($parsedPost->authors[1]->byline, $parsedPost->authors[1]->email)
+            ->andReturn($author2);
 
         $this->shortUrlService
             ->expects('getRepository->getShortUrlForShortUrl')
@@ -102,13 +131,14 @@ class PostManagerTest extends TestCase
         $this->assertSame($parsedPost->metadata->excerpt, $post->getExcerpt());
         $this->assertSame($parsedPost->metadata->feedId, $post->getFeedId());
         $this->assertSame($parsedPost->metadata->additional, $post->getMetadata());
-        $this->assertTrue($post->getAuthors()->isEmpty());
         $this->assertSame($parsedPost->metadata->categories, $post->getCategory());
         $this->assertEquals($parsedPost->metadata->createdAt, $post->getCreatedAt());
         $this->assertEquals($parsedPost->metadata->updatedAt, $post->getUpdatedAt());
         $this->assertTrue($post->getTags()->contains($tag1));
         $this->assertTrue($post->getTags()->contains($tag2));
         $this->assertTrue($post->getShortUrls()->contains($shortUrl));
+        $this->assertTrue($post->getAuthors()->contains($author1));
+        $this->assertTrue($post->getAuthors()->contains($author2));
     }
 
     public function testCreateFromParsedPostWithMinimalData(): void
@@ -131,6 +161,7 @@ class PostManagerTest extends TestCase
                 updatedAt: null,
             ),
             $this->faker->text(),
+            [],
         );
 
         $this->tagService->expects('getRepository->findOneByName')->never();
@@ -178,8 +209,12 @@ class PostManagerTest extends TestCase
                 updatedAt: new DateTimeImmutable(),
             ),
             $this->faker->text(),
+            [
+                new ParsedPostAuthor($this->faker->name(), $this->faker->safeEmail()),
+            ],
         );
 
+        $author1 = new Author();
         $tag1 = new PostTag();
         $tag2 = new PostTag();
         $shortUrl = new ShortUrl();
@@ -187,6 +222,11 @@ class PostManagerTest extends TestCase
         $this->tagService->expects('getRepository->findOneByName')->with('tag1')->andReturn($tag1);
         $this->tagService->expects('getRepository->findOneByName')->with('tag2')->andReturnNull();
         $this->tagService->expects('createTag')->with('tag2')->andReturn($tag2);
+
+        $this->authorService
+            ->expects('getRepository->findOneBy')
+            ->with(['email' => $parsedPost->authors[0]->email])
+            ->andReturn($author1);
 
         $this->shortUrlService
             ->expects('getRepository->getShortUrlForShortUrl')
@@ -211,13 +251,13 @@ class PostManagerTest extends TestCase
         $this->assertSame($parsedPost->metadata->excerpt, $post->getExcerpt());
         $this->assertSame($parsedPost->metadata->feedId, $post->getFeedId());
         $this->assertSame($parsedPost->metadata->additional, $post->getMetadata());
-        $this->assertTrue($post->getAuthors()->isEmpty());
         $this->assertSame($parsedPost->metadata->categories, $post->getCategory());
         $this->assertEquals($parsedPost->metadata->createdAt, $post->getCreatedAt());
         $this->assertEquals($parsedPost->metadata->updatedAt, $post->getUpdatedAt());
         $this->assertTrue($post->getTags()->contains($tag1));
         $this->assertTrue($post->getTags()->contains($tag2));
         $this->assertTrue($post->getShortUrls()->contains($shortUrl));
+        $this->assertTrue($post->getAuthors()->contains($author1));
     }
 
     public function testUpdateFromParsedPostWithMinimalData(): void
@@ -240,6 +280,7 @@ class PostManagerTest extends TestCase
                 updatedAt: null,
             ),
             $this->faker->text(),
+            [],
         );
 
         $this->tagService->expects('getRepository->findOneByName')->never();
@@ -292,6 +333,7 @@ class PostManagerTest extends TestCase
                 updatedAt: null,
             ),
             $this->faker->text(),
+            [],
         );
 
         $post = (new Post())
@@ -325,6 +367,7 @@ class PostManagerTest extends TestCase
                 updatedAt: null,
             ),
             $this->faker->text(),
+            [],
         );
 
         $post = (new Post())
@@ -360,6 +403,7 @@ class PostManagerTest extends TestCase
                 updatedAt: null,
             ),
             $this->faker->text(),
+            [],
         );
 
         $post = (new Post())
@@ -403,6 +447,7 @@ class PostManagerTest extends TestCase
                 updatedAt: null,
             ),
             $this->faker->text(),
+            [],
         );
 
         $this->expectException(InvalidArgumentException::class);

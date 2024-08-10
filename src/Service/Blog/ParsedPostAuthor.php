@@ -23,15 +23,9 @@ declare(strict_types=1);
 
 namespace App\Service\Blog;
 
-final readonly class ParsedPost
+final readonly class ParsedPostAuthor
 {
-    /**
-     * @param list<ParsedPostAuthor> $authors
-     */
-    public function __construct(
-        public ParsedPostMetadata $metadata,
-        public string $content,
-        public array $authors,
-    ) {
+    public function __construct(public string $byline, public string $email)
+    {
     }
 }

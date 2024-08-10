@@ -47,6 +47,8 @@ services:
         arguments:
             - '%app.service.better_stack.source_token%'
             - 'info'
+    PhpExtended\Email\MailboxListParser: ~
+    PhpExtended\Email\MailboxListParserInterface: '@PhpExtended\Email\MailboxListParser'
     Psr\Clock\ClockInterface $monotonicClock: '@Symfony\Component\Clock\MonotonicClock'
     Psr\Clock\ClockInterface: '@Symfony\Component\Clock\NativeClock'
     Psr\Http\Message\UriFactoryInterface: '@Laminas\Diactoros\UriFactory'

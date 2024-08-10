@@ -1,22 +1,10 @@
 ---
-layout: post
-authors:
-    - Frodo Baggins <frodo@example.com>, Samwise Gamgee <samwise@example.com>
-    - '"    Peregrin Took    " <pippin@example.com>, merry@example.com'
 title: Lorem Ipsum Odor Amet
 date: 2004-02-22 06:00:52 -06:00
-categories: [blog]
-tags: [tests, latin]
-id: 00fadd19-6120-7332-8a74-e1821536b10e
 slug: lorem-ipsum
 status: published
-feed_id: https://example.com/feed-id/123
-description: A short description of this post.
-keywords: [latin, gibberish, testing]
-excerpt: >
-    This is an excerpt of the post.
-    The second sentence of the excerpt.
-    The last sentence of the excerpt.
+authors:
+    - this-is-not-a-valid-email-address
 ---
 
 # Lorem Ipsum

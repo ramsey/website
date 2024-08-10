@@ -6,12 +6,14 @@ namespace App\Tests\Service\Blog;
 
 use App\Entity\PostBodyType;
 use App\Entity\PostCategory;
+use App\Service\Blog\ParsedPostAuthor;
 use App\Service\Blog\StaticFileParser;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use PhpExtended\Email\MailboxListParser;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -32,7 +34,8 @@ class StaticFileParserTest extends TestCase
 
         $filesystem = new Filesystem();
         $frontMatter = FrontMatterChain::create();
-        $parser = new StaticFileParser($filesystem, $frontMatter);
+        $emailParser = new MailboxListParser();
+        $parser = new StaticFileParser($filesystem, $frontMatter, $emailParser);
 
         $parsedPost = $parser->parse($path);
 
@@ -53,6 +56,17 @@ class StaticFileParserTest extends TestCase
         $this->assertSame($expectedDate->format('c'), $parsedPost->metadata->createdAt->format('c'));
         $this->assertNull($parsedPost->metadata->updatedAt);
 
+        $this->assertCount(4, $parsedPost->authors);
+        $this->assertContainsOnlyInstancesOf(ParsedPostAuthor::class, $parsedPost->authors);
+        $this->assertSame('Frodo Baggins', $parsedPost->authors[0]->byline);
+        $this->assertSame('frodo@example.com', $parsedPost->authors[0]->email);
+        $this->assertSame('Samwise Gamgee', $parsedPost->authors[1]->byline);
+        $this->assertSame('samwise@example.com', $parsedPost->authors[1]->email);
+        $this->assertSame('Peregrin Took', $parsedPost->authors[2]->byline);
+        $this->assertSame('pippin@example.com', $parsedPost->authors[2]->email);
+        $this->assertSame('', $parsedPost->authors[3]->byline);
+        $this->assertSame('merry@example.com', $parsedPost->authors[3]->email);
+
         // The content should not have the front matter embedded in it.
         $this->assertStringNotContainsString('---', $parsedPost->content);
     }
@@ -66,11 +80,13 @@ class StaticFileParserTest extends TestCase
     #[TestWith([__DIR__ . '/fixtures/missing-title.md', 'Posts must have a title'])]
     #[TestWith([__DIR__ . '/fixtures/missing-slug.md', 'Posts must have a slug'])]
     #[TestWith([__DIR__ . '/fixtures/missing-status.md', 'Posts must have a valid status'])]
+    #[TestWith([__DIR__ . '/fixtures/invalid-authors.md', 'When provided, authors must have valid mailbox strings'])]
     public function testValidation(string $path, string $expectedMessage): void
     {
         $filesystem = new Filesystem();
         $frontMatter = FrontMatterChain::create();
-        $parser = new StaticFileParser($filesystem, $frontMatter);
+        $emailParser = new MailboxListParser();
+        $parser = new StaticFileParser($filesystem, $frontMatter, $emailParser);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedMessage);
@@ -83,7 +99,8 @@ class StaticFileParserTest extends TestCase
     {
         $filesystem = new Filesystem();
         $frontMatter = FrontMatterChain::create();
-        $parser = new StaticFileParser($filesystem, $frontMatter);
+        $emailParser = new MailboxListParser();
+        $parser = new StaticFileParser($filesystem, $frontMatter, $emailParser);
 
         $parsedPost = $parser->parse(__DIR__ . '/fixtures/minimal.md');
 
@@ -99,6 +116,7 @@ class StaticFileParserTest extends TestCase
         $this->assertNull($parsedPost->metadata->feedId);
         $this->assertSame([], $parsedPost->metadata->additional);
         $this->assertNull($parsedPost->metadata->updatedAt);
+        $this->assertSame([], $parsedPost->authors);
 
         // The content should not have the front matter embedded in it.
         $this->assertStringNotContainsString('---', $parsedPost->content);
