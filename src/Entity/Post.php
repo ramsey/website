@@ -48,7 +48,7 @@ class Post
      * @var Collection<int, Author>
      */
     #[ORM\JoinTable(name: 'posts_authors')]
-    #[ORM\ManyToMany(targetEntity: Author::class, inversedBy: 'posts')]
+    #[ORM\ManyToMany(targetEntity: Author::class, inversedBy: 'posts', cascade: ['persist'])]
     private Collection $authors;
 
     #[ORM\Column(length: 255)]
@@ -97,7 +97,7 @@ class Post
      * @var Collection<int, PostTag>
      */
     #[ORM\JoinTable(name: 'posts_post_tags')]
-    #[ORM\ManyToMany(targetEntity: PostTag::class, inversedBy: 'posts')]
+    #[ORM\ManyToMany(targetEntity: PostTag::class, inversedBy: 'posts', cascade: ['persist'])]
     private Collection $tags;
 
     /**

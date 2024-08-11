@@ -63,7 +63,7 @@ final class PostFixtures extends Fixture implements DependentFixtureInterface
         /** @var ShortUrl $shortUrl */
         $shortUrl = $this->getReference(ShortUrlFixtures::SHORT_URL1);
 
-        $post1Id = Uuid::uuid7();
+        $post1Id = Uuid::fromString('01913f38-fe0b-7220-bc2a-bea9e990d181');
         $post1 = (new Post())
             ->setId($post1Id)
             ->addAuthor($author1)
@@ -81,7 +81,7 @@ final class PostFixtures extends Fixture implements DependentFixtureInterface
             ->setExcerpt($this->faker->sentence())
             ->addShortUrl($shortUrl)
             ->setFeedId($post1Id->getUrn())
-            ->setCreatedAt(new DateTimeImmutable())
+            ->setCreatedAt(new DateTimeImmutable('2024-08-08 13:32:45 +00:00'))
             ->setMetadata(['foo' => 1234, 'bar' => 'abcd', 'baz' => null]);
         $manager->persist($post1);
 
