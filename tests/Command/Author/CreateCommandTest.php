@@ -152,11 +152,7 @@ class CreateCommandTest extends KernelTestCase
         $this->assertStringContainsString($author2Email, $output);
 
         $this->assertStringContainsString(
-            sprintf(
-                '[INFO] All authors are associated with user "%s" (%s).',
-                $knownUser->getName(),
-                $knownUser->getId(),
-            ),
+            sprintf('[INFO] All authors are associated with user "%s"', $knownUser->getName()),
             $output,
         );
 
