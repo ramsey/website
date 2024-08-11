@@ -121,17 +121,4 @@ class UserTest extends KernelTestCase
         $this->assertInstanceOf(DatetimeImmutable::class, $user->getUpdatedAt());
         $this->assertSame($date->format('c'), $user->getUpdatedAt()->format('c'));
     }
-
-    #[TestDox('sets the deletedAt property')]
-    public function testSetDeletedAt(): void
-    {
-        $date = new DateTime();
-
-        $user = new User();
-
-        $this->assertSame($user, $user->setDeletedAt($date));
-        $this->assertNotSame($date, $user->getDeletedAt());
-        $this->assertInstanceOf(DatetimeImmutable::class, $user->getDeletedAt());
-        $this->assertSame($date->format('c'), $user->getDeletedAt()->format('c'));
-    }
 }

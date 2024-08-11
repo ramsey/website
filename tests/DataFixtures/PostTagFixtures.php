@@ -31,8 +31,7 @@ final class PostTagFixtures extends Fixture
         $tag3 = (new PostTag())
             ->setName(self::TAG3)
             ->setCreatedAt(new DateTimeImmutable('-2 weeks'))
-            ->setUpdatedAt(new DateTimeImmutable('-1 weeks'))
-            ->setDeletedAt(new DateTimeImmutable('-3 days'));
+            ->setUpdatedAt(new DateTimeImmutable('-1 weeks'));
         $manager->persist($tag3);
 
         $manager->flush();

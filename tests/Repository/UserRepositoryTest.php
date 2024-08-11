@@ -37,7 +37,6 @@ class UserRepositoryTest extends KernelTestCase
     {
         /** @var User $user */
         $user = $this->repository->createQueryBuilder('u')
-            ->andWhere('u.deletedAt IS NULL')
             ->andWhere('JSONB_CONTAINS(u.roles, :role) = true')
             ->setParameter('role', '"ROLE_SUPER_ADMIN"')
             ->getQuery()

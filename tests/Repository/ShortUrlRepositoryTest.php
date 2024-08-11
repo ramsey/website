@@ -7,8 +7,6 @@ namespace App\Tests\Repository;
 use App\Entity\ShortUrl;
 use App\Repository\ShortUrlRepository;
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\Criteria;
 use InvalidArgumentException;
 use Laminas\Diactoros\Uri;
 use PHPUnit\Framework\Attributes\Group;
@@ -44,16 +42,11 @@ class ShortUrlRepositoryTest extends KernelTestCase
 
     public function testFindAllWithCriteria(): void
     {
-        $criteria = new Criteria();
-        $criteria->where(Criteria::expr()->isNull('deletedAt'));
-
-        /** @var Collection<int, ShortUrl> $shortUrls */
-        $shortUrls = $this->repository->matching($criteria);
+        $shortUrls = $this->repository->findAll();
 
         $this->assertGreaterThan(0, count($shortUrls));
 
         foreach ($shortUrls as $shortUrl) {
-            $this->assertNull($shortUrl->getDeletedAt());
             $this->assertInstanceOf(UuidInterface::class, $shortUrl->getId());
         }
     }
@@ -69,16 +62,12 @@ class ShortUrlRepositoryTest extends KernelTestCase
 
     public function testFindOneBySlug(): void
     {
-        $criteria = new Criteria();
-        $criteria->where(Criteria::expr()->isNull('deletedAt'));
+        $shortUrls = $this->repository->findAll();
 
-        /** @var Collection<int, ShortUrl> $shortUrls */
-        $shortUrls = $this->repository->matching($criteria);
-
-        $shortUrl = $this->repository->findOneBySlug((string) $shortUrls[0]?->getSlug());
+        $shortUrl = $this->repository->findOneBySlug((string) $shortUrls[0]->getSlug());
 
         $this->assertSame('https://example.com/this-is-a-long-url', (string) $shortUrl?->getDestinationUrl());
-        $this->assertSame($shortUrls[0]?->getSlug(), $shortUrl?->getSlug());
+        $this->assertSame($shortUrls[0]->getSlug(), $shortUrl?->getSlug());
         $this->assertInstanceOf(UuidInterface::class, $shortUrl?->getId());
     }
 

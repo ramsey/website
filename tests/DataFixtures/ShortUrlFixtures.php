@@ -22,8 +22,7 @@ final class ShortUrlFixtures extends Fixture
         $shortUrl1 = $this->shortUrlManager
             ->createShortUrl('https://example.com/this-is-a-long-url')
             ->setCreatedAt(new DateTime('14 days ago'))
-            ->setUpdatedAt(new DateTime('last week'))
-            ->setDeletedAt(new DateTime('yesterday'));
+            ->setUpdatedAt(new DateTime('last week'));
         $manager->persist($shortUrl1);
 
         $shortUrl2 = $this->shortUrlManager

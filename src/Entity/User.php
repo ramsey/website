@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Doctrine\Traits\SoftDeleteable;
 use App\Doctrine\Traits\Timestampable;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -45,7 +44,6 @@ use function array_unique;
 class User implements PasswordAuthenticatedUserInterface, UserInterface
 {
     use Timestampable;
-    use SoftDeleteable;
 
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]

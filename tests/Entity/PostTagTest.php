@@ -48,7 +48,6 @@ class PostTagTest extends KernelTestCase
         $this->assertSame(PostTagFixtures::TAG1, $tag->getName());
         $this->assertInstanceOf(DateTimeImmutable::class, $tag->getCreatedAt());
         $this->assertNull($tag->getUpdatedAt());
-        $this->assertNull($tag->getDeletedAt());
     }
 
     #[TestDox('sets the name property')]
@@ -115,18 +114,5 @@ class PostTagTest extends KernelTestCase
         $this->assertNotSame($date, $postTag->getUpdatedAt());
         $this->assertInstanceOf(DatetimeImmutable::class, $postTag->getUpdatedAt());
         $this->assertSame($date->format('c'), $postTag->getUpdatedAt()->format('c'));
-    }
-
-    #[TestDox('sets the deletedAt property')]
-    public function testSetDeletedAt(): void
-    {
-        $date = new DateTime();
-
-        $postTag = new PostTag();
-
-        $this->assertSame($postTag, $postTag->setDeletedAt($date));
-        $this->assertNotSame($date, $postTag->getDeletedAt());
-        $this->assertInstanceOf(DatetimeImmutable::class, $postTag->getDeletedAt());
-        $this->assertSame($date->format('c'), $postTag->getDeletedAt()->format('c'));
     }
 }

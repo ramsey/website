@@ -44,16 +44,6 @@ final class UserFixtures extends Fixture
         $adminUser->setUpdatedAt(new DateTimeImmutable('-6 weeks'));
         $manager->persist($adminUser);
 
-        $deletedUser = new UserEntity();
-        $deletedUser->setName($this->faker->name());
-        $deletedUser->setEmail($this->faker->safeEmail());
-        $deletedUser->setPassword($this->passwordHasher->hashPassword($deletedUser, $this->faker->password()));
-        $deletedUser->setRoles(['ROLE_USER']);
-        $deletedUser->setCreatedAt(new DateTimeImmutable('-5 weeks'));
-        $deletedUser->setUpdatedAt(new DateTimeImmutable('-4 weeks'));
-        $deletedUser->setDeletedAt(new DateTimeImmutable('-3 weeks'));
-        $manager->persist($deletedUser);
-
         $user = new UserEntity();
         $user->setName($this->faker->name());
         $user->setEmail('user@example.com');

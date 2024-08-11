@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Doctrine\Traits\SoftDeleteable;
 use App\Doctrine\Traits\Timestampable;
 use App\Repository\PostRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -38,7 +37,6 @@ use Ramsey\Uuid\UuidInterface;
 class Post
 {
     use Timestampable;
-    use SoftDeleteable;
 
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]

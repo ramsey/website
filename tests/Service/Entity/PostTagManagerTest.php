@@ -37,7 +37,6 @@ class PostTagManagerTest extends TestCase
         $this->assertSame('test_tag', $tag->getName());
         $this->assertInstanceOf(DateTimeImmutable::class, $tag->getCreatedAt());
         $this->assertNull($tag->getUpdatedAt());
-        $this->assertNull($tag->getDeletedAt());
         $this->assertEmpty($tag->getPosts());
     }
 

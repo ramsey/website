@@ -50,7 +50,6 @@ class ShortUrlRepository extends ServiceEntityRepository
     {
         /** @var ShortUrl|null */
         return $this->createQueryBuilder('s')
-            ->andWhere('s.deletedAt IS NULL')
             ->andWhere('s.customSlug = :customSlug')
             ->setParameter('customSlug', $customSlug)
             ->getQuery()
@@ -61,7 +60,6 @@ class ShortUrlRepository extends ServiceEntityRepository
     {
         /** @var ShortUrl|null */
         return $this->createQueryBuilder('s')
-            ->andWhere('s.deletedAt IS NULL')
             ->andWhere('s.slug = :slug')
             ->setParameter('slug', $slug)
             ->getQuery()

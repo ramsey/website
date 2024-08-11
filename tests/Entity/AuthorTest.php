@@ -52,7 +52,6 @@ class AuthorTest extends KernelTestCase
         $this->assertInstanceOf(User::class, $author->getUser());
         $this->assertInstanceOf(DateTimeImmutable::class, $author->getCreatedAt());
         $this->assertNull($author->getUpdatedAt());
-        $this->assertNull($author->getDeletedAt());
     }
 
     #[TestDox('sets the byline property')]
@@ -115,19 +114,6 @@ class AuthorTest extends KernelTestCase
         $this->assertNotSame($date, $author->getUpdatedAt());
         $this->assertInstanceOf(DatetimeImmutable::class, $author->getUpdatedAt());
         $this->assertSame($date->format('c'), $author->getUpdatedAt()->format('c'));
-    }
-
-    #[TestDox('sets the deletedAt property')]
-    public function testSetDeletedAt(): void
-    {
-        $date = new DateTime();
-
-        $author = new Author();
-
-        $this->assertSame($author, $author->setDeletedAt($date));
-        $this->assertNotSame($date, $author->getDeletedAt());
-        $this->assertInstanceOf(DatetimeImmutable::class, $author->getDeletedAt());
-        $this->assertSame($date->format('c'), $author->getDeletedAt()->format('c'));
     }
 
     #[TestDox('add a post')]

@@ -23,7 +23,6 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Doctrine\Traits\SoftDeleteable;
 use App\Doctrine\Traits\Timestampable;
 use App\Repository\ShortUrlRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -39,7 +38,6 @@ use Ramsey\Uuid\UuidInterface;
 class ShortUrl
 {
     use Timestampable;
-    use SoftDeleteable;
 
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
