@@ -56,7 +56,7 @@ final class UserFixtures extends Fixture
 
         $user = new UserEntity();
         $user->setName($this->faker->name());
-        $user->setEmail($this->faker->safeEmail());
+        $user->setEmail('user@example.com');
         $user->setPassword($this->passwordHasher->hashPassword($user, $this->faker->password()));
         $user->setRoles(['ROLE_USER']);
         $user->setCreatedAt(new DateTimeImmutable('-2 weeks'));

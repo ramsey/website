@@ -45,7 +45,7 @@ final class AuthorFixtures extends Fixture implements DependentFixtureInterface
 
         $author2 = (new Author())
             ->setByline($faker->name())
-            ->setEmail($faker->safeEmail())
+            ->setEmail('author2@example.com')
             ->setCreatedAt(new DateTimeImmutable('-3 weeks'));
         $manager->persist($author2);
 
