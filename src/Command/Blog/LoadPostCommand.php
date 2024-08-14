@@ -23,6 +23,9 @@ declare(strict_types=1);
 
 namespace App\Command\Blog;
 
+use App\Console\ConfirmationQuestionDeclined;
+use App\Entity\Post;
+use App\Service\Blog\ParsedPost;
 use App\Service\Blog\PostParser;
 use App\Service\Entity\PostManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,7 +42,7 @@ use function ucfirst;
 
 #[AsCommand(
     name: 'app:blog:load-post',
-    description: 'Parses and loads/updates a blog post in the database from a static file',
+    description: 'Parses and loads/updates a blog post from a static file',
 )]
 final class LoadPostCommand extends Command
 {
@@ -53,7 +56,11 @@ final class LoadPostCommand extends Command
 
     protected function configure(): void
     {
-        $this->addArgument('path', InputArgument::REQUIRED, 'The path to the static blog post file');
+        $this
+            ->addOption(name: 'dry-run', description: 'Do not make any changes to the database')
+            ->addOption(name: 'force', description: 'Do not prompt for confirmation if the blog post already exists')
+            ->addOption(name: 'save-deferred', description: 'Defer saving; use only when called from another command!')
+            ->addArgument('path', InputArgument::REQUIRED, 'The path to the static blog post file');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -63,14 +70,47 @@ final class LoadPostCommand extends Command
         /** @var string $path */
         $path = $input->getArgument('path');
 
+        /** @var bool $isDryRun */
+        $isDryRun = $input->getOption('dry-run');
+
+        /** @var bool $isForced */
+        $isForced = $input->getOption('force');
+
+        /** @var bool $isSaveDeferred */
+        $isSaveDeferred = $input->getOption('save-deferred');
+
         try {
-            $parsedPost = $this->postParser->parse($path);
+            [$post, $action] = $this->createPostForSaving($this->postParser->parse($path), $io, $isForced);
+        } catch (ConfirmationQuestionDeclined $exception) {
+            $io->getErrorStyle()->warning($exception->getMessage());
+
+            return Command::FAILURE;
         } catch (InvalidArgumentException $exception) {
             $io->getErrorStyle()->error($exception->getMessage());
 
             return Command::FAILURE;
         }
 
+        if (!$isDryRun) {
+            $this->saveToDatabase($post, $isSaveDeferred);
+        }
+
+        $io->writeln(sprintf(
+            '%s<info>%s blog post for %s: "%s"</info>',
+            $isDryRun ? '<comment>[DRY-RUN]</comment> ' : '',
+            ucfirst($action),
+            $post->getCreatedAt()->format('Y-m-d'),
+            $post->getTitle(),
+        ));
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * @return array{Post, "created" | "updated"}
+     */
+    private function createPostForSaving(ParsedPost $parsedPost, SymfonyStyle $io, bool $isForced): array
+    {
         $existingPost = $this->postManager->getRepository()->find($parsedPost->metadata->id);
 
         if ($existingPost !== null) {
@@ -79,24 +119,24 @@ final class LoadPostCommand extends Command
                 $existingPost->getId(),
             );
 
-            if (!$io->confirm($question)) {
-                $io->getErrorStyle()->warning('Aborting...');
-
-                return Command::FAILURE;
+            if (!$isForced && !$io->confirm($question)) {
+                throw new ConfirmationQuestionDeclined('Aborting...');
             }
 
-            $action = 'updated';
-            $post = $this->postManager->updateFromParsedPost($existingPost, $parsedPost);
-        } else {
-            $action = 'created';
-            $post = $this->postManager->createFromParsedPost($parsedPost);
+            return [$this->postManager->updateFromParsedPost($existingPost, $parsedPost), 'updated'];
         }
 
+        return [$this->postManager->createFromParsedPost($parsedPost), 'created'];
+    }
+
+    private function saveToDatabase(Post $post, bool $isSaveDeferred): void
+    {
         $this->entityManager->persist($post);
-        $this->entityManager->flush();
 
-        $io->info(sprintf('%s blog post with ID %s', ucfirst($action), $post->getId()));
-
-        return Command::SUCCESS;
+        // If saving is deferred, then this should be called from another internal
+        // command that has access to the entity manager and can flush it.
+        if (!$isSaveDeferred) {
+            $this->entityManager->flush();
+        }
     }
 }

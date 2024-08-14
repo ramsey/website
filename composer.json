@@ -49,6 +49,7 @@
         "symfony/dotenv": "~7.1.0",
         "symfony/expression-language": "~7.1.0",
         "symfony/filesystem": "~7.1.0",
+        "symfony/finder": "~7.1.0",
         "symfony/flex": "^2",
         "symfony/form": "~7.1.0",
         "symfony/framework-bundle": "~7.1.0",

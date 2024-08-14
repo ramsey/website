@@ -12,6 +12,7 @@ use App\Entity\PostStatus;
 use App\Entity\PostTag;
 use App\Repository\PostRepository;
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -29,6 +30,7 @@ class LoadPostCommandTest extends KernelTestCase
 {
     private CommandTester $commandTester;
     private PostRepository $repository;
+    private ObjectManager $entityManager;
 
     protected function setUp(): void
     {
@@ -41,9 +43,9 @@ class LoadPostCommandTest extends KernelTestCase
 
         /** @var Registry $doctrine */
         $doctrine = $kernel->getContainer()->get('doctrine');
-        $entityManager = $doctrine->getManager();
+        $this->entityManager = $doctrine->getManager();
 
-        $this->repository = $entityManager->getRepository(Post::class);
+        $this->repository = $this->entityManager->getRepository(Post::class);
     }
 
     #[TestDox('displays an error when the file cannot be found')]
@@ -60,15 +62,20 @@ class LoadPostCommandTest extends KernelTestCase
     #[TestDox('loads a new static blog post and saves it to the database')]
     public function testCreateBlogPost(): void
     {
-        $this->commandTester->execute(['path' => __DIR__ . '/fixtures/blog-post.md']);
+        $this->commandTester->execute(['path' => __DIR__ . '/fixtures/good-posts/blog-post.md']);
         $output = $this->commandTester->getDisplay();
 
         $this->commandTester->assertCommandIsSuccessful();
 
+        $this->assertStringNotContainsString('[DRY-RUN]', $output);
         $this->assertStringContainsString(
-            'Created blog post with ID 01913efd-d808-726a-b62d-20c5c34ca3bd',
+            'Created blog post for 2024-08-11: "Lorem Ipsum Odor Amet"',
             $output,
         );
+
+        // Clear the entity manager so that the next find() call makes a
+        // fresh database request for the entity.
+        $this->entityManager->clear();
 
         $post = $this->repository->find('01913efd-d808-726a-b62d-20c5c34ca3bd');
 
@@ -117,7 +124,7 @@ class LoadPostCommandTest extends KernelTestCase
     public function testUpdateBlogPost(): void
     {
         $this->commandTester->setInputs(['yes']);
-        $this->commandTester->execute(['path' => __DIR__ . '/fixtures/blog-post-update.md']);
+        $this->commandTester->execute(['path' => __DIR__ . '/fixtures/good-posts/blog-post-update.md']);
         $output = $this->commandTester->getDisplay();
 
         $this->commandTester->assertCommandIsSuccessful();
@@ -128,9 +135,13 @@ class LoadPostCommandTest extends KernelTestCase
         );
 
         $this->assertStringContainsString(
-            'Updated blog post with ID 01913f38-fe0b-7220-bc2a-bea9e990d181',
+            'Updated blog post for 2024-08-08: "Let\'s Update A Blog Post!"',
             $output,
         );
+
+        // Clear the entity manager so that the next find() call makes a
+        // fresh database request for the entity.
+        $this->entityManager->clear();
 
         $post = $this->repository->find('01913f38-fe0b-7220-bc2a-bea9e990d181');
 
@@ -160,7 +171,7 @@ class LoadPostCommandTest extends KernelTestCase
     public function testAbortUpdatingBlogPost(): void
     {
         $this->commandTester->setInputs(['no']);
-        $this->commandTester->execute(['path' => __DIR__ . '/fixtures/blog-post-update.md']);
+        $this->commandTester->execute(['path' => __DIR__ . '/fixtures/good-posts/blog-post-update.md']);
         $output = $this->commandTester->getDisplay();
 
         $this->assertSame(Command::FAILURE, $this->commandTester->getStatusCode());
@@ -171,5 +182,128 @@ class LoadPostCommandTest extends KernelTestCase
         );
 
         $this->assertStringContainsString('Aborting...', $output);
+    }
+
+    #[TestDox('uses a dry-run to loads a new static blog post, without saving')]
+    public function testCreateBlogPostWithDryRun(): void
+    {
+        $this->commandTester->execute(['path' => __DIR__ . '/fixtures/good-posts/blog-post.md', '--dry-run' => true]);
+        $output = $this->commandTester->getDisplay();
+
+        $this->commandTester->assertCommandIsSuccessful();
+
+        $this->assertStringContainsString(
+            '[DRY-RUN] Created blog post for 2024-08-11: "Lorem Ipsum Odor Amet"',
+            $output,
+        );
+
+        $post = $this->repository->find('01913efd-d808-726a-b62d-20c5c34ca3bd');
+
+        $this->assertNull($post);
+    }
+
+    #[TestDox('uses a dry-run to load an existing static blog post, without saving')]
+    public function testUpdateBlogPostWithDryRun(): void
+    {
+        $this->commandTester->setInputs(['yes']);
+        $this->commandTester->execute([
+            'path' => __DIR__ . '/fixtures/good-posts/blog-post-update.md',
+            '--dry-run' => true,
+        ]);
+        $output = $this->commandTester->getDisplay();
+
+        $this->commandTester->assertCommandIsSuccessful();
+
+        $this->assertStringContainsString(
+            'A post with ID 01913f38-fe0b-7220-bc2a-bea9e990d181 already exists. Do you want to update it?',
+            $output,
+        );
+
+        $this->assertStringContainsString(
+            '[DRY-RUN] Updated blog post for 2024-08-08: "Let\'s Update A Blog Post!"',
+            $output,
+        );
+
+        // Clear the entity manager so that the next find() call makes a
+        // fresh database request for the entity.
+        $this->entityManager->clear();
+
+        $post = $this->repository->find('01913f38-fe0b-7220-bc2a-bea9e990d181');
+
+        $this->assertInstanceOf(Post::class, $post);
+        $this->assertNull($post->getUpdatedAt());
+    }
+
+    #[TestDox('allows skipping the prompt when updating a blog post')]
+    public function testUpdateBlogPostWithForce(): void
+    {
+        $this->commandTester->execute([
+            'path' => __DIR__ . '/fixtures/good-posts/blog-post-update.md',
+            '--force' => true,
+        ]);
+        $output = $this->commandTester->getDisplay();
+
+        $this->commandTester->assertCommandIsSuccessful();
+
+        $this->assertStringNotContainsString('already exists. Do you want to update it?', $output);
+        $this->assertStringContainsString('Updated blog post for 2024-08-08: "Let\'s Update A Blog Post!"', $output);
+
+        // Clear the entity manager so that the next find() call makes a
+        // fresh database request for the entity.
+        $this->entityManager->clear();
+
+        $post = $this->repository->find('01913f38-fe0b-7220-bc2a-bea9e990d181');
+
+        $this->assertInstanceOf(Post::class, $post);
+        $this->assertNotNull($post->getUpdatedAt());
+    }
+
+    #[TestDox('does not save a new blog post to the database because saving is deferred')]
+    public function testCreateBlogPostWithSavingDeferred(): void
+    {
+        $this->commandTester->execute([
+            'path' => __DIR__ . '/fixtures/good-posts/blog-post.md',
+            '--save-deferred' => true,
+        ]);
+        $output = $this->commandTester->getDisplay();
+
+        $this->commandTester->assertCommandIsSuccessful();
+
+        $this->assertStringNotContainsString('[DRY-RUN]', $output);
+        $this->assertStringContainsString('Created blog post for 2024-08-11: "Lorem Ipsum Odor Amet"', $output);
+
+        // Clear the entity manager so that the next find() call makes a
+        // fresh database request for the entity.
+        $this->entityManager->clear();
+
+        $post = $this->repository->find('01913efd-d808-726a-b62d-20c5c34ca3bd');
+
+        $this->assertNull($post);
+    }
+
+    #[TestDox('does not update a blog post in the database because saving is deferred')]
+    public function testUpdateBlogPostWithSavingDeferred(): void
+    {
+        $this->commandTester->execute([
+            'path' => __DIR__ . '/fixtures/good-posts/blog-post-update.md',
+            '--save-deferred' => true,
+            '--force' => true,
+        ]);
+
+        $output = $this->commandTester->getDisplay();
+
+        $this->commandTester->assertCommandIsSuccessful();
+
+        $this->assertStringNotContainsString('[DRY-RUN]', $output);
+        $this->assertStringContainsString('Updated blog post for 2024-08-08: "Let\'s Update A Blog Post!"', $output);
+
+        // Clear the entity manager so that the next find() call makes a
+        // fresh database request for the entity.
+        $this->entityManager->clear();
+
+        $post = $this->repository->find('01913f38-fe0b-7220-bc2a-bea9e990d181');
+
+        $this->assertInstanceOf(Post::class, $post);
+        $this->assertNull($post->getUpdatedAt());
     }
 }

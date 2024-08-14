@@ -55,6 +55,7 @@ services:
     Symfony\Component\Clock\MonotonicClock: ~
     Symfony\Component\Clock\NativeClock: ~
     Symfony\Component\Filesystem\Filesystem: ~
+    Symfony\Component\Finder\Finder: ~
     Webuni\FrontMatter\FrontMatterInterface:
         factory: ['Webuni\FrontMatter\FrontMatterChain', 'create']
 
