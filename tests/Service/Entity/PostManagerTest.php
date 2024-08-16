@@ -427,6 +427,8 @@ class PostManagerTest extends TestCase
     #[TestWith(['cannot-have/symbols'])]
     #[TestWith(['cannot-have*symbols'])]
     #[TestWith(['cannot-have%symbols'])]
+    #[TestWith(['-cannot-begin-with-dashes'])]
+    #[TestWith(['cannot-end-with-dashes-'])]
     public function testInvalidSlug(string $slug): void
     {
         $parsedPost = new ParsedPost(

@@ -29,13 +29,12 @@ use App\Service\Blog\ParsedPost;
 use DateTimeInterface;
 use InvalidArgumentException;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\Routing\Requirement\Requirement;
 
 use function preg_match;
 
 final readonly class PostManager implements PostService
 {
-    private const string SLUG_PATTERN = '/^[a-zA-Z0-9\-]+$/';
-
     public function __construct(
         private PostRepository $repository,
         private PostTagService $postTagService,
@@ -142,7 +141,7 @@ final readonly class PostManager implements PostService
             throw new InvalidArgumentException('Unable to update post with parsed post having a different slug');
         }
 
-        if (!preg_match(self::SLUG_PATTERN, $slug)) {
+        if (!preg_match('/^' . Requirement::ASCII_SLUG . '$/', $slug)) {
             throw new InvalidArgumentException("Slug is invalid: $slug");
         }
     }

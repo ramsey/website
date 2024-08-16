@@ -17,6 +17,7 @@ use PhpExtended\Email\MailboxListParser;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 use Webuni\FrontMatter\FrontMatterChain;
 
 #[TestDox('StaticFileParser')]
@@ -35,7 +36,8 @@ class StaticFileParserTest extends TestCase
         $filesystem = new Filesystem();
         $frontMatter = FrontMatterChain::create();
         $emailParser = new MailboxListParser();
-        $parser = new StaticFileParser($filesystem, $frontMatter, $emailParser);
+        $slugger = new AsciiSlugger();
+        $parser = new StaticFileParser($filesystem, $frontMatter, $emailParser, $slugger);
 
         $parsedPost = $parser->parse($path);
 
@@ -78,7 +80,6 @@ class StaticFileParserTest extends TestCase
     #[TestWith([__DIR__ . '/fixtures/missing-date.md', 'Posts must have a valid date'])]
     #[TestWith([__DIR__ . '/fixtures/invalid-updated.md', 'When provided, updated must be a valid date'])]
     #[TestWith([__DIR__ . '/fixtures/missing-title.md', 'Posts must have a title'])]
-    #[TestWith([__DIR__ . '/fixtures/missing-slug.md', 'Posts must have a slug'])]
     #[TestWith([__DIR__ . '/fixtures/missing-status.md', 'Posts must have a valid status'])]
     #[TestWith([__DIR__ . '/fixtures/invalid-authors.md', 'When provided, authors must have valid mailbox strings'])]
     public function testValidation(string $path, string $expectedMessage): void
@@ -86,7 +87,8 @@ class StaticFileParserTest extends TestCase
         $filesystem = new Filesystem();
         $frontMatter = FrontMatterChain::create();
         $emailParser = new MailboxListParser();
-        $parser = new StaticFileParser($filesystem, $frontMatter, $emailParser);
+        $slugger = new AsciiSlugger();
+        $parser = new StaticFileParser($filesystem, $frontMatter, $emailParser, $slugger);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedMessage);
@@ -100,12 +102,13 @@ class StaticFileParserTest extends TestCase
         $filesystem = new Filesystem();
         $frontMatter = FrontMatterChain::create();
         $emailParser = new MailboxListParser();
-        $parser = new StaticFileParser($filesystem, $frontMatter, $emailParser);
+        $slugger = new AsciiSlugger();
+        $parser = new StaticFileParser($filesystem, $frontMatter, $emailParser, $slugger);
 
         $parsedPost = $parser->parse(__DIR__ . '/fixtures/minimal.md');
 
         $this->assertSame('Lorem Ipsum Odor Amet', $parsedPost->metadata->title);
-        $this->assertSame('lorem-ipsum', $parsedPost->metadata->slug);
+        $this->assertSame('lorem-ipsum-odor-amet', $parsedPost->metadata->slug);
         $this->assertInstanceOf(DateTimeImmutable::class, $parsedPost->metadata->createdAt);
         $this->assertInstanceOf(UuidInterface::class, $parsedPost->metadata->id);
         $this->assertSame([], $parsedPost->metadata->categories);

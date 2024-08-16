@@ -35,11 +35,13 @@ use Ramsey\Uuid\Uuid;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Throwable;
 use Webuni\FrontMatter\FrontMatterInterface;
 
 use function is_array;
 use function sprintf;
+use function strtolower;
 use function trim;
 
 /**
@@ -48,9 +50,10 @@ use function trim;
 final readonly class StaticFileParser implements PostParser
 {
     public function __construct(
-        public Filesystem $filesystem,
-        public FrontMatterInterface $frontMatter,
-        public MailboxListParserInterface $mailboxListParser,
+        private Filesystem $filesystem,
+        private FrontMatterInterface $frontMatter,
+        private MailboxListParserInterface $mailboxListParser,
+        private SluggerInterface $slugger,
     ) {
     }
 
@@ -102,7 +105,7 @@ final readonly class StaticFileParser implements PostParser
             id: isset($metadata['id']) ? Uuid::fromString($metadata['id']) : Uuid::uuid7(),
             contentType: $type,
             title: $metadata['title'] ?? throw new InvalidArgumentException('Posts must have a title'),
-            slug: $metadata['slug'] ?? throw new InvalidArgumentException('Posts must have a slug'),
+            slug: $metadata['slug'] ?? strtolower((string) $this->slugger->slug($metadata['title'])),
             status: PostStatus::tryFrom($metadata['status'] ?? 'undefined')
                 ?? throw new InvalidArgumentException('Posts must have a valid status'),
             categories: $categories,
