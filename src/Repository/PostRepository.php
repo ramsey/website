@@ -24,8 +24,12 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Post;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Throwable;
+
+use function sprintf;
 
 /**
  * @extends ServiceEntityRepository<Post>
@@ -35,5 +39,26 @@ class PostRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Post::class);
+    }
+
+    public function findOneByYearMonthSlug(int | string $year, int | string $month, string $slug): ?Post
+    {
+        try {
+            $startDate = new DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month));
+            $endDate = $startDate->modify('+1 month');
+        } catch (Throwable) {
+            return null;
+        }
+
+        /** @var Post | null */
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.slug = :slug')
+            ->andWhere('p.createdAt >= :startDate')
+            ->andWhere('p.createdAt < :endDate')
+            ->setParameter('slug', $slug)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }
