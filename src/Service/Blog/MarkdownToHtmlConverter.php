@@ -21,12 +21,33 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Service\Blog;
 
-enum PostBodyType: string
+use App\Entity\Post;
+use App\Entity\PostBodyType;
+use League\CommonMark\ConverterInterface;
+
+use function sprintf;
+
+/**
+ * A post body converter that converts Markdown posts to HTML
+ */
+final readonly class MarkdownToHtmlConverter implements PostBodyConverter
 {
-    case Html = 'html';
-    case Markdown = 'markdown';
-    case Plaintext = 'plaintext';
-    case ReStructuredText = 'reStructuredText';
+    public function __construct(private ConverterInterface $converter)
+    {
+    }
+
+    public function convert(Post $post): string
+    {
+        if ($post->getBodyType() === PostBodyType::Markdown) {
+            return $this->converter->convert($post->getBody())->getContent();
+        }
+
+        throw new UnsupportedPostBodyType(sprintf(
+            '%s does not support %s',
+            $this::class,
+            $post->getBodyType()->value,
+        ));
+    }
 }

@@ -21,12 +21,14 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Service\Blog;
 
-enum PostBodyType: string
+use InvalidArgumentException;
+
+/**
+ * Thrown when attempting to process a post body with a type
+ * that's not supported
+ */
+class UnsupportedPostBodyType extends InvalidArgumentException
 {
-    case Html = 'html';
-    case Markdown = 'markdown';
-    case Plaintext = 'plaintext';
-    case ReStructuredText = 'reStructuredText';
 }

@@ -10,6 +10,19 @@ parameters:
     app.data.webfinger_account: '%app.data_dir%/webfinger_account.php'
     app.service.analytics.secret_key: '%env(resolve:ANALYTICS_SECRET_KEY)%'
     app.service.better_stack.source_token: '%env(resolve:BETTER_STACK_SOURCE_TOKEN)%'
+    app.service.league.common_mark.config:
+        html_input: 'escape'
+        max_nesting_level: 50
+        autolink:
+            allowed_protocols: ['https', 'http']
+            default_protocol: 'https'
+        external_link:
+            internal_hosts: ['/(^|\.)benramsey\.com$/', '/(^|\.)ramsey\.dev$/']
+            open_in_new_window: false
+            html_class: 'external'
+            nofollow: ''
+            noopener: 'external'
+            noreferrer: ''
     app.service.plausible.api_token: '%env(resolve:PLAUSIBLE_API_TOKEN)%'
     app.service.plausible.base_uri: 'https://plausible.io/api/'
     app.service.plausible.domains:
@@ -37,12 +50,32 @@ services:
     # please note that last definitions always *replace* previous ones
 
     App\Service\Analytics\AnalyticsService: '@App\Service\Analytics\NoOpProvider'
+    App\Service\Blog\PostBodyConverter $markdownToHtmlConverter: '@App\Service\Blog\MarkdownToHtmlConverter'
     Devarts\PlausiblePHP\PlausibleAPI:
         arguments:
             - '%app.service.plausible.api_token%'
             - '%app.service.plausible.base_uri%'
     GeoIp2\ProviderInterface: '@geoip2.database.default_reader'
     Laminas\Diactoros\UriFactory: ~
+    League\CommonMark\ConverterInterface: '@League\CommonMark\MarkdownConverter'
+    League\CommonMark\Extension\:
+        resource: '../vendor/league/commonmark/src/Extension/'
+    League\CommonMark\Environment\Environment:
+        arguments: ['%app.service.league.common_mark.config%']
+        calls:
+            - addExtension: ['@League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension']
+            - addExtension: ['@League\CommonMark\Extension\Attributes\AttributesExtension']
+            - addExtension: ['@League\CommonMark\Extension\Autolink\AutolinkExtension']
+            - addExtension: ['@League\CommonMark\Extension\DescriptionList\DescriptionListExtension']
+            - addExtension: ['@League\CommonMark\Extension\DisallowedRawHtml\DisallowedRawHtmlExtension']
+            - addExtension: ['@League\CommonMark\Extension\ExternalLink\ExternalLinkExtension']
+            - addExtension: ['@League\CommonMark\Extension\Footnote\FootnoteExtension']
+            - addExtension: ['@League\CommonMark\Extension\HeadingPermalink\HeadingPermalinkExtension']
+            - addExtension: ['@League\CommonMark\Extension\Strikethrough\StrikethroughExtension']
+            - addExtension: ['@League\CommonMark\Extension\Table\TableExtension']
+            - addExtension: ['@League\CommonMark\Extension\SmartPunct\SmartPunctExtension']
+    League\CommonMark\Environment\EnvironmentInterface: '@League\CommonMark\Environment\Environment'
+    League\CommonMark\MarkdownConverter: ~
     Logtail\Monolog\LogtailHandler:
         arguments:
             - '%app.service.better_stack.source_token%'

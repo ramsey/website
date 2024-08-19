@@ -30,6 +30,7 @@
         "easycorp/easyadmin-bundle": "^4.10",
         "gpslab/geoip2": "^2.1",
         "laminas/laminas-diactoros": "^3.3",
+        "league/commonmark": "^2.5",
         "logtail/monolog-logtail": "^3.2",
         "matomo/device-detector": "^6.3",
         "php-extended/php-email-address-interface": "^7.0",

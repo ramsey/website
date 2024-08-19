@@ -21,12 +21,17 @@
 
 declare(strict_types=1);
 
-namespace App\Entity;
+namespace App\Service\Blog;
 
-enum PostBodyType: string
+use App\Entity\Post;
+
+interface PostBodyConverter
 {
-    case Html = 'html';
-    case Markdown = 'markdown';
-    case Plaintext = 'plaintext';
-    case ReStructuredText = 'reStructuredText';
+    /**
+     * Converts a post's body from type {@see \App\Entity\PostBodyType} to a
+     * string representation of a different type
+     *
+     * @throws UnsupportedPostBodyType if the converter doesn't support the post's body type
+     */
+    public function convert(Post $post): string;
 }
