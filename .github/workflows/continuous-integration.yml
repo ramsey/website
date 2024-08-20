@@ -72,11 +72,11 @@ jobs:
     runs-on: "ubuntu-latest"
 
     env:
-      DATABASE_URL: "postgresql://app:9b487983153e2a5a9be25c8d9788e6eb@127.0.0.1:5432/app_test"
+      DATABASE_URL: "postgresql://app:9b487983153e2a5a9be25c8d9788e6eb@127.0.0.1:5432/app_test?serverVersion=16&charset=utf8"
 
     services:
       postgres:
-        image: "postgres"
+        image: "postgres:16"
         env:
           POSTGRES_PASSWORD: "9b487983153e2a5a9be25c8d9788e6eb"
           POSTGRES_USER: "app"
