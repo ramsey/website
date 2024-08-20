@@ -10,7 +10,6 @@
          displayDetailsOnTestsThatTriggerNotices="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          colors="true"
-         testdox="true"
 >
     <testsuites>
         <testsuite name="Project Test Suite">

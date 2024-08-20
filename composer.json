@@ -226,7 +226,7 @@
         "test:db:teardown": [
             "bin/console --env=test doctrine:database:drop --force"
         ],
-        "test:unit": "phpunit --colors=always --testdox"
+        "test:unit": "phpunit --colors=always"
     },
     "scripts-descriptions": {
         "analyze": "Run all static analysis checks.",
