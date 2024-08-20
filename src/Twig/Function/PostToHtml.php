@@ -21,19 +21,34 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\Twig\Function;
 
-use App\Twig\TwigExtensionCompilerPass;
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+use App\Entity\Post;
+use App\Service\Blog\PostBodyConverter;
+use Twig\Markup;
+use Twig\TwigFunction;
 
-class Kernel extends BaseKernel
+/**
+ * A Twig function that converts a Post body to HTML output
+ */
+final readonly class PostToHtml implements TwigFunctionFactory
 {
-    use MicroKernelTrait;
-
-    protected function build(ContainerBuilder $container): void
+    public function __construct(private PostBodyConverter $postBodyToHtmlConverter)
     {
-        $container->addCompilerPass(new TwigExtensionCompilerPass());
+    }
+
+    public function __invoke(Post $post): Markup
+    {
+        return new Markup($this->postBodyToHtmlConverter->convert($post), 'utf-8');
+    }
+
+    public function getFunctionName(): string
+    {
+        return 'post_to_html';
+    }
+
+    public function getTwigFunction(): TwigFunction
+    {
+        return new TwigFunction($this->getFunctionName(), $this(...));
     }
 }

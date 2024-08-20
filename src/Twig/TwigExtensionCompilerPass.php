@@ -21,19 +21,29 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\Twig;
 
-use App\Twig\TwigExtensionCompilerPass;
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+use Symfony\Component\DependencyInjection\Reference;
 
-class Kernel extends BaseKernel
+use function array_keys;
+
+/**
+ * Registers custom Twig functions, filters, etc. with {@see Extension}
+ */
+final readonly class TwigExtensionCompilerPass implements CompilerPassInterface
 {
-    use MicroKernelTrait;
-
-    protected function build(ContainerBuilder $container): void
+    public function process(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new TwigExtensionCompilerPass());
+        if (!$container->has(Extension::class)) {
+            return;
+        }
+
+        $definition = $container->findDefinition(Extension::class);
+
+        foreach (array_keys($container->findTaggedServiceIds('app.twig.function_factory')) as $id) {
+            $definition->addMethodCall('addFunctionFactory', [new Reference($id)]);
+        }
     }
 }

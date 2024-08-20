@@ -21,19 +21,35 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\Twig;
 
-use App\Twig\TwigExtensionCompilerPass;
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+use App\Twig\Function\TwigFunctionFactory;
+use Twig\Extension\AbstractExtension;
+use Twig\Extension\ExtensionInterface;
+use Twig\TwigFunction;
 
-class Kernel extends BaseKernel
+/**
+ * Configures additional Twig functionality for ramsey/website
+ */
+final class Extension extends AbstractExtension implements ExtensionInterface
 {
-    use MicroKernelTrait;
+    /**
+     * @var TwigFunctionFactory[]
+     */
+    private array $functionFactories = [];
 
-    protected function build(ContainerBuilder $container): void
+    /**
+     * @return TwigFunction[]
+     */
+    public function getFunctions(): iterable
     {
-        $container->addCompilerPass(new TwigExtensionCompilerPass());
+        foreach ($this->functionFactories as $functionFactory) {
+            yield $functionFactory->getTwigFunction();
+        }
+    }
+
+    public function addFunctionFactory(TwigFunctionFactory $functionFactory): void
+    {
+        $this->functionFactories[] = $functionFactory;
     }
 }

@@ -21,19 +21,18 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\Twig\Function;
 
-use App\Twig\TwigExtensionCompilerPass;
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Twig\TwigFunction;
 
-class Kernel extends BaseKernel
+/**
+ * A factory that returns a TwigFunction instance
+ */
+#[AutoconfigureTag('app.twig.function_factory')]
+interface TwigFunctionFactory
 {
-    use MicroKernelTrait;
+    public function getFunctionName(): string;
 
-    protected function build(ContainerBuilder $container): void
-    {
-        $container->addCompilerPass(new TwigExtensionCompilerPass());
-    }
+    public function getTwigFunction(): TwigFunction;
 }
