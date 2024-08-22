@@ -9,7 +9,6 @@ use App\Entity\ShortUrl;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Entity\ShortUrlService;
-use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -80,7 +79,8 @@ class ShortUrlCrudControllerTest extends WebTestCase
 
         $this->assertInstanceOf(ShortUrl::class, $shortUrl);
         $this->assertSame('generated-slug', $shortUrl->getSlug());
-        $this->assertInstanceOf(DateTimeInterface::class, $shortUrl->getCreatedAt());
+        $this->assertNull($shortUrl->getCreatedAt());
+        $this->assertNull($shortUrl->getUpdatedAt());
     }
 
     public function testPersistEntityWithoutCustomSlug(): void
@@ -131,7 +131,7 @@ class ShortUrlCrudControllerTest extends WebTestCase
         $controller = new ShortUrlCrudController($manager);
         $controller->updateEntity($em, $shortUrl);
 
-        $this->assertInstanceOf(DateTimeInterface::class, $shortUrl->getUpdatedAt());
+        $this->assertNull($shortUrl->getUpdatedAt());
     }
 
     public function testUpdateEntityWithCustomSlug(): void
@@ -148,6 +148,6 @@ class ShortUrlCrudControllerTest extends WebTestCase
         $controller = new ShortUrlCrudController($manager);
         $controller->updateEntity($em, $shortUrl);
 
-        $this->assertInstanceOf(DateTimeInterface::class, $shortUrl->getUpdatedAt());
+        $this->assertNull($shortUrl->getUpdatedAt());
     }
 }

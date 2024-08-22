@@ -41,6 +41,7 @@ use function array_unique;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(fields: ['email'])]
+#[ORM\HasLifecycleCallbacks]
 class User implements PasswordAuthenticatedUserInterface, UserInterface
 {
     use Timestampable;

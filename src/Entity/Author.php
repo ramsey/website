@@ -32,6 +32,7 @@ use Ramsey\Uuid\Doctrine\UuidV7Generator;
 use Ramsey\Uuid\UuidInterface;
 
 #[ORM\Entity(repositoryClass: AuthorRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Author
 {
     use Timestampable;

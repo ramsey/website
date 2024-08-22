@@ -1,5 +1,4 @@
 ---
-date: 2004-02-22 06:00:52 -06:00
 slug: lorem-ipsum
 status: published
 ---

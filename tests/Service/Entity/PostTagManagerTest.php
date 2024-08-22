@@ -6,7 +6,6 @@ namespace App\Tests\Service\Entity;
 
 use App\Repository\PostTagRepository;
 use App\Service\Entity\PostTagManager;
-use DateTimeImmutable;
 use InvalidArgumentException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -35,7 +34,7 @@ class PostTagManagerTest extends TestCase
         $tag = $this->manager->createTag('test_tag');
 
         $this->assertSame('test_tag', $tag->getName());
-        $this->assertInstanceOf(DateTimeImmutable::class, $tag->getCreatedAt());
+        $this->assertNull($tag->getCreatedAt());
         $this->assertNull($tag->getUpdatedAt());
         $this->assertEmpty($tag->getPosts());
     }

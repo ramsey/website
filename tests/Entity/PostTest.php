@@ -71,8 +71,10 @@ class PostTest extends KernelTestCase
         $this->assertFalse($post->getShortUrls()->isEmpty());
         $this->assertFalse($post->getTags()->isEmpty());
         $this->assertGreaterThan(0, strlen($post->getExcerpt()));
-        $this->assertInstanceOf(DateTimeImmutable::class, $post->getCreatedAt());
-        $this->assertNull($post->getUpdatedAt());
+        $this->assertSame('2024-08-08 13:32:45', $post->getCreatedAt()?->format('Y-m-d H:i:s'));
+        $this->assertSame('2024-08-21 05:15:02', $post->getUpdatedAt()?->format('Y-m-d H:i:s'));
+        $this->assertSame('2024-08-12 01:34:03', $post->getPublishedAt()?->format('Y-m-d H:i:s'));
+        $this->assertSame('2024-08-17 23:22:33', $post->getModifiedAt()?->format('Y-m-d H:i:s'));
         $this->assertJsonStringEqualsJsonString(
             (string) json_encode(['foo' => 1234, 'bar' => 'abcd', 'baz' => null]),
             (string) json_encode($post->getMetadata()),
@@ -324,5 +326,32 @@ class PostTest extends KernelTestCase
 
         $this->assertSame($post, $post->setStatus(PostStatus::Hidden));
         $this->assertSame(PostStatus::Hidden, $post->getStatus());
+    }
+
+    public function testPublishedAt(): void
+    {
+        $date = new DateTimeImmutable();
+        $post = new Post();
+
+        $this->assertSame($post, $post->setPublishedAt($date));
+
+        // They aren't the same instance because we use
+        // DateTimeImmutable::createFromInterface() when setting it.
+        $this->assertEquals($date, $post->getPublishedAt());
+        $this->assertNotSame($date, $post->getPublishedAt());
+    }
+
+    public function testModifiedAt(): void
+    {
+        $date = new DateTimeImmutable();
+        $post = new Post();
+
+        $this->assertNull($post->getModifiedAt());
+        $this->assertSame($post, $post->setModifiedAt($date));
+
+        // They aren't the same instance because we use
+        // DateTimeImmutable::createFromInterface() when setting it.
+        $this->assertEquals($date, $post->getModifiedAt());
+        $this->assertNotSame($date, $post->getModifiedAt());
     }
 }

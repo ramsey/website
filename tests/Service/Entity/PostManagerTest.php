@@ -19,7 +19,6 @@ use App\Service\Entity\AuthorService;
 use App\Service\Entity\PostManager;
 use App\Service\Entity\PostTagService;
 use App\Service\Entity\ShortUrlService;
-use DateInterval;
 use DateTimeImmutable;
 use Faker\Factory;
 use Faker\Generator;
@@ -31,6 +30,8 @@ use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
+
+use function assert;
 
 class PostManagerTest extends TestCase
 {
@@ -81,7 +82,8 @@ class PostManagerTest extends TestCase
                 feedId: $this->faker->url(),
                 additional: ['foo' => 'abc', 'bar' => 456, 'shorturl' => 'https://bram.se/short-url'],
                 createdAt: new DateTimeImmutable(),
-                updatedAt: new DateTimeImmutable(),
+                publishedAt: new DateTimeImmutable(),
+                modifiedAt: new DateTimeImmutable(),
             ),
             $this->faker->text(),
             [
@@ -133,7 +135,8 @@ class PostManagerTest extends TestCase
         $this->assertSame($parsedPost->metadata->additional, $post->getMetadata());
         $this->assertSame($parsedPost->metadata->categories, $post->getCategory());
         $this->assertEquals($parsedPost->metadata->createdAt, $post->getCreatedAt());
-        $this->assertEquals($parsedPost->metadata->updatedAt, $post->getUpdatedAt());
+        $this->assertEquals($parsedPost->metadata->publishedAt, $post->getPublishedAt());
+        $this->assertEquals($parsedPost->metadata->modifiedAt, $post->getModifiedAt());
         $this->assertTrue($post->getTags()->contains($tag1));
         $this->assertTrue($post->getTags()->contains($tag2));
         $this->assertTrue($post->getShortUrls()->contains($shortUrl));
@@ -157,8 +160,9 @@ class PostManagerTest extends TestCase
                 excerpt: null,
                 feedId: null,
                 additional: [],
-                createdAt: new DateTimeImmutable(),
-                updatedAt: null,
+                createdAt: null,
+                publishedAt: null,
+                modifiedAt: null,
             ),
             $this->faker->text(),
             [],
@@ -183,8 +187,10 @@ class PostManagerTest extends TestCase
         $this->assertSame([], $post->getMetadata());
         $this->assertTrue($post->getAuthors()->isEmpty());
         $this->assertSame([], $post->getCategory());
-        $this->assertEquals($parsedPost->metadata->createdAt, $post->getCreatedAt());
+        $this->assertNull($post->getCreatedAt());
         $this->assertNull($post->getUpdatedAt());
+        $this->assertNull($post->getPublishedAt());
+        $this->assertNull($post->getModifiedAt());
         $this->assertTrue($post->getTags()->isEmpty());
         $this->assertTrue($post->getShortUrls()->isEmpty());
     }
@@ -206,7 +212,8 @@ class PostManagerTest extends TestCase
                 feedId: $this->faker->url(),
                 additional: ['foo' => 'abc', 'bar' => 456, 'shorturl' => 'https://bram.se/short-url'],
                 createdAt: new DateTimeImmutable(),
-                updatedAt: new DateTimeImmutable(),
+                publishedAt: new DateTimeImmutable(),
+                modifiedAt: new DateTimeImmutable(),
             ),
             $this->faker->text(),
             [
@@ -233,6 +240,8 @@ class PostManagerTest extends TestCase
             ->with('https://bram.se/short-url')
             ->andReturn($shortUrl);
 
+        assert($parsedPost->metadata->createdAt !== null);
+
         $post = (new Post())
             ->setId(clone $parsedPost->metadata->id)
             ->setSlug($parsedPost->metadata->slug)
@@ -253,7 +262,8 @@ class PostManagerTest extends TestCase
         $this->assertSame($parsedPost->metadata->additional, $post->getMetadata());
         $this->assertSame($parsedPost->metadata->categories, $post->getCategory());
         $this->assertEquals($parsedPost->metadata->createdAt, $post->getCreatedAt());
-        $this->assertEquals($parsedPost->metadata->updatedAt, $post->getUpdatedAt());
+        $this->assertEquals($parsedPost->metadata->publishedAt, $post->getPublishedAt());
+        $this->assertEquals($parsedPost->metadata->modifiedAt, $post->getModifiedAt());
         $this->assertTrue($post->getTags()->contains($tag1));
         $this->assertTrue($post->getTags()->contains($tag2));
         $this->assertTrue($post->getShortUrls()->contains($shortUrl));
@@ -276,8 +286,9 @@ class PostManagerTest extends TestCase
                 excerpt: null,
                 feedId: null,
                 additional: [],
-                createdAt: new DateTimeImmutable(),
-                updatedAt: null,
+                createdAt: null,
+                publishedAt: null,
+                modifiedAt: null,
             ),
             $this->faker->text(),
             [],
@@ -290,7 +301,7 @@ class PostManagerTest extends TestCase
         $post = (new Post())
             ->setId(clone $parsedPost->metadata->id)
             ->setSlug($parsedPost->metadata->slug)
-            ->setCreatedAt(clone $parsedPost->metadata->createdAt);
+            ->setCreatedAt(new DateTimeImmutable());
 
         $post = $this->manager->updateFromParsedPost($post, $parsedPost);
 
@@ -307,8 +318,10 @@ class PostManagerTest extends TestCase
         $this->assertSame([], $post->getMetadata());
         $this->assertTrue($post->getAuthors()->isEmpty());
         $this->assertSame([], $post->getCategory());
-        $this->assertEquals($parsedPost->metadata->createdAt, $post->getCreatedAt());
+        $this->assertInstanceOf(DateTimeImmutable::class, $post->getCreatedAt());
         $this->assertNull($post->getUpdatedAt());
+        $this->assertNull($post->getPublishedAt());
+        $this->assertNull($post->getModifiedAt());
         $this->assertTrue($post->getTags()->isEmpty());
         $this->assertTrue($post->getShortUrls()->isEmpty());
     }
@@ -329,8 +342,9 @@ class PostManagerTest extends TestCase
                 excerpt: null,
                 feedId: null,
                 additional: [],
-                createdAt: new DateTimeImmutable(),
-                updatedAt: null,
+                createdAt: null,
+                publishedAt: null,
+                modifiedAt: null,
             ),
             $this->faker->text(),
             [],
@@ -339,7 +353,7 @@ class PostManagerTest extends TestCase
         $post = (new Post())
             ->setId(Uuid::uuid7())
             ->setSlug($parsedPost->metadata->slug)
-            ->setCreatedAt(clone $parsedPost->metadata->createdAt);
+            ->setCreatedAt(new DateTimeImmutable());
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to update post with parsed post having a different ID');
@@ -364,7 +378,8 @@ class PostManagerTest extends TestCase
                 feedId: null,
                 additional: [],
                 createdAt: new DateTimeImmutable(),
-                updatedAt: null,
+                publishedAt: null,
+                modifiedAt: null,
             ),
             $this->faker->text(),
             [],
@@ -373,7 +388,7 @@ class PostManagerTest extends TestCase
         $post = (new Post())
             ->setId(clone $parsedPost->metadata->id)
             ->setSlug('a-different-slug')
-            ->setCreatedAt(clone $parsedPost->metadata->createdAt);
+            ->setCreatedAt(new DateTimeImmutable());
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to update post with parsed post having a different slug');
@@ -381,10 +396,9 @@ class PostManagerTest extends TestCase
         $this->manager->updateFromParsedPost($post, $parsedPost);
     }
 
-    public function testUpdateFromParsedPostThrowsForMismatchedCreatedAt(): void
+    #[TestDox('created date in parsed post does not overwrite the post created date')]
+    public function testUpdateFromParsedPostWithDifferentCreatedAt(): void
     {
-        $createdAt = new DateTimeImmutable('-2 weeks');
-
         $parsedPost = new ParsedPost(
             new ParsedPostMetadata(
                 id: Uuid::uuid7(),
@@ -399,22 +413,24 @@ class PostManagerTest extends TestCase
                 excerpt: null,
                 feedId: null,
                 additional: [],
-                createdAt: $createdAt,
-                updatedAt: null,
+                createdAt: new DateTimeImmutable('-2 weeks'),
+                publishedAt: null,
+                modifiedAt: null,
             ),
             $this->faker->text(),
             [],
         );
 
+        $originalPostCreated = new DateTimeImmutable('-3 weeks');
+
         $post = (new Post())
             ->setId(clone $parsedPost->metadata->id)
             ->setSlug($parsedPost->metadata->slug)
-            ->setCreatedAt($createdAt->sub(new DateInterval('PT1S')));
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unable to update post with parsed post having a different creation date');
+            ->setCreatedAt($originalPostCreated);
 
         $this->manager->updateFromParsedPost($post, $parsedPost);
+
+        $this->assertEquals($originalPostCreated, $post->getCreatedAt());
     }
 
     #[TestWith(['cannot have spaces'])]
@@ -445,8 +461,9 @@ class PostManagerTest extends TestCase
                 excerpt: null,
                 feedId: null,
                 additional: [],
-                createdAt: new DateTimeImmutable(),
-                updatedAt: null,
+                createdAt: null,
+                publishedAt: null,
+                modifiedAt: null,
             ),
             $this->faker->text(),
             [],

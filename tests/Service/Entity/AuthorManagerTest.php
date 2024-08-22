@@ -6,7 +6,6 @@ namespace App\Tests\Service\Entity;
 
 use App\Repository\AuthorRepository;
 use App\Service\Entity\AuthorManager;
-use DateTimeImmutable;
 use Faker\Factory;
 use Faker\Generator;
 use Mockery;
@@ -41,7 +40,7 @@ class AuthorManagerTest extends TestCase
 
         $this->assertSame($byline, $author->getByline());
         $this->assertSame($email, $author->getEmail());
-        $this->assertInstanceOf(DateTimeImmutable::class, $author->getCreatedAt());
+        $this->assertNull($author->getCreatedAt());
         $this->assertNull($author->getUpdatedAt());
         $this->assertNull($author->getUser());
         $this->assertEmpty($author->getPosts());

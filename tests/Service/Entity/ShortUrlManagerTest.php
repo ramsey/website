@@ -8,7 +8,6 @@ use App\Entity\ShortUrl;
 use App\Repository\ShortUrlRepository;
 use App\Service\Codec\Base62Codec;
 use App\Service\Entity\ShortUrlManager;
-use DateTimeImmutable;
 use InvalidArgumentException;
 use Laminas\Diactoros\UriFactory;
 use Mockery;
@@ -77,10 +76,10 @@ final class ShortUrlManagerTest extends TestCase
 
         $shortUrl = $this->manager->createShortUrl($url);
 
-        $this->assertSame($url, (string) $shortUrl->getDestinationUrl());
+        $this->assertSame($url, $shortUrl->getDestinationUrl());
         $this->assertIsString($shortUrl->getSlug());
         $this->assertNull($shortUrl->getCustomSlug());
-        $this->assertInstanceOf(DateTimeImmutable::class, $shortUrl->getCreatedAt());
+        $this->assertNull($shortUrl->getCreatedAt());
         $this->assertNull($shortUrl->getUpdatedAt());
     }
 
@@ -97,10 +96,10 @@ final class ShortUrlManagerTest extends TestCase
 
         $shortUrl = $this->manager->createShortUrl($url);
 
-        $this->assertSame($url, (string) $shortUrl->getDestinationUrl());
+        $this->assertSame($url, $shortUrl->getDestinationUrl());
         $this->assertIsString($shortUrl->getSlug());
         $this->assertNull($shortUrl->getCustomSlug());
-        $this->assertInstanceOf(DateTimeImmutable::class, $shortUrl->getCreatedAt());
+        $this->assertNull($shortUrl->getCreatedAt());
         $this->assertNull($shortUrl->getUpdatedAt());
     }
 

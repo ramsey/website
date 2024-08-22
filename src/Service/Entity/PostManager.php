@@ -26,7 +26,6 @@ namespace App\Service\Entity;
 use App\Entity\Post;
 use App\Repository\PostRepository;
 use App\Service\Blog\ParsedPost;
-use DateTimeInterface;
 use InvalidArgumentException;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Routing\Requirement\Requirement;
@@ -47,8 +46,11 @@ final readonly class PostManager implements PostService
     {
         $post = (new Post())
             ->setId($parsedPost->metadata->id)
-            ->setSlug($parsedPost->metadata->slug)
-            ->setCreatedAt($parsedPost->metadata->createdAt);
+            ->setSlug($parsedPost->metadata->slug);
+
+        if ($parsedPost->metadata->createdAt !== null) {
+            $post->setCreatedAt($parsedPost->metadata->createdAt);
+        }
 
         return $this->updateFromParsedPost($post, $parsedPost);
     }
@@ -65,7 +67,6 @@ final readonly class PostManager implements PostService
     {
         $this->checkId($post, $parsedPost->metadata->id);
         $this->checkSlug($post, $parsedPost->metadata->slug);
-        $this->checkCreatedAt($post, $parsedPost->metadata->createdAt);
 
         $post
             ->setStatus($parsedPost->metadata->status)
@@ -79,8 +80,12 @@ final readonly class PostManager implements PostService
             ->setMetadata($parsedPost->metadata->additional)
             ->setCategory($parsedPost->metadata->categories);
 
-        if ($parsedPost->metadata->updatedAt !== null) {
-            $post->setUpdatedAt($parsedPost->metadata->updatedAt);
+        if ($parsedPost->metadata->publishedAt !== null) {
+            $post->setPublishedAt($parsedPost->metadata->publishedAt);
+        }
+
+        if ($parsedPost->metadata->modifiedAt !== null) {
+            $post->setModifiedAt($parsedPost->metadata->modifiedAt);
         }
 
         // Remove any tags and then add them back from the metadata.
@@ -116,15 +121,6 @@ final readonly class PostManager implements PostService
 
         if ($shortUrl !== null) {
             $post->addShortUrl($shortUrl);
-        }
-    }
-
-    private function checkCreatedAt(Post $post, DateTimeInterface $createdAt): void
-    {
-        if ($post->getCreatedAt()->format('U') !== $createdAt->format('U')) {
-            throw new InvalidArgumentException(
-                'Unable to update post with parsed post having a different creation date',
-            );
         }
     }
 

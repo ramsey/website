@@ -25,7 +25,6 @@ namespace App\Service\Entity;
 
 use App\Entity\Author;
 use App\Repository\AuthorRepository;
-use DateTimeImmutable;
 
 final readonly class AuthorManager implements AuthorService
 {
@@ -35,10 +34,7 @@ final readonly class AuthorManager implements AuthorService
 
     public function createAuthor(string $byline, string $email): Author
     {
-        return (new Author())
-            ->setByline($byline)
-            ->setEmail($email)
-            ->setCreatedAt(new DateTimeImmutable());
+        return (new Author())->setByline($byline)->setEmail($email);
     }
 
     public function getRepository(): AuthorRepository

@@ -25,7 +25,6 @@ namespace App\Service\Entity;
 
 use App\Entity\PostTag;
 use App\Repository\PostTagRepository;
-use DateTimeImmutable;
 use InvalidArgumentException;
 
 use function preg_match;
@@ -42,9 +41,7 @@ final readonly class PostTagManager implements PostTagService
     {
         $this->checkTagName($tag);
 
-        return (new PostTag())
-            ->setName($tag)
-            ->setCreatedAt(new DateTimeImmutable());
+        return (new PostTag())->setName($tag);
     }
 
     public function getRepository(): PostTagRepository

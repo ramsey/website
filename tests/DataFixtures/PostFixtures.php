@@ -82,6 +82,9 @@ final class PostFixtures extends Fixture implements DependentFixtureInterface
             ->addShortUrl($shortUrl)
             ->setFeedId($post1Id->getUrn())
             ->setCreatedAt(new DateTimeImmutable('2024-08-08 13:32:45 +00:00'))
+            ->setUpdatedAt(new DateTimeImmutable('2024-08-21 00:15:02 -05:00'))
+            ->setPublishedAt(new DateTimeImmutable('2024-08-11 21:34:03 -04:00'))
+            ->setModifiedAt(new DateTimeImmutable('2024-08-18 01:22:33 +02:00'))
             ->setMetadata(['foo' => 1234, 'bar' => 'abcd', 'baz' => null]);
         $manager->persist($post1);
 
@@ -99,8 +102,7 @@ final class PostFixtures extends Fixture implements DependentFixtureInterface
             ->setBodyType(PostBodyType::Html)
             ->setBody($this->faker->text())
             ->setExcerpt($this->faker->sentence())
-            ->setFeedId($post2Id->getUrn())
-            ->setCreatedAt(new DateTimeImmutable());
+            ->setFeedId($post2Id->getUrn());
         $manager->persist($post2);
 
         $manager->flush();

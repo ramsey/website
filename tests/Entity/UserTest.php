@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Tests\Entity;
 
 use App\Entity\User;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Faker\Factory;
@@ -52,6 +51,8 @@ class UserTest extends KernelTestCase
         $this->assertSame(['ROLE_USER', 'ROLE_ADMIN'], $user->getRoles());
         $this->assertIsString($user->getPassword());
         $this->assertGreaterThan(0, strlen($user->getPassword()));
+        $this->assertInstanceOf(DateTimeImmutable::class, $user->getCreatedAt());
+        $this->assertInstanceOf(DateTimeImmutable::class, $user->getUpdatedAt());
     }
 
     #[TestDox('sets the name property')]
@@ -94,31 +95,5 @@ class UserTest extends KernelTestCase
 
         $this->assertSame($user, $user->setPassword($password));
         $this->assertSame($password, $user->getPassword());
-    }
-
-    #[TestDox('sets the createdAt property')]
-    public function testSetCreatedAt(): void
-    {
-        $date = new DateTime();
-
-        $user = new User();
-
-        $this->assertSame($user, $user->setCreatedAt($date));
-        $this->assertNotSame($date, $user->getCreatedAt());
-        $this->assertInstanceOf(DatetimeImmutable::class, $user->getCreatedAt());
-        $this->assertSame($date->format('c'), $user->getCreatedAt()->format('c'));
-    }
-
-    #[TestDox('sets the updatedAt property')]
-    public function testSetUpdatedAt(): void
-    {
-        $date = new DateTime();
-
-        $user = new User();
-
-        $this->assertSame($user, $user->setUpdatedAt($date));
-        $this->assertNotSame($date, $user->getUpdatedAt());
-        $this->assertInstanceOf(DatetimeImmutable::class, $user->getUpdatedAt());
-        $this->assertSame($date->format('c'), $user->getUpdatedAt()->format('c'));
     }
 }

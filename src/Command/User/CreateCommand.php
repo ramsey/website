@@ -24,7 +24,6 @@ declare(strict_types=1);
 namespace App\Command\User;
 
 use App\Entity\User;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -89,9 +88,7 @@ final class CreateCommand extends Command
             ->setName($name)
             ->setEmail($email)
             ->setPassword($this->passwordHasher->hashPassword($user, $plaintextPassword))
-            ->setRoles($roles)
-            ->setCreatedAt(new DateTimeImmutable())
-            ->setUpdatedAt(new DateTimeImmutable());
+            ->setRoles($roles);
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();

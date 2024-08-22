@@ -25,6 +25,8 @@ namespace App\Entity;
 
 use App\Doctrine\Traits\Timestampable;
 use App\Repository\PostRepository;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -34,6 +36,7 @@ use Ramsey\Uuid\UuidInterface;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ORM\Index(fields: ['createdAt', 'slug'])]
+#[ORM\HasLifecycleCallbacks]
 class Post
 {
     use Timestampable;
@@ -106,6 +109,12 @@ class Post
 
     #[ORM\Column(length: 20, nullable: true, enumType: PostStatus::class)]
     private PostStatus $status = PostStatus::Draft;
+
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $publishedAt = null;
+
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $modifiedAt = null;
 
     public function __construct()
     {
@@ -282,6 +291,36 @@ class Post
     public function setMetadata(array $metadata): static
     {
         $this->metadata = $metadata;
+
+        return $this;
+    }
+
+    public function getModifiedAt(): ?DateTimeImmutable
+    {
+        return $this->modifiedAt;
+    }
+
+    /**
+     * @phpstan-assert !null $this->getModifiedAt()
+     */
+    public function setModifiedAt(DateTimeInterface $modifiedAt): static
+    {
+        $this->modifiedAt = DateTimeImmutable::createFromInterface($modifiedAt);
+
+        return $this;
+    }
+
+    public function getPublishedAt(): ?DateTimeImmutable
+    {
+        return $this->publishedAt;
+    }
+
+    /**
+     * @phpstan-assert !null $this->getPublishedAt()
+     */
+    public function setPublishedAt(DateTimeInterface $publishedAt): static
+    {
+        $this->publishedAt = DateTimeImmutable::createFromInterface($publishedAt);
 
         return $this;
     }

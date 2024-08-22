@@ -42,8 +42,9 @@ use Ramsey\Uuid\UuidInterface;
  *      keywords?: list<string>,
  *      excerpt?: string,
  *      feed_id?: string,
- *      date?: string,
- *      updated?: string,
+ *      created?: string,
+ *      published?: string,
+ *      modified?: string,
  *  }
  */
 final readonly class ParsedPostMetadata
@@ -67,8 +68,9 @@ final readonly class ParsedPostMetadata
         public ?string $excerpt,
         public ?string $feedId,
         public array $additional,
-        public DateTimeInterface $createdAt,
-        public ?DateTimeInterface $updatedAt,
+        public ?DateTimeInterface $createdAt,
+        public ?DateTimeInterface $publishedAt,
+        public ?DateTimeInterface $modifiedAt,
     ) {
     }
 }

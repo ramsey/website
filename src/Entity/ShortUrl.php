@@ -35,6 +35,7 @@ use Ramsey\Uuid\UuidInterface;
  */
 #[ORM\Entity(repositoryClass: ShortUrlRepository::class)]
 #[ORM\Index(fields: ['destinationUrl'])]
+#[ORM\HasLifecycleCallbacks]
 class ShortUrl
 {
     use Timestampable;

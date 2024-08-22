@@ -25,7 +25,6 @@ namespace App\Controller\Admin;
 
 use App\Entity\ShortUrl;
 use App\Service\Entity\ShortUrlService;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -95,9 +94,7 @@ final class ShortUrlCrudController extends AbstractCrudController
      */
     public function createEntity(string $entityFqcn): ShortUrl
     {
-        return (new $entityFqcn())
-            ->setSlug($this->shortUrlManager->generateSlug())
-            ->setCreatedAt(new DateTimeImmutable());
+        return (new $entityFqcn())->setSlug($this->shortUrlManager->generateSlug());
     }
 
     /**
@@ -106,7 +103,6 @@ final class ShortUrlCrudController extends AbstractCrudController
     // phpcs:ignore SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        $entityInstance->setUpdatedAt(new DateTimeImmutable());
         $this->persistEntity($entityManager, $entityInstance);
     }
 

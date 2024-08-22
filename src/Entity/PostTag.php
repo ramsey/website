@@ -32,6 +32,7 @@ use Ramsey\Uuid\Doctrine\UuidV7Generator;
 use Ramsey\Uuid\UuidInterface;
 
 #[ORM\Entity(repositoryClass: PostTagRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class PostTag
 {
     use Timestampable;

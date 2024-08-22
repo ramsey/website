@@ -2,8 +2,7 @@
 id: 01913f38-fe0b-7220-bc2a-bea9e990d181
 authors: author2@example.com
 title: "Let's Update A Blog Post!"
-date: 2024-08-08 13:32:45 +00:00
-updated: 2024-08-11 00:18:26 +00:00
+created: 2024-08-08 13:32:45 +00:00
 status: hidden
 categories: [blog]
 tags: [fun-things]

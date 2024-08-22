@@ -14,7 +14,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Twig\TwigFunction;
 
 use function count;
-use function iterator_to_array;
 
 #[TestDox('TwigExtensionCompilerPass')]
 class TwigExtensionCompilerPassTest extends KernelTestCase
@@ -29,7 +28,11 @@ class TwigExtensionCompilerPassTest extends KernelTestCase
 
         /** @var Extension $extension */
         $extension = $container->get(Extension::class);
-        $functions = iterator_to_array($extension->getFunctions());
+
+        $functions = [];
+        foreach ($extension->getFunctions() as $function) {
+            $functions[] = $function;
+        }
 
         $this->assertGreaterThan(0, count($functions));
         $this->assertContainsOnlyInstancesOf(TwigFunction::class, $functions);

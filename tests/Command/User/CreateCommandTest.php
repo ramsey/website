@@ -73,7 +73,7 @@ final class CreateCommandTest extends KernelTestCase
         $this->assertNotSame($password, $user->getPassword());
         $this->assertSame(['ROLE_USER'], $user->getRoles());
         $this->assertInstanceOf(DateTimeImmutable::class, $user->getCreatedAt());
-        $this->assertInstanceOf(DateTimeImmutable::class, $user->getUpdatedAt());
+        $this->assertNull($user->getUpdatedAt());
     }
 
     #[TestDox('creates a user with the given roles')]

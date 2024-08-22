@@ -26,7 +26,6 @@ namespace App\Service\Entity;
 use App\Entity\ShortUrl;
 use App\Repository\ShortUrlRepository;
 use App\Service\Codec\Base62Codec;
-use DateTimeImmutable;
 use InvalidArgumentException;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
@@ -73,9 +72,7 @@ final readonly class ShortUrlManager implements ShortUrlService
 
     public function createShortUrl(string $url, ?string $customSlug = null): ShortUrl
     {
-        $shortUrl = (new ShortUrl())
-            ->setDestinationUrl($this->uriFactory->createUri($url))
-            ->setCreatedAt(new DateTimeImmutable());
+        $shortUrl = (new ShortUrl())->setDestinationUrl($this->uriFactory->createUri($url));
 
         if ($customSlug !== null) {
             $shortUrl = $this->checkAndSetCustomSlug($shortUrl, $customSlug);

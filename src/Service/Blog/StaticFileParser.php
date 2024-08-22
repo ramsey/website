@@ -32,7 +32,6 @@ use PhpExtended\Email\MailboxList;
 use PhpExtended\Email\MailboxListParserInterface;
 use PhpExtended\Parser\ParseThrowable;
 use Ramsey\Uuid\Uuid;
-use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -85,22 +84,6 @@ final readonly class StaticFileParser implements PostParser
             $categories[] = PostCategory::from($category);
         }
 
-        try {
-            $createdAt = isset($metadata['date'])
-                ? new DateTimeImmutable("@{$metadata['date']}")
-                : throw new RuntimeException('Missing date');
-        } catch (Throwable) {
-            throw new InvalidArgumentException('Posts must have a valid date');
-        }
-
-        try {
-            $updatedAt = isset($metadata['updated'])
-                ? new DateTimeImmutable("@{$metadata['updated']}")
-                : null;
-        } catch (Throwable) {
-            throw new InvalidArgumentException('When provided, updated must be a valid date');
-        }
-
         return new ParsedPostMetadata(
             id: isset($metadata['id']) ? Uuid::fromString($metadata['id']) : Uuid::uuid7(),
             contentType: $type,
@@ -115,8 +98,9 @@ final readonly class StaticFileParser implements PostParser
             excerpt: $metadata['excerpt'] ?? null,
             feedId: $metadata['feed_id'] ?? null,
             additional: $this->getAdditionalMetadata($metadata),
-            createdAt: $createdAt,
-            updatedAt: $updatedAt,
+            createdAt: $this->parseDate($metadata, 'created'),
+            publishedAt: $this->parseDate($metadata, 'published'),
+            modifiedAt: $this->parseDate($metadata, 'modified'),
         );
     }
 
@@ -141,8 +125,9 @@ final readonly class StaticFileParser implements PostParser
             $metadata['keywords'],
             $metadata['excerpt'],
             $metadata['feed_id'],
-            $metadata['date'],
-            $metadata['updated'],
+            $metadata['created'],
+            $metadata['published'],
+            $metadata['modified'],
         );
 
         return $metadata;
@@ -194,5 +179,20 @@ final readonly class StaticFileParser implements PostParser
         }
 
         return $authors;
+    }
+
+    /**
+     * @param PostMetadata $metadata
+     * @param 'created' | 'published' | 'modified' $property
+     */
+    private function parseDate(array $metadata, string $property): ?DateTimeImmutable
+    {
+        try {
+            return isset($metadata[$property])
+                ? new DateTimeImmutable('@' . $metadata[$property])
+                : null;
+        } catch (Throwable) {
+            throw new InvalidArgumentException("When provided, $property must be a valid date");
+        }
     }
 }

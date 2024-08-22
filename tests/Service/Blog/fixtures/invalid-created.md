@@ -1,5 +1,6 @@
 ---
 title: Lorem Ipsum Odor Amet
+created: this is not a valid date
 slug: lorem-ipsum
 status: published
 ---

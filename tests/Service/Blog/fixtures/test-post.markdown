@@ -4,7 +4,9 @@ authors:
     - Frodo Baggins <frodo@example.com>, Samwise Gamgee <samwise@example.com>
     - '"    Peregrin Took    " <pippin@example.com>, merry@example.com'
 title: Lorem Ipsum Odor Amet
-date: 2004-02-22 06:00:52 -06:00
+created: 2004-02-22 06:00:52 -06:00
+published: 2004-02-23 09:22:15 -06:00
+modified: 2009-11-15 22:11:19 -05:00
 categories: [blog]
 tags: [tests, latin]
 id: 00fadd19-6120-7332-8a74-e1821536b10e

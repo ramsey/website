@@ -26,24 +26,30 @@ namespace App\Doctrine\Traits;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Event\PrePersistEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 
 trait Timestampable
 {
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
-    private DateTimeImmutable $createdAt;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $updatedAt = null;
 
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(DateTimeInterface $createdAt): static
+    /**
+     * @phpstan-assert !null $this->getCreatedAt()
+     */
+    public function setCreatedAt(DateTimeInterface $createdAt = new DateTimeImmutable()): static
     {
-        if (!isset($this->createdAt)) {
+        // Do not overwrite the createdAt date, if it is already set.
+        if ($this->createdAt === null) {
             $this->createdAt = DateTimeImmutable::createFromInterface($createdAt);
         }
 
@@ -58,10 +64,28 @@ trait Timestampable
     /**
      * @phpstan-assert !null $this->getUpdatedAt()
      */
-    public function setUpdatedAt(DateTimeInterface $updatedAt): static
+    public function setUpdatedAt(DateTimeInterface $updatedAt = new DateTimeImmutable()): static
     {
         $this->updatedAt = DateTimeImmutable::createFromInterface($updatedAt);
 
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    public static function prePersist(PrePersistEventArgs $eventArgs): void
+    {
+        /** @var static $entity */
+        $entity = $eventArgs->getObject();
+
+        $entity->setCreatedAt();
+    }
+
+    #[ORM\PreUpdate]
+    public static function preUpdate(PreUpdateEventArgs $eventArgs): void
+    {
+        /** @var static $entity */
+        $entity = $eventArgs->getObject();
+
+        $entity->setUpdatedAt();
     }
 }

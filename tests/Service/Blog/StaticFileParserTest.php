@@ -31,7 +31,9 @@ class StaticFileParserTest extends TestCase
     public function testParse(string $path, PostBodyType $expectedType): void
     {
         $expectedId = Uuid::fromString('00fadd19-6120-7332-8a74-e1821536b10e');
-        $expectedDate = new DateTimeImmutable('@1077451252');
+        $expectedCreated = new DateTimeImmutable('2004-02-22 12:00:52 +00:00');
+        $expectedPublished = new DateTimeImmutable('2004-02-23 15:22:15 +00:00');
+        $expectedModified = new DateTimeImmutable('2009-11-16 03:11:19 +00:00');
 
         $filesystem = new Filesystem();
         $frontMatter = FrontMatterChain::create();
@@ -55,8 +57,9 @@ class StaticFileParserTest extends TestCase
         );
         $this->assertSame('https://example.com/feed-id/123', $parsedPost->metadata->feedId);
         $this->assertSame(['layout' => 'post'], $parsedPost->metadata->additional);
-        $this->assertSame($expectedDate->format('c'), $parsedPost->metadata->createdAt->format('c'));
-        $this->assertNull($parsedPost->metadata->updatedAt);
+        $this->assertSame($expectedCreated->format('U'), $parsedPost->metadata->createdAt?->format('U'));
+        $this->assertSame($expectedPublished->format('U'), $parsedPost->metadata->publishedAt?->format('U'));
+        $this->assertSame($expectedModified->format('U'), $parsedPost->metadata->modifiedAt?->format('U'));
 
         $this->assertCount(4, $parsedPost->authors);
         $this->assertContainsOnlyInstancesOf(ParsedPostAuthor::class, $parsedPost->authors);
@@ -76,9 +79,9 @@ class StaticFileParserTest extends TestCase
     #[TestDox('throws exceptions on validation errors')]
     #[TestWith(['/path/to/file.md', 'Could not find file /path/to/file.md'])]
     #[TestWith([__DIR__ . '/fixtures/invalid-extension.txt', 'File does not have an acceptable extension:'])]
-    #[TestWith([__DIR__ . '/fixtures/invalid-date.md', 'Posts must have a valid date'])]
-    #[TestWith([__DIR__ . '/fixtures/missing-date.md', 'Posts must have a valid date'])]
-    #[TestWith([__DIR__ . '/fixtures/invalid-updated.md', 'When provided, updated must be a valid date'])]
+    #[TestWith([__DIR__ . '/fixtures/invalid-created.md', 'When provided, created must be a valid date'])]
+    #[TestWith([__DIR__ . '/fixtures/invalid-published.md', 'When provided, published must be a valid date'])]
+    #[TestWith([__DIR__ . '/fixtures/invalid-modified.md', 'When provided, modified must be a valid date'])]
     #[TestWith([__DIR__ . '/fixtures/missing-title.md', 'Posts must have a title'])]
     #[TestWith([__DIR__ . '/fixtures/missing-status.md', 'Posts must have a valid status'])]
     #[TestWith([__DIR__ . '/fixtures/invalid-authors.md', 'When provided, authors must have valid mailbox strings'])]
@@ -109,7 +112,6 @@ class StaticFileParserTest extends TestCase
 
         $this->assertSame('Lorem Ipsum Odor Amet', $parsedPost->metadata->title);
         $this->assertSame('lorem-ipsum-odor-amet', $parsedPost->metadata->slug);
-        $this->assertInstanceOf(DateTimeImmutable::class, $parsedPost->metadata->createdAt);
         $this->assertInstanceOf(UuidInterface::class, $parsedPost->metadata->id);
         $this->assertSame([], $parsedPost->metadata->categories);
         $this->assertSame([], $parsedPost->metadata->tags);
@@ -118,7 +120,9 @@ class StaticFileParserTest extends TestCase
         $this->assertNull($parsedPost->metadata->excerpt);
         $this->assertNull($parsedPost->metadata->feedId);
         $this->assertSame([], $parsedPost->metadata->additional);
-        $this->assertNull($parsedPost->metadata->updatedAt);
+        $this->assertNull($parsedPost->metadata->createdAt);
+        $this->assertNull($parsedPost->metadata->publishedAt);
+        $this->assertNull($parsedPost->metadata->modifiedAt);
         $this->assertSame([], $parsedPost->authors);
 
         // The content should not have the front matter embedded in it.

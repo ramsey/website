@@ -7,7 +7,6 @@ namespace App\Tests\Entity;
 use App\Entity\Author;
 use App\Entity\Post;
 use App\Entity\User;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Faker\Factory;
@@ -88,32 +87,6 @@ class AuthorTest extends KernelTestCase
 
         $this->assertSame($author, $author->setUser($user));
         $this->assertSame($user, $author->getUser());
-    }
-
-    #[TestDox('sets the createdAt property')]
-    public function testSetCreatedAt(): void
-    {
-        $date = new DateTime();
-
-        $author = new Author();
-
-        $this->assertSame($author, $author->setCreatedAt($date));
-        $this->assertNotSame($date, $author->getCreatedAt());
-        $this->assertInstanceOf(DatetimeImmutable::class, $author->getCreatedAt());
-        $this->assertSame($date->format('c'), $author->getCreatedAt()->format('c'));
-    }
-
-    #[TestDox('sets the updatedAt property')]
-    public function testSetUpdatedAt(): void
-    {
-        $date = new DateTime();
-
-        $author = new Author();
-
-        $this->assertSame($author, $author->setUpdatedAt($date));
-        $this->assertNotSame($date, $author->getUpdatedAt());
-        $this->assertInstanceOf(DatetimeImmutable::class, $author->getUpdatedAt());
-        $this->assertSame($date->format('c'), $author->getUpdatedAt()->format('c'));
     }
 
     #[TestDox('add a post')]

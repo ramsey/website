@@ -99,7 +99,7 @@ final class LoadPostCommand extends Command
             '%s<info>%s blog post for %s: "%s"</info>',
             $isDryRun ? '<comment>[DRY-RUN]</comment> ' : '',
             ucfirst($action),
-            $post->getCreatedAt()->format('Y-m-d'),
+            $post->getCreatedAt()?->format('Y-m-d'),
             $post->getTitle(),
         ));
 

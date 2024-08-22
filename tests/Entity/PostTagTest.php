@@ -7,7 +7,6 @@ namespace App\Tests\Entity;
 use App\Entity\Post;
 use App\Entity\PostTag;
 use App\Tests\DataFixtures\PostTagFixtures;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Faker\Factory;
@@ -88,31 +87,5 @@ class PostTagTest extends KernelTestCase
         $this->assertCount(1, $tag->getPosts());
         $this->assertFalse($tag->getPosts()->contains($post1));
         $this->assertTrue($tag->getPosts()->contains($post2));
-    }
-
-    #[TestDox('sets the createdAt property')]
-    public function testSetCreatedAt(): void
-    {
-        $date = new DateTime();
-
-        $postTag = new PostTag();
-
-        $this->assertSame($postTag, $postTag->setCreatedAt($date));
-        $this->assertNotSame($date, $postTag->getCreatedAt());
-        $this->assertInstanceOf(DatetimeImmutable::class, $postTag->getCreatedAt());
-        $this->assertSame($date->format('c'), $postTag->getCreatedAt()->format('c'));
-    }
-
-    #[TestDox('sets the updatedAt property')]
-    public function testSetUpdatedAt(): void
-    {
-        $date = new DateTime();
-
-        $postTag = new PostTag();
-
-        $this->assertSame($postTag, $postTag->setUpdatedAt($date));
-        $this->assertNotSame($date, $postTag->getUpdatedAt());
-        $this->assertInstanceOf(DatetimeImmutable::class, $postTag->getUpdatedAt());
-        $this->assertSame($date->format('c'), $postTag->getUpdatedAt()->format('c'));
     }
 }

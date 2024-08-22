@@ -2,7 +2,7 @@
 layout: post
 authors: Frodo Baggins <frodo@example.com>, Samwise Gamgee <sam@example.com>
 title: Lorem Ipsum Odor Amet
-date: 2024-08-10 20:11:49 -05:00
+created: 2024-08-10 20:11:49 -05:00
 status: draft
 categories: [blog]
 tags: [cool-stuff, latin, fake]
