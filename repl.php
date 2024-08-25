@@ -12,7 +12,8 @@ date_default_timezone_set('UTC');
 
 (new Dotenv())->bootEnv(__DIR__ . '/.env');
 
-$kernel = new Kernel('dev', true);
+// phpcs:ignore SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable.DisallowedSuperGlobalVariable
+$kernel = new Kernel($_ENV['APP_ENV'], (bool) $_ENV['APP_DEBUG']);
 $kernel->boot();
 
 // phpcs:disable SlevomatCodingStandard.Variables.UnusedVariable.UnusedVariable
