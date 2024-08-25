@@ -28,6 +28,7 @@ use App\Repository\AuthorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use InvalidArgumentException;
 use Ramsey\Uuid\Doctrine\UuidV7Generator;
 use Ramsey\Uuid\UuidInterface;
 
@@ -52,8 +53,19 @@ class Author
     /**
      * @var Collection<int, Post>
      */
-    #[ORM\ManyToMany(targetEntity: Post::class, mappedBy: 'authors')]
+    #[ORM\ManyToMany(targetEntity: Post::class, mappedBy: 'authors', cascade: ['persist'])]
     private Collection $posts;
+
+    /**
+     * @var Collection<int, AuthorLink>
+     */
+    #[ORM\OneToMany(
+        targetEntity: AuthorLink::class,
+        mappedBy: 'author',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true,
+    )]
+    private Collection $links;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true)]
@@ -61,6 +73,7 @@ class Author
 
     public function __construct()
     {
+        $this->links = new ArrayCollection();
         $this->posts = new ArrayCollection();
     }
 
@@ -72,6 +85,23 @@ class Author
 
         if (!$post->getAuthors()->contains($this)) {
             $post->addAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function addLink(AuthorLink $link): static
+    {
+        if ($link->getAuthor() !== null && $link->getAuthor() !== $this) {
+            throw new InvalidArgumentException('An author is already associated with this link');
+        }
+
+        if (!$this->links->contains($link)) {
+            $this->links->add($link);
+        }
+
+        if ($link->getAuthor() === null) {
+            $link->setAuthor($this);
         }
 
         return $this;
@@ -107,6 +137,14 @@ class Author
     }
 
     /**
+     * @return Collection<int, AuthorLink>
+     */
+    public function getLinks(): Collection
+    {
+        return $this->links;
+    }
+
+    /**
      * @return Collection<int, Post>
      */
     public function getPosts(): Collection
@@ -126,10 +164,17 @@ class Author
         return $this;
     }
 
+    public function removeLink(AuthorLink $link): static
+    {
+        if ($link->getAuthor() === $this) {
+            $link->removeAuthor();
+        }
+
+        return $this;
+    }
+
     public function removePost(Post $post): static
     {
-        $this->posts->removeElement($post);
-
         if ($post->getAuthors()->contains($this)) {
             $post->removeAuthor($this);
         }

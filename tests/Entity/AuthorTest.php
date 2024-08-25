@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Entity;
 
 use App\Entity\Author;
+use App\Entity\AuthorLink;
 use App\Entity\Post;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Faker\Factory;
 use Faker\Generator;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use Ramsey\Uuid\UuidInterface;
@@ -134,5 +136,67 @@ class AuthorTest extends KernelTestCase
         // The author should still contain post 3 and post 3 should contain the author.
         $this->assertTrue($author->getPosts()->contains($post3));
         $this->assertTrue($post3->getAuthors()->contains($author));
+    }
+
+    #[TestDox('adds a link')]
+    public function testAddLink(): void
+    {
+        $link = new AuthorLink();
+
+        $author = new Author();
+
+        $this->assertSame($author, $author->addLink($link));
+        $this->assertTrue($author->getLinks()->contains($link));
+        $this->assertSame($author, $link->getAuthor());
+    }
+
+    #[TestDox('throws an exception if the link belongs to another author')]
+    public function testAddLinkThrowsExceptionWhenLinkAlreadyOwned(): void
+    {
+        $author1 = new Author();
+        $author2 = new Author();
+
+        $link = new AuthorLink();
+        $link->setAuthor($author1);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('An author is already associated with this link');
+
+        $author2->addLink($link);
+    }
+
+    #[TestDox('removes a link')]
+    public function testRemoveLink(): void
+    {
+        $link1 = new AuthorLink();
+        $link2 = new AuthorLink();
+        $link3 = new AuthorLink();
+
+        $author = new Author();
+
+        $author->addLink($link1)->addLink($link2)->addLink($link3);
+
+        // The author should contain all links, and each link should have the author.
+        $this->assertTrue($author->getLinks()->contains($link1));
+        $this->assertTrue($author->getLinks()->contains($link2));
+        $this->assertTrue($author->getLinks()->contains($link3));
+        $this->assertSame($author, $link1->getAuthor());
+        $this->assertSame($author, $link2->getAuthor());
+        $this->assertSame($author, $link3->getAuthor());
+
+        // Remove the second link from the author.
+        $this->assertSame($author, $author->removeLink($link2));
+
+        // The author should still contain link 1 and link 1 should have the author.
+        $this->assertTrue($author->getLinks()->contains($link1));
+        $this->assertSame($author, $link1->getAuthor());
+
+        // The author should no longer contain link 2 and link 2 should not have the author.
+        $this->assertFalse($author->getLinks()->contains($link2));
+        $this->assertNull($link2->getAuthor());
+
+        // The author should still contain link 3 and link 3 should have the author.
+        $this->assertTrue($author->getLinks()->contains($link3));
+        $this->assertSame($author, $link3->getAuthor());
     }
 }

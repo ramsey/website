@@ -380,10 +380,7 @@ class Post
     public function removeAuthor(Author $author): static
     {
         $this->authors->removeElement($author);
-
-        if ($author->getPosts()->contains($this)) {
-            $author->removePost($this);
-        }
+        $author->getPosts()->removeElement($this);
 
         return $this;
     }
