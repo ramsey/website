@@ -6,6 +6,7 @@ namespace App\Tests\Entity;
 
 use App\Entity\Author;
 use App\Entity\AuthorLink;
+use App\Entity\AuthorLinkType;
 use App\Entity\Post;
 use App\Entity\User;
 use DateTimeImmutable;
@@ -13,8 +14,10 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Faker\Factory;
 use Faker\Generator;
 use InvalidArgumentException;
+use Laminas\Diactoros\Uri;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\Attributes\TestWith;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -198,5 +201,51 @@ class AuthorTest extends KernelTestCase
         // The author should still contain link 3 and link 3 should have the author.
         $this->assertTrue($author->getLinks()->contains($link3));
         $this->assertSame($author, $link3->getAuthor());
+    }
+
+    #[TestWith(['website'])]
+    #[TestWith([AuthorLinkType::Website])]
+    #[TestWith(['linkedin'])]
+    #[TestWith([AuthorLinkType::LinkedIn])]
+    #[TestWith(['mastodon'])]
+    #[TestWith([AuthorLinkType::Mastodon])]
+    #[TestWith([AuthorLinkType::GitHub])]
+    #[TestWith([AuthorLinkType::SpeakerDeck])]
+    public function testGetLink(AuthorLinkType | string $type): void
+    {
+        $uri1 = new Uri($this->faker->url());
+        $link1 = (new AuthorLink())
+            ->setType(AuthorLinkType::LinkedIn)
+            ->setUrl($uri1);
+
+        $uri2 = new Uri($this->faker->url());
+        $link2 = (new AuthorLink())
+            ->setType(AuthorLinkType::Website)
+            ->setUrl($uri2);
+
+        $uri3 = new Uri($this->faker->url());
+        $link3 = (new AuthorLink())
+            ->setType(AuthorLinkType::Mastodon)
+            ->setUrl($uri3);
+
+        $uri4 = new Uri($this->faker->url());
+        $link4 = (new AuthorLink())
+            ->setType(AuthorLinkType::Website)
+            ->setUrl($uri4);
+
+        $expected = match ($type) {
+            'linkedin', AuthorLinkType::LinkedIn => $uri1,
+            'website', AuthorLinkType::Website => $uri2,
+            'mastodon', AuthorLinkType::Mastodon => $uri3,
+            default => null,
+        };
+
+        $author = (new Author())
+            ->addLink($link1)
+            ->addLink($link2)
+            ->addLink($link3)
+            ->addLink($link4);
+
+        $this->assertSame($expected, $author->getLink($type));
     }
 }

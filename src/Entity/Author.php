@@ -29,8 +29,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
+use Psr\Http\Message\UriInterface;
 use Ramsey\Uuid\Doctrine\UuidV7Generator;
 use Ramsey\Uuid\UuidInterface;
+
+use function is_string;
 
 #[ORM\Entity(repositoryClass: AuthorRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -134,6 +137,21 @@ class Author
         $this->email = $email;
 
         return $this;
+    }
+
+    public function getLink(AuthorLinkType | string $type): ?UriInterface
+    {
+        if (is_string($type)) {
+            $type = AuthorLinkType::from($type);
+        }
+
+        foreach ($this->links as $link) {
+            if ($link->getType() === $type) {
+                return $link->getUrl();
+            }
+        }
+
+        return null;
     }
 
     /**
