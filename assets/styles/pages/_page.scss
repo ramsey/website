@@ -27,20 +27,18 @@
       }
 
       article {
-        p {
-          font-size: 1.45rem;
-          font-weight: 200;
-          line-height: 1.1em;
-          margin: 0 0 0.75em 0;
-          padding: 0 0.25em;
-          text-align: justify;
+        font-size: 1.45rem;
+        font-weight: 200;
+        line-height: 1.1em;
+        margin: 0 0 0.75em 0;
+        padding: 0;
+        text-align: justify;
 
-          -webkit-hyphens: auto;
-          hyphens: auto;
+        -webkit-hyphens: auto;
+        hyphens: auto;
 
-          @media (max-width: v.$viewportSmaller) {
-            text-align: left;
-          }
+        @media (max-width: v.$viewportSmaller) {
+          text-align: left;
         }
       }
     }

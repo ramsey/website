@@ -10,6 +10,12 @@ html {
     background-image: linear-gradient(to bottom, var(--color-background-grad1), var(--color-background-grad2) 60%);
     background-repeat: no-repeat;
     color: var(--color-text);
+
+    ::selection {
+      background: var(--yellow);
+      color: var(--black);
+    }
+
     font-family: Saira, sans-serif;
     margin: 0;
     overflow-x: clip;

@@ -6,10 +6,129 @@
 }
 
 @font-face {
-  font-family: "Sarabun";
+  font-family: "Bitter";
+  font-style: normal;
+  font-weight: 100;
+  src: url("../media/fonts/Bitter/Bitter-Thin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: italic;
+  font-weight: 100;
+  src: url("../media/fonts/Bitter/Bitter-ThinItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: normal;
+  font-weight: 200;
+  src: url("../media/fonts/Bitter/Bitter-ExtraLight.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: italic;
+  font-weight: 200;
+  src: url("../media/fonts/Bitter/Bitter-ExtraLightItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: normal;
+  font-weight: 300;
+  src: url("../media/fonts/Bitter/Bitter-Light.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: italic;
+  font-weight: 300;
+  src: url("../media/fonts/Bitter/Bitter-LightItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../media/fonts/Bitter/Bitter-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: italic;
+  font-weight: 400;
+  src: url("../media/fonts/Bitter/Bitter-Italic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: normal;
+  font-weight: 500;
+  src: url("../media/fonts/Bitter/Bitter-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
   font-style: italic;
   font-weight: 500;
-  src: url("../media/fonts/Sarabun/Sarabun-MediumItalic.woff2") format("woff2");
+  src: url("../media/fonts/Bitter/Bitter-MediumItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: normal;
+  font-weight: 600;
+  src: url("../media/fonts/Bitter/Bitter-SemiBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: italic;
+  font-weight: 600;
+  src: url("../media/fonts/Bitter/Bitter-SemiBoldItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: normal;
+  font-weight: 700;
+  src: url("../media/fonts/Bitter/Bitter-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: italic;
+  font-weight: 700;
+  src: url("../media/fonts/Bitter/Bitter-BoldItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: normal;
+  font-weight: 800;
+  src: url("../media/fonts/Bitter/Bitter-ExtraBold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: italic;
+  font-weight: 800;
+  src: url("../media/fonts/Bitter/Bitter-ExtraBoldItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: normal;
+  font-weight: 900;
+  src: url("../media/fonts/Bitter/Bitter-Black.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bitter";
+  font-style: italic;
+  font-weight: 900;
+  src: url("../media/fonts/Bitter/Bitter-BlackItalic.woff2") format("woff2");
 }
 
 @font-face {
@@ -136,6 +255,13 @@
   font-style: italic;
   font-weight: 900;
   src: url("../media/fonts/Saira/Saira-BlackItalic.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Sarabun";
+  font-style: italic;
+  font-weight: 500;
+  src: url("../media/fonts/Sarabun/Sarabun-MediumItalic.woff2") format("woff2");
 }
 
 @font-face {

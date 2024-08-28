@@ -15,6 +15,9 @@ indent_size = 4
 [*.{yml,yaml}]
 trim_trailing_whitespace = false
 
+[*.scss]
+indent_size = 2
+
 [.github/**.{yml,yaml}]
 indent_size = 2
 
