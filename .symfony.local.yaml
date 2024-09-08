@@ -1,0 +1,8 @@
+http:
+    daemon: true
+    use_gzip: true
+    no_workers: false
+
+workers:
+    docker_compose: ~
+    messenger_consume_async: ~
