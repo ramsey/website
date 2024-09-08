@@ -25,6 +25,7 @@ namespace App\Service\Entity;
 
 use App\Entity\Post;
 use App\Repository\PostRepository;
+use App\Service\Blog\ContentHash;
 use App\Service\Blog\ParsedPost;
 use InvalidArgumentException;
 use Ramsey\Uuid\UuidInterface;
@@ -53,6 +54,15 @@ final readonly class PostManager implements PostService
         }
 
         return $this->updateFromParsedPost($post, $parsedPost);
+    }
+
+    public function getContentHash(ParsedPost | Post $post): ContentHash
+    {
+        if ($post instanceof ParsedPost) {
+            return ContentHash::createFromParsedPost($post);
+        }
+
+        return ContentHash::createFromPost($post);
     }
 
     public function getRepository(): PostRepository

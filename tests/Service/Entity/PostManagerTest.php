@@ -474,4 +474,52 @@ class PostManagerTest extends TestCase
 
         $this->manager->createFromParsedPost($parsedPost);
     }
+
+    public function testGetContentHashUsingParsedPost(): void
+    {
+        $uuid = Uuid::fromString('0191d32d-4d61-727d-b09c-e13ee30091b1');
+
+        $parsedPost = new ParsedPost(
+            new ParsedPostMetadata(
+                id: $uuid,
+                contentType: PostBodyType::Markdown,
+                title: 'Post Title',
+                slug: 'post-title',
+                status: PostStatus::Draft,
+                categories: [],
+                tags: [],
+                description: null,
+                keywords: [],
+                excerpt: null,
+                feedId: null,
+                additional: [],
+                createdAt: null,
+                publishedAt: null,
+                modifiedAt: null,
+            ),
+            'Post body content.',
+            [],
+        );
+
+        $contentHash = $this->manager->getContentHash($parsedPost);
+
+        $this->assertSame('b917a6125004b86e516e1b0c7d8f0e6e34dfb19819802b98392098933d6a9bb4', $contentHash->getHash());
+    }
+
+    public function testGetContentHashUsingPost(): void
+    {
+        $uuid = Uuid::fromString('0191d32d-4d61-727d-b09c-e13ee30091b1');
+
+        $post = (new Post())
+            ->setId($uuid)
+            ->setBodyType(PostBodyType::Markdown)
+            ->setTitle('Post Title')
+            ->setSlug('post-title')
+            ->setStatus(PostStatus::Draft)
+            ->setBody('Post body content.');
+
+        $contentHash = $this->manager->getContentHash($post);
+
+        $this->assertSame('b917a6125004b86e516e1b0c7d8f0e6e34dfb19819802b98392098933d6a9bb4', $contentHash->getHash());
+    }
 }
