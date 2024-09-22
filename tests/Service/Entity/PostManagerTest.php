@@ -16,6 +16,7 @@ use App\Service\Blog\ParsedPost;
 use App\Service\Blog\ParsedPostAuthor;
 use App\Service\Blog\ParsedPostMetadata;
 use App\Service\Entity\AuthorService;
+use App\Service\Entity\EntityExists;
 use App\Service\Entity\PostManager;
 use App\Service\Entity\PostTagService;
 use App\Service\Entity\ShortUrlService;
@@ -32,6 +33,7 @@ use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 
 use function assert;
+use function sprintf;
 
 class PostManagerTest extends TestCase
 {
@@ -521,5 +523,177 @@ class PostManagerTest extends TestCase
         $contentHash = $this->manager->getContentHash($post);
 
         $this->assertSame('b917a6125004b86e516e1b0c7d8f0e6e34dfb19819802b98392098933d6a9bb4', $contentHash->getHash());
+    }
+
+    public function testUpsertFromParsedPostCreatesNewPost(): void
+    {
+        $parsedPost = new ParsedPost(
+            new ParsedPostMetadata(
+                id: Uuid::uuid7(),
+                contentType: PostBodyType::Markdown,
+                title: $this->faker->sentence(),
+                slug: $this->faker->slug(),
+                status: PostStatus::Draft,
+                categories: [],
+                tags: [],
+                description: null,
+                keywords: [],
+                excerpt: null,
+                feedId: null,
+                additional: [],
+                createdAt: null,
+                publishedAt: null,
+                modifiedAt: null,
+            ),
+            $this->faker->text(),
+            [],
+        );
+
+        $this->repository->expects('find')->with($parsedPost->metadata->id)->andReturnNull();
+
+        $post = $this->manager->upsertFromParsedPost($parsedPost);
+
+        $this->assertEquals($parsedPost->metadata->id, $post->getId());
+        $this->assertSame($parsedPost->metadata->title, $post->getTitle());
+        $this->assertSame($parsedPost->metadata->slug, $post->getSlug());
+        $this->assertSame($parsedPost->metadata->status, $post->getStatus());
+        $this->assertSame($parsedPost->content, $post->getBody());
+        $this->assertSame($parsedPost->metadata->contentType, $post->getBodyType());
+        $this->assertNull($post->getDescription());
+        $this->assertSame([], $post->getKeywords());
+        $this->assertNull($post->getExcerpt());
+        $this->assertNull($post->getFeedId());
+        $this->assertSame([], $post->getMetadata());
+        $this->assertTrue($post->getAuthors()->isEmpty());
+        $this->assertSame([], $post->getCategory());
+        $this->assertNull($post->getCreatedAt());
+        $this->assertNull($post->getUpdatedAt());
+        $this->assertNull($post->getPublishedAt());
+        $this->assertNull($post->getModifiedAt());
+        $this->assertTrue($post->getTags()->isEmpty());
+        $this->assertTrue($post->getShortUrls()->isEmpty());
+    }
+
+    public function testUpsertFromParsedPostWithExistingIdenticalPostIsNoop(): void
+    {
+        $parsedPost = new ParsedPost(
+            new ParsedPostMetadata(
+                id: Uuid::uuid7(),
+                contentType: PostBodyType::Markdown,
+                title: $this->faker->sentence(),
+                slug: $this->faker->slug(),
+                status: PostStatus::Draft,
+                categories: [],
+                tags: [],
+                description: null,
+                keywords: [],
+                excerpt: null,
+                feedId: null,
+                additional: [],
+                createdAt: null,
+                publishedAt: null,
+                modifiedAt: null,
+            ),
+            $this->faker->text(),
+            [],
+        );
+
+        $post = (new Post())
+            ->setId($parsedPost->metadata->id)
+            ->setBodyType($parsedPost->metadata->contentType)
+            ->setTitle($parsedPost->metadata->title)
+            ->setSlug($parsedPost->metadata->slug)
+            ->setStatus($parsedPost->metadata->status)
+            ->setBody($parsedPost->content);
+
+        $this->repository->expects('find')->with($parsedPost->metadata->id)->andReturn($post);
+
+        $result = $this->manager->upsertFromParsedPost($parsedPost);
+
+        $this->assertSame($post, $result);
+    }
+
+    public function testUpsertFromParsedPostThrowsExceptionForExistingPostWithChanges(): void
+    {
+        $parsedPost = new ParsedPost(
+            new ParsedPostMetadata(
+                id: Uuid::uuid7(),
+                contentType: PostBodyType::Markdown,
+                title: $this->faker->sentence(),
+                slug: $this->faker->slug(),
+                status: PostStatus::Draft,
+                categories: [],
+                tags: [],
+                description: null,
+                keywords: [],
+                excerpt: null,
+                feedId: null,
+                additional: [],
+                createdAt: null,
+                publishedAt: null,
+                modifiedAt: null,
+            ),
+            $this->faker->text(),
+            [],
+        );
+
+        $post = (new Post())
+            ->setId($parsedPost->metadata->id)
+            ->setBodyType($parsedPost->metadata->contentType)
+            ->setTitle($parsedPost->metadata->title)
+            ->setSlug($parsedPost->metadata->slug)
+            ->setStatus($parsedPost->metadata->status)
+            ->setBody($parsedPost->content . 'Tiny addition to force different content hashes.');
+
+        $this->repository->expects('find')->with($parsedPost->metadata->id)->andReturn($post);
+
+        $this->expectException(EntityExists::class);
+        $this->expectExceptionMessage(sprintf(
+            "A post with ID '%s' already exists; call %s with TRUE as the second parameter to update the post",
+            $parsedPost->metadata->id,
+            PostManager::class . '::upsertFromParsedPost',
+        ));
+
+        $this->manager->upsertFromParsedPost($parsedPost);
+    }
+
+    public function testUpsertFromParsedPostWithExistingPostAndDoUpdateConfirmation(): void
+    {
+        $parsedPost = new ParsedPost(
+            new ParsedPostMetadata(
+                id: Uuid::uuid7(),
+                contentType: PostBodyType::Markdown,
+                title: $this->faker->sentence(),
+                slug: $this->faker->slug(),
+                status: PostStatus::Draft,
+                categories: [],
+                tags: [],
+                description: null,
+                keywords: [],
+                excerpt: null,
+                feedId: null,
+                additional: [],
+                createdAt: null,
+                publishedAt: null,
+                modifiedAt: null,
+            ),
+            $this->faker->text(),
+            [],
+        );
+
+        $post = (new Post())
+            ->setId($parsedPost->metadata->id)
+            ->setBodyType($parsedPost->metadata->contentType)
+            ->setTitle($parsedPost->metadata->title)
+            ->setSlug($parsedPost->metadata->slug)
+            ->setStatus($parsedPost->metadata->status)
+            ->setBody($parsedPost->content . 'Tiny addition to force different content hashes.');
+
+        $this->repository->expects('find')->with($parsedPost->metadata->id)->andReturn($post);
+
+        $result = $this->manager->upsertFromParsedPost($parsedPost, doUpdate: true);
+
+        $this->assertSame($post, $result);
+        $this->assertSame($parsedPost->content, $post->getBody());
     }
 }

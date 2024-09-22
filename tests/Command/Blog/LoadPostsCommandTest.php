@@ -94,8 +94,8 @@ class LoadPostsCommandTest extends KernelTestCase
 
         $this->assertStringNotContainsString('[DRY-RUN]', $output);
         $this->assertStringNotContainsString('already exists. Do you want to update it?', $output);
-        $this->assertStringContainsString('Created blog post for 2024-08-11: "Lorem Ipsum Odor Amet"', $output);
-        $this->assertStringContainsString('Updated blog post for 2024-08-08: "Let\'s Update A Blog Post!"', $output);
+        $this->assertStringContainsString('Saved blog post for 2024-08-11: "Lorem Ipsum Odor Amet"', $output);
+        $this->assertStringContainsString('Saved blog post for 2024-08-08: "Let\'s Update A Blog Post!"', $output);
 
         // Clear the entity manager so that the next find() calls make
         // fresh database requests for the entities.

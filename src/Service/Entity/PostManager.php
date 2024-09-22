@@ -32,6 +32,7 @@ use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\Routing\Requirement\Requirement;
 
 use function preg_match;
+use function sprintf;
 
 final readonly class PostManager implements PostService
 {
@@ -119,6 +120,29 @@ final readonly class PostManager implements PostService
         $this->associateShortUrl($post, $shortUrl);
 
         return $post;
+    }
+
+    public function upsertFromParsedPost(ParsedPost $parsedPost, bool $doUpdate = false): Post
+    {
+        $existingPost = $this->getRepository()->find($parsedPost->metadata->id);
+
+        if ($existingPost !== null) {
+            if ($this->getContentHash($parsedPost)->equals($this->getContentHash($existingPost))) {
+                return $existingPost;
+            }
+
+            if (!$doUpdate) {
+                throw new EntityExists(sprintf(
+                    "A post with ID '%s' already exists; call %s with TRUE as the second parameter to update the post",
+                    $parsedPost->metadata->id,
+                    __METHOD__,
+                ));
+            }
+
+            return $this->updateFromParsedPost($existingPost, $parsedPost);
+        }
+
+        return $this->createFromParsedPost($parsedPost);
     }
 
     private function associateShortUrl(Post $post, ?string $url): void

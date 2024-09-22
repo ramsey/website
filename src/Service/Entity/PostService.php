@@ -54,4 +54,11 @@ interface PostService extends EntityService
      * Updates a Post entity from a ParsedPost
      */
     public function updateFromParsedPost(Post $post, ParsedPost $parsedPost): Post;
+
+    /**
+     * Creates or updates a Post entity from a ParsedPost
+     *
+     * @throws EntityExists if `$doUpdate` is `false` and the entity already exists
+     */
+    public function upsertFromParsedPost(ParsedPost $parsedPost, bool $doUpdate = false): Post;
 }

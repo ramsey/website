@@ -27,6 +27,7 @@ use App\Console\ConfirmationQuestionDeclined;
 use App\Entity\Post;
 use App\Service\Blog\ParsedPost;
 use App\Service\Blog\PostParser;
+use App\Service\Entity\EntityExists;
 use App\Service\Entity\PostManager;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
@@ -38,7 +39,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function sprintf;
-use function ucfirst;
 
 #[AsCommand(
     name: 'app:blog:load-post',
@@ -80,7 +80,7 @@ final class LoadPostCommand extends Command
         $isSaveDeferred = $input->getOption('save-deferred');
 
         try {
-            [$post, $action] = $this->createPostForSaving($this->postParser->parse($path), $io, $isForced);
+            $post = $this->createPostForSaving($this->postParser->parse($path), $io, $isForced);
         } catch (ConfirmationQuestionDeclined $exception) {
             $io->getErrorStyle()->warning($exception->getMessage());
 
@@ -96,9 +96,8 @@ final class LoadPostCommand extends Command
         }
 
         $io->writeln(sprintf(
-            '%s<info>%s blog post for %s: "%s"</info>',
+            '%s<info>Saved blog post for %s: "%s"</info>',
             $isDryRun ? '<comment>[DRY-RUN]</comment> ' : '',
-            ucfirst($action),
             $post->getCreatedAt()?->format('Y-m-d'),
             $post->getTitle(),
         ));
@@ -106,27 +105,24 @@ final class LoadPostCommand extends Command
         return Command::SUCCESS;
     }
 
-    /**
-     * @return array{Post, "created" | "updated"}
-     */
-    private function createPostForSaving(ParsedPost $parsedPost, SymfonyStyle $io, bool $isForced): array
+    private function createPostForSaving(ParsedPost $parsedPost, SymfonyStyle $io, bool $isForced): Post
     {
-        $existingPost = $this->postManager->getRepository()->find($parsedPost->metadata->id);
-
-        if ($existingPost !== null) {
+        try {
+            $post = $this->postManager->upsertFromParsedPost($parsedPost, doUpdate: $isForced);
+        } catch (EntityExists) {
             $question = sprintf(
                 'A post with ID <comment>%s</comment> already exists. Do you want to update it?',
-                $existingPost->getId(),
+                $parsedPost->metadata->id,
             );
 
-            if (!$isForced && !$io->confirm($question)) {
+            if (!$io->confirm($question)) {
                 throw new ConfirmationQuestionDeclined('Aborting...');
             }
 
-            return [$this->postManager->updateFromParsedPost($existingPost, $parsedPost), 'updated'];
+            $post = $this->postManager->upsertFromParsedPost($parsedPost, doUpdate: true);
         }
 
-        return [$this->postManager->createFromParsedPost($parsedPost), 'created'];
+        return $post;
     }
 
     private function saveToDatabase(Post $post, bool $isSaveDeferred): void
