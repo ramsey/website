@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Command\Author;
 
+use App\Console\Command;
 use App\Repository\UserRepository;
 use App\Service\Entity\AuthorService;
 use DateTimeImmutable;
@@ -30,7 +31,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use PhpExtended\Email\MailboxList;
 use PhpExtended\Email\MailboxListParserInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -86,9 +86,9 @@ final class CreateCommand extends Command
             $user = $this->userRepository->find($userId);
 
             if ($user === null) {
-                $io->getErrorStyle()->error(sprintf('User with ID "%s" does not exist.', $userId));
+                $this->logger->error(sprintf('User with ID "%s" does not exist.', $userId));
 
-                return Command::FAILURE;
+                return self::FAILURE;
             }
         }
 
@@ -108,9 +108,9 @@ final class CreateCommand extends Command
                 );
 
                 if ($author->getByline() !== $byline && !$io->confirm($question, false)) {
-                    $io->getErrorStyle()->warning('Aborting...');
+                    $this->logger->warning('Aborting...');
 
-                    return Command::FAILURE;
+                    return self::FAILURE;
                 }
 
                 $author->setByline($byline);
@@ -147,6 +147,6 @@ final class CreateCommand extends Command
             ));
         }
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 }

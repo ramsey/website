@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 use Ramsey\Uuid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -50,7 +51,7 @@ class ForDateCommandTest extends KernelTestCase
     }
 
     #[TestDox('creates a version 7 UUID from the date argument')]
-    public function testExecuteWitArgument(): void
+    public function testExecuteWithArgument(): void
     {
         $date = new DateTime('2024-07-28 11:27:38 -05:00');
         $date->setTimezone(new DateTimeZone('UTC'));
@@ -72,5 +73,18 @@ class ForDateCommandTest extends KernelTestCase
         $uuid = Uuid::fromString($output);
         $this->assertSame(7, $uuid->getVersion());
         $this->assertSame($date->format('c'), $uuid->getDateTime()->format('c'));
+    }
+
+    public function testExecuteWithInvalidDate(): void
+    {
+        $date = new DateTime('2024-07-28 11:27:38 -05:00');
+        $date->setTimezone(new DateTimeZone('UTC'));
+
+        $this->commandTester->execute(['date' => 'foobar']);
+
+        $output = $this->commandTester->getDisplay();
+
+        $this->assertSame(Command::FAILURE, $this->commandTester->getStatusCode());
+        $this->assertStringContainsString("[ERROR] Invalid date string: 'foobar'", $output);
     }
 }

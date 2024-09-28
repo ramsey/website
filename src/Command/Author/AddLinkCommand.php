@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Command\Author;
 
+use App\Console\Command;
 use App\Entity\Author;
 use App\Entity\AuthorLink;
 use App\Entity\AuthorLinkType;
@@ -31,11 +32,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Psr\Http\Message\UriFactoryInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
 use function array_column;
@@ -70,8 +69,6 @@ final class AddLinkCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-
         /** @var string $email */
         $email = $input->getArgument('email');
 
@@ -94,7 +91,7 @@ final class AddLinkCommand extends Command
                 ? $this->uriFactory->createUri($link)
                 : throw new InvalidArgumentException('The link cannot be an empty string.');
         } catch (Throwable $exception) {
-            $io->getErrorStyle()->error($exception->getMessage());
+            $this->logger->error($exception->getMessage());
 
             return self::FAILURE;
         }
@@ -107,8 +104,8 @@ final class AddLinkCommand extends Command
         $this->entityManager->persist($authorLink);
         $this->entityManager->flush();
 
-        $io->getErrorStyle()->info(sprintf('Link "%s" added for author %s.', $link, $author->getByline()));
+        $this->logger->info(sprintf('Link "%s" added for author %s.', $link, $author->getByline()));
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 }

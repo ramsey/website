@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 namespace App\Command\Blog;
 
+use App\Console\Command;
 use App\Console\ConfirmationQuestionDeclined;
 use App\Entity\Post;
 use App\Service\Blog\ParsedPost;
@@ -32,7 +33,6 @@ use App\Service\Entity\PostManager;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -82,13 +82,13 @@ final class LoadPostCommand extends Command
         try {
             $post = $this->createPostForSaving($this->postParser->parse($path), $io, $isForced);
         } catch (ConfirmationQuestionDeclined $exception) {
-            $io->getErrorStyle()->warning($exception->getMessage());
+            $this->logger->warning($exception->getMessage());
 
-            return Command::FAILURE;
+            return self::FAILURE;
         } catch (InvalidArgumentException $exception) {
-            $io->getErrorStyle()->error($exception->getMessage());
+            $this->logger->error($exception->getMessage());
 
-            return Command::FAILURE;
+            return self::FAILURE;
         }
 
         if (!$isDryRun) {
@@ -102,7 +102,7 @@ final class LoadPostCommand extends Command
             $post->getTitle(),
         ));
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 
     private function createPostForSaving(ParsedPost $parsedPost, SymfonyStyle $io, bool $isForced): Post

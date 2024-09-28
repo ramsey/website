@@ -23,15 +23,14 @@ declare(strict_types=1);
 
 namespace App\Command\Blog;
 
+use App\Console\Command;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
 use Throwable;
@@ -60,8 +59,6 @@ final class LoadPostsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-
         /** @var string $path */
         $path = $input->getArgument('path');
 
@@ -71,28 +68,28 @@ final class LoadPostsCommand extends Command
         try {
             $this->finder->files()->name(['*.md', '*.markdown', '*.rst', '*.html'])->in($path);
         } catch (DirectoryNotFoundException $exception) {
-            $io->getErrorStyle()->error($exception->getMessage());
+            $this->logger->error($exception->getMessage());
 
-            return Command::FAILURE;
+            return self::FAILURE;
         }
 
         if (!$this->finder->hasResults()) {
-            $io->getErrorStyle()->info(sprintf('No posts found in %s', $path));
+            $this->logger->info(sprintf('No posts found in %s', $path));
 
-            return Command::SUCCESS;
+            return self::SUCCESS;
         }
 
         try {
             $this->loadBlogPosts($this->finder, $output, $isDryRun);
         } catch (Throwable $exception) {
-            $io->getErrorStyle()->error($exception->getMessage());
+            $this->logger->error($exception->getMessage());
 
-            return Command::FAILURE;
+            return self::FAILURE;
         }
 
         $this->entityManager->flush();
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 
     private function loadBlogPosts(Finder $finder, OutputInterface $output, bool $isDryRun): void
@@ -110,7 +107,7 @@ final class LoadPostsCommand extends Command
 
             $returnCode = $this->getApplication()?->doRun($loadPostInput, $output);
 
-            if ($returnCode !== Command::SUCCESS) {
+            if ($returnCode !== self::SUCCESS) {
                 throw new RuntimeException('An error occurred while loading blog posts.');
             }
         }

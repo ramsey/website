@@ -23,10 +23,10 @@ declare(strict_types=1);
 
 namespace App\Command\User;
 
+use App\Console\Command;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -100,6 +100,6 @@ final class CreateCommand extends Command
             $user->getId(),
         ));
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 }

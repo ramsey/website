@@ -23,10 +23,11 @@ declare(strict_types=1);
 
 namespace App\Command\Uuid;
 
+use App\Console\Command;
+use DateMalformedStringException;
 use DateTimeImmutable;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -53,7 +54,13 @@ final class ForDateCommand extends Command
         /** @var string | null $inputDate */
         $inputDate = $input->getArgument('date');
 
-        $date = new DateTimeImmutable($inputDate ?? 'now');
+        try {
+            $date = new DateTimeImmutable($inputDate ?? 'now');
+        } catch (DateMalformedStringException) {
+            $this->logger->error("Invalid date string: '$inputDate'");
+
+            return self::FAILURE;
+        }
 
         $uuid = Uuid::uuid7($date);
 
@@ -61,6 +68,6 @@ final class ForDateCommand extends Command
         $output->write(sprintf('%s', $uuid->toString()));
         $errorOutput->writeln('');
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 }
