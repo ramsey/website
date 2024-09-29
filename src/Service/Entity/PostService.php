@@ -25,7 +25,6 @@ namespace App\Service\Entity;
 
 use App\Entity\Post;
 use App\Repository\PostRepository;
-use App\Service\Blog\ContentHash;
 use App\Service\Blog\ParsedPost;
 
 /**
@@ -39,14 +38,6 @@ interface PostService extends EntityService
      * Creates a Post entity from a ParsedPost
      */
     public function createFromParsedPost(ParsedPost $parsedPost): Post;
-
-    /**
-     * Returns a content hash for the given ParsedPost or Post instances
-     *
-     * The content hash may be used to determine whether the content has changed
-     * or is equal to an earlier version of the content (e.g., using an ETag).
-     */
-    public function getContentHash(ParsedPost | Post $post): ContentHash;
 
     public function getRepository(): PostRepository;
 

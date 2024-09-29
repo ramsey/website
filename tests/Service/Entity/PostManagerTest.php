@@ -477,54 +477,6 @@ class PostManagerTest extends TestCase
         $this->manager->createFromParsedPost($parsedPost);
     }
 
-    public function testGetContentHashUsingParsedPost(): void
-    {
-        $uuid = Uuid::fromString('0191d32d-4d61-727d-b09c-e13ee30091b1');
-
-        $parsedPost = new ParsedPost(
-            new ParsedPostMetadata(
-                id: $uuid,
-                contentType: PostBodyType::Markdown,
-                title: 'Post Title',
-                slug: 'post-title',
-                status: PostStatus::Draft,
-                categories: [],
-                tags: [],
-                description: null,
-                keywords: [],
-                excerpt: null,
-                feedId: null,
-                additional: [],
-                createdAt: null,
-                publishedAt: null,
-                modifiedAt: null,
-            ),
-            'Post body content.',
-            [],
-        );
-
-        $contentHash = $this->manager->getContentHash($parsedPost);
-
-        $this->assertSame('b917a6125004b86e516e1b0c7d8f0e6e34dfb19819802b98392098933d6a9bb4', $contentHash->getHash());
-    }
-
-    public function testGetContentHashUsingPost(): void
-    {
-        $uuid = Uuid::fromString('0191d32d-4d61-727d-b09c-e13ee30091b1');
-
-        $post = (new Post())
-            ->setId($uuid)
-            ->setBodyType(PostBodyType::Markdown)
-            ->setTitle('Post Title')
-            ->setSlug('post-title')
-            ->setStatus(PostStatus::Draft)
-            ->setBody('Post body content.');
-
-        $contentHash = $this->manager->getContentHash($post);
-
-        $this->assertSame('b917a6125004b86e516e1b0c7d8f0e6e34dfb19819802b98392098933d6a9bb4', $contentHash->getHash());
-    }
-
     public function testUpsertFromParsedPostCreatesNewPost(): void
     {
         $parsedPost = new ParsedPost(
@@ -572,45 +524,6 @@ class PostManagerTest extends TestCase
         $this->assertNull($post->getModifiedAt());
         $this->assertTrue($post->getTags()->isEmpty());
         $this->assertTrue($post->getShortUrls()->isEmpty());
-    }
-
-    public function testUpsertFromParsedPostWithExistingIdenticalPostIsNoop(): void
-    {
-        $parsedPost = new ParsedPost(
-            new ParsedPostMetadata(
-                id: Uuid::uuid7(),
-                contentType: PostBodyType::Markdown,
-                title: $this->faker->sentence(),
-                slug: $this->faker->slug(),
-                status: PostStatus::Draft,
-                categories: [],
-                tags: [],
-                description: null,
-                keywords: [],
-                excerpt: null,
-                feedId: null,
-                additional: [],
-                createdAt: null,
-                publishedAt: null,
-                modifiedAt: null,
-            ),
-            $this->faker->text(),
-            [],
-        );
-
-        $post = (new Post())
-            ->setId($parsedPost->metadata->id)
-            ->setBodyType($parsedPost->metadata->contentType)
-            ->setTitle($parsedPost->metadata->title)
-            ->setSlug($parsedPost->metadata->slug)
-            ->setStatus($parsedPost->metadata->status)
-            ->setBody($parsedPost->content);
-
-        $this->repository->expects('find')->with($parsedPost->metadata->id)->andReturn($post);
-
-        $result = $this->manager->upsertFromParsedPost($parsedPost);
-
-        $this->assertSame($post, $result);
     }
 
     public function testUpsertFromParsedPostThrowsExceptionForExistingPostWithChanges(): void

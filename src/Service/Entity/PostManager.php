@@ -25,7 +25,6 @@ namespace App\Service\Entity;
 
 use App\Entity\Post;
 use App\Repository\PostRepository;
-use App\Service\Blog\ContentHash;
 use App\Service\Blog\ParsedPost;
 use InvalidArgumentException;
 use Ramsey\Uuid\UuidInterface;
@@ -55,15 +54,6 @@ final readonly class PostManager implements PostService
         }
 
         return $this->updateFromParsedPost($post, $parsedPost);
-    }
-
-    public function getContentHash(ParsedPost | Post $post): ContentHash
-    {
-        if ($post instanceof ParsedPost) {
-            return ContentHash::createFromParsedPost($post);
-        }
-
-        return ContentHash::createFromPost($post);
     }
 
     public function getRepository(): PostRepository
@@ -127,10 +117,6 @@ final readonly class PostManager implements PostService
         $existingPost = $this->getRepository()->find($parsedPost->metadata->id);
 
         if ($existingPost !== null) {
-            if ($this->getContentHash($parsedPost)->equals($this->getContentHash($existingPost))) {
-                return $existingPost;
-            }
-
             if (!$doUpdate) {
                 throw new EntityExists(sprintf(
                     "A post with ID '%s' already exists; call %s with TRUE as the second parameter to update the post",
