@@ -68,13 +68,13 @@ final class LoadPostsCommand extends Command
         try {
             $this->finder->files()->name(['*.md', '*.markdown', '*.rst', '*.html'])->in($path);
         } catch (DirectoryNotFoundException $exception) {
-            $this->logger->error($exception->getMessage());
+            $this->getStyle()->error($exception->getMessage());
 
             return self::FAILURE;
         }
 
         if (!$this->finder->hasResults()) {
-            $this->logger->info(sprintf('No posts found in %s', $path));
+            $this->getStyle()->info(sprintf('No posts found in %s', $path));
 
             return self::SUCCESS;
         }
@@ -82,7 +82,7 @@ final class LoadPostsCommand extends Command
         try {
             $this->loadBlogPosts($this->finder, $output, $isDryRun);
         } catch (Throwable $exception) {
-            $this->logger->error($exception->getMessage());
+            $this->getStyle()->error($exception->getMessage());
 
             return self::FAILURE;
         }

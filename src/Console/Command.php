@@ -23,23 +23,47 @@ declare(strict_types=1);
 
 namespace App\Console;
 
+use LogicException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\Service\Attribute\Required;
 
-abstract class Command extends SymfonyCommand
+abstract class Command extends SymfonyCommand implements LoggerAwareInterface
 {
-    protected IoAwareLogger $logger;
+    protected ?SymfonyStyle $style = null;
+    protected LoggerInterface $logger;
+
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
 
     #[Required]
-    public function setIoLogger(IoAwareLogger $logger): void
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
 
+    public function getErrorStyle(): SymfonyStyle
+    {
+        return $this->getStyle()->getErrorStyle();
+    }
+
+    public function getStyle(): SymfonyStyle
+    {
+        if ($this->style === null) {
+            throw new LogicException('You must call initialize() before calling this method');
+        }
+
+        return $this->style;
+    }
+
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $this->logger->setIo($input, $output);
+        $this->style = new SymfonyStyle($input, $output);
     }
 }

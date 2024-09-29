@@ -27,12 +27,10 @@ use App\Console\Command;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 use function sprintf;
@@ -73,15 +71,8 @@ final class CreateCommand extends Command
         /** @var string $email */
         $email = $input->getArgument('email');
 
-        /** @var QuestionHelper $helper */
-        $helper = $this->getHelper('question');
-
-        $passwordQuestion = (new Question('Password: '))
-            ->setHidden(true)
-            ->setHiddenFallback(false);
-
         /** @var string $plaintextPassword */
-        $plaintextPassword = $helper->ask($input, $output, $passwordQuestion);
+        $plaintextPassword = $this->getStyle()->askHidden('Password: ');
 
         $user = new User();
         $user
@@ -93,8 +84,8 @@ final class CreateCommand extends Command
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $output->writeln('');
-        $output->writeln(sprintf(
+        $this->getStyle()->newLine();
+        $this->getStyle()->writeln(sprintf(
             'Created user <comment>%s</comment> with ID <comment>%s</comment>',
             $user->getName(),
             $user->getId(),

@@ -35,7 +35,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function sprintf;
 use function trim;
@@ -70,8 +69,6 @@ final class CreateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-
         /** @var string | null $userId */
         $userId = $input->getOption('user-id');
 
@@ -86,7 +83,7 @@ final class CreateCommand extends Command
             $user = $this->userRepository->find($userId);
 
             if ($user === null) {
-                $this->logger->error(sprintf('User with ID "%s" does not exist.', $userId));
+                $this->getStyle()->error(sprintf('User with ID "%s" does not exist.', $userId));
 
                 return self::FAILURE;
             }
@@ -107,8 +104,8 @@ final class CreateCommand extends Command
                     $author->getByline(),
                 );
 
-                if ($author->getByline() !== $byline && !$io->confirm($question, false)) {
-                    $this->logger->warning('Aborting...');
+                if ($author->getByline() !== $byline && !$this->getStyle()->confirm($question, false)) {
+                    $this->getStyle()->warning('Aborting...');
 
                     return self::FAILURE;
                 }
@@ -127,9 +124,9 @@ final class CreateCommand extends Command
 
         $this->entityManager->flush();
 
-        $io->newLine();
+        $this->getStyle()->newLine();
 
-        $table = $io->createTable();
+        $table = $this->getStyle()->createTable();
         $table->setHeaderTitle('Authors');
         $table->setHeaders(['Byline', 'Email', 'ID']);
 
@@ -140,7 +137,7 @@ final class CreateCommand extends Command
         $table->render();
 
         if ($user !== null) {
-            $io->info(sprintf(
+            $this->getStyle()->info(sprintf(
                 'All authors are associated with user "%s" (%s).',
                 $user->getName(),
                 $user->getId(),

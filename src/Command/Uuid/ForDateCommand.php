@@ -30,7 +30,6 @@ use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function sprintf;
@@ -49,24 +48,23 @@ final class ForDateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $errorOutput = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
-
         /** @var string | null $inputDate */
         $inputDate = $input->getArgument('date');
 
         try {
             $date = new DateTimeImmutable($inputDate ?? 'now');
         } catch (DateMalformedStringException) {
-            $this->logger->error("Invalid date string: '$inputDate'");
+            $this->getStyle()->error("Invalid date string: '$inputDate'");
 
             return self::FAILURE;
         }
 
         $uuid = Uuid::uuid7($date);
 
-        $errorOutput->writeln(['', sprintf('<info>Your version 7 UUID for %s is:</info>', $date->format('c'))]);
-        $output->write(sprintf('%s', $uuid->toString()));
-        $errorOutput->writeln('');
+        $this->getErrorStyle()->newLine();
+        $this->getErrorStyle()->writeln(sprintf('<info>Your version 7 UUID for %s is:</info>', $date->format('c')));
+        $this->getStyle()->write(sprintf('%s', $uuid->toString()));
+        $this->getErrorStyle()->newLine();
 
         return self::SUCCESS;
     }

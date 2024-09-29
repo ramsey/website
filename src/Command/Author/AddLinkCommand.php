@@ -91,7 +91,7 @@ final class AddLinkCommand extends Command
                 ? $this->uriFactory->createUri($link)
                 : throw new InvalidArgumentException('The link cannot be an empty string.');
         } catch (Throwable $exception) {
-            $this->logger->error($exception->getMessage());
+            $this->getStyle()->error($exception->getMessage());
 
             return self::FAILURE;
         }
@@ -104,7 +104,7 @@ final class AddLinkCommand extends Command
         $this->entityManager->persist($authorLink);
         $this->entityManager->flush();
 
-        $this->logger->info(sprintf('Link "%s" added for author %s.', $link, $author->getByline()));
+        $this->getStyle()->info(sprintf('Link "%s" added for author %s.', $link, $author->getByline()));
 
         return self::SUCCESS;
     }

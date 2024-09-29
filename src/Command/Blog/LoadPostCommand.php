@@ -36,7 +36,6 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 use function sprintf;
 
@@ -65,8 +64,6 @@ final class LoadPostCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-
         /** @var string $path */
         $path = $input->getArgument('path');
 
@@ -80,13 +77,13 @@ final class LoadPostCommand extends Command
         $isSaveDeferred = $input->getOption('save-deferred');
 
         try {
-            $post = $this->createPostForSaving($this->postParser->parse($path), $io, $isForced);
+            $post = $this->createPostForSaving($this->postParser->parse($path), $isForced);
         } catch (ConfirmationQuestionDeclined $exception) {
-            $this->logger->warning($exception->getMessage());
+            $this->getStyle()->warning($exception->getMessage());
 
             return self::FAILURE;
         } catch (InvalidArgumentException $exception) {
-            $this->logger->error($exception->getMessage());
+            $this->getStyle()->error($exception->getMessage());
 
             return self::FAILURE;
         }
@@ -95,7 +92,7 @@ final class LoadPostCommand extends Command
             $this->saveToDatabase($post, $isSaveDeferred);
         }
 
-        $io->writeln(sprintf(
+        $this->getStyle()->writeln(sprintf(
             '%s<info>Saved blog post for %s: "%s"</info>',
             $isDryRun ? '<comment>[DRY-RUN]</comment> ' : '',
             $post->getCreatedAt()?->format('Y-m-d'),
@@ -105,7 +102,7 @@ final class LoadPostCommand extends Command
         return self::SUCCESS;
     }
 
-    private function createPostForSaving(ParsedPost $parsedPost, SymfonyStyle $io, bool $isForced): Post
+    private function createPostForSaving(ParsedPost $parsedPost, bool $isForced): Post
     {
         try {
             $post = $this->postManager->upsertFromParsedPost($parsedPost, doUpdate: $isForced);
@@ -115,7 +112,7 @@ final class LoadPostCommand extends Command
                 $parsedPost->metadata->id,
             );
 
-            if (!$io->confirm($question)) {
+            if (!$this->getStyle()->confirm($question)) {
                 throw new ConfirmationQuestionDeclined('Aborting...');
             }
 
