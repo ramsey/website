@@ -27,7 +27,10 @@ use App\Entity\Post;
 use App\Repository\PostRepository;
 use App\Service\Blog\ParsedPost;
 use InvalidArgumentException;
+use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Message\UriInterface;
 use Ramsey\Uuid\UuidInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Routing\Requirement\Requirement;
 
 use function preg_match;
@@ -36,11 +39,24 @@ use function sprintf;
 final readonly class PostManager implements PostService
 {
     public function __construct(
+        #[Autowire('%app.shortener.base_url%')] private string $baseUrl,
         private PostRepository $repository,
         private PostTagService $postTagService,
         private ShortUrlService $shortUrlService,
         private AuthorService $authorService,
+        private UriFactoryInterface $uriFactory,
     ) {
+    }
+
+    public function buildUrl(Post $post): ?UriInterface
+    {
+        if ($post->getPublishedAt() !== null) {
+            return $this->uriFactory->createUri(
+                "{$this->baseUrl}blog/{$post->getPublishedAt()->format('Y/m')}/{$post->getSlug()}",
+            );
+        }
+
+        return null;
     }
 
     public function createFromParsedPost(ParsedPost $parsedPost): Post

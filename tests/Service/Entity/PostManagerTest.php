@@ -24,12 +24,14 @@ use DateTimeImmutable;
 use Faker\Factory;
 use Faker\Generator;
 use InvalidArgumentException;
+use Laminas\Diactoros\UriFactory;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\UriInterface;
 use Ramsey\Uuid\Uuid;
 
 use function assert;
@@ -54,10 +56,12 @@ class PostManagerTest extends TestCase
         $this->shortUrlService = Mockery::mock(ShortUrlService::class);
         $this->repository = Mockery::mock(PostRepository::class);
         $this->manager = new PostManager(
+            'http://localhost/',
             $this->repository,
             $this->tagService,
             $this->shortUrlService,
             $this->authorService,
+            new UriFactory(),
         );
     }
 
@@ -608,5 +612,24 @@ class PostManagerTest extends TestCase
 
         $this->assertSame($post, $result);
         $this->assertSame($parsedPost->content, $post->getBody());
+    }
+
+    public function testBuildUrlReturnsNullIfPostHasNoPublishedDate(): void
+    {
+        $post = (new Post());
+
+        $this->assertNull($this->manager->buildUrl($post));
+    }
+
+    public function testBuildUrl(): void
+    {
+        $post = (new Post())
+            ->setPublishedAt(new DateTimeImmutable('September 29, 2024 12:34:56'))
+            ->setSlug('this-is-a-slug');
+
+        $url = $this->manager->buildUrl($post);
+
+        $this->assertInstanceOf(UriInterface::class, $url);
+        $this->assertSame('http://localhost/blog/2024/09/this-is-a-slug', (string) $url);
     }
 }

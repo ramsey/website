@@ -26,6 +26,7 @@ namespace App\Service\Entity;
 use App\Entity\Post;
 use App\Repository\PostRepository;
 use App\Service\Blog\ParsedPost;
+use Psr\Http\Message\UriInterface;
 
 /**
  * A service for interacting with posts
@@ -34,6 +35,11 @@ use App\Service\Blog\ParsedPost;
  */
 interface PostService extends EntityService
 {
+    /**
+     * Returns a UriInterface for the given Post entity
+     */
+    public function buildUrl(Post $post): ?UriInterface;
+
     /**
      * Creates a Post entity from a ParsedPost
      */

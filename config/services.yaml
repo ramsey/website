@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app.base_url: 'https://ben.ramsey.dev/'
     app.data_dir: '%kernel.project_dir%/data'
     app.data.changed_website_uri: '%app.data_dir%/changed_website_uri.php'
     app.data.openpgp_web_key: '%app.data_dir%/openpgp_web_key.php'
@@ -95,6 +96,7 @@ services:
 
 when@test: &services_test
     parameters:
+        app.base_url: 'https://localhost/'
         app.service.plausible.domains:
             - 'not-a-domain-that-should-be-used-in-a-test.example.com'
         app.shortener.base_url: 'https://localhost/su/'
@@ -116,6 +118,7 @@ when@test_no_db: *services_test
 
 when@dev:
     parameters:
+        app.base_url: 'https://localhost:8000/'
         app.shortener.base_url: 'https://localhost:8000/su/'
 
     services:
