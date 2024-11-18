@@ -76,7 +76,7 @@
         "symfony/var-dumper": "~7.1.0",
         "symfony/web-link": "~7.1.0",
         "symfony/yaml": "~7.1.0",
-        "symfonycasts/sass-bundle": "^0.7.0",
+        "symfonycasts/sass-bundle": "^0.8.2",
         "tuupola/base62": "^2.1",
         "twig/extra-bundle": "^3.0",
         "twig/twig": "^3.0",
