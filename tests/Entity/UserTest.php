@@ -70,6 +70,7 @@ class UserTest extends KernelTestCase
     public function testSetEmail(): void
     {
         $email = $this->faker->safeEmail();
+        assert(strlen($email) > 0);
 
         $user = new User();
 

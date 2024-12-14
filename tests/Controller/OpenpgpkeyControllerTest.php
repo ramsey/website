@@ -7,6 +7,7 @@ namespace App\Tests\Controller;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class OpenpgpkeyControllerTest extends WebTestCase
 {
@@ -18,10 +19,13 @@ class OpenpgpkeyControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('GET', "https://{$host}/.well-known/openpgpkey/policy");
 
+        /** @var Response $response */
+        $response = $client->getResponse();
+
         $this->assertResponseIsSuccessful();
         $this->assertSame(
             "# Policy flags for domain {$host}\n",
-            (string) $client->getResponse()->getContent(),
+            (string) $response->getContent(),
         );
         $this->assertResponseHeaderSame('access-control-allow-origin', '*');
         $this->assertResponseHeaderSame('content-type', 'text/plain; charset=utf-8');
@@ -39,10 +43,13 @@ class OpenpgpkeyControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('GET', "https://openpgpkey.{$host}/.well-known/openpgpkey/{$host}/policy");
 
+        /** @var Response $response */
+        $response = $client->getResponse();
+
         $this->assertResponseIsSuccessful();
         $this->assertSame(
             "# Policy flags for domain {$host}\n",
-            (string) $client->getResponse()->getContent(),
+            (string) $response->getContent(),
         );
         $this->assertResponseHeaderSame('access-control-allow-origin', '*');
         $this->assertResponseHeaderSame('content-type', 'text/plain; charset=utf-8');

@@ -7,6 +7,7 @@ namespace App\Tests\Controller;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 use function array_values;
 use function json_encode;
@@ -92,15 +93,18 @@ class WebFingerControllerTest extends WebTestCase
         $this->assertResponseHeaderSame('access-control-allow-origin', '*');
         $this->assertResponseHeaderSame('content-type', 'application/jrd+json; charset=utf-8');
 
+        /** @var Response $response */
+        $response = $client->getResponse();
+
         if ($shouldPass) {
             $this->assertResponseIsSuccessful();
             $this->assertJsonStringEqualsJsonString(
                 (string) json_encode(self::EXPECTED_DATA),
-                (string) $client->getResponse()->getContent(),
+                (string) $response->getContent(),
             );
         } else {
             $this->assertResponseStatusCodeSame(404);
-            $this->assertJsonStringEqualsJsonString('{}', (string) $client->getResponse()->getContent());
+            $this->assertJsonStringEqualsJsonString('{}', (string) $response->getContent());
         }
     }
 
@@ -126,10 +130,13 @@ class WebFingerControllerTest extends WebTestCase
             . '&rel=me&rel=' . urlencode('http://webfinger.net/rel/profile-page'),
         );
 
+        /** @var Response $response */
+        $response = $client->getResponse();
+
         $this->assertResponseIsSuccessful();
         $this->assertJsonStringEqualsJsonString(
             (string) json_encode($expectedData),
-            (string) $client->getResponse()->getContent(),
+            (string) $response->getContent(),
         );
     }
 }
