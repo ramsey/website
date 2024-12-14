@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c1cad2f47761423ea9450f11677626c7",
+    "content-hash": "b067902f8ff94500a45c51b40930c717",
     "packages": [
         {
             "name": "brick/math",
@@ -225,23 +225,22 @@
         },
         {
             "name": "devarts/plausible-php",
-            "version": "dev-feature/events-debugging",
+            "version": "v3.3.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/ramsey/plausible-php.git",
-                "reference": "208b0b39bcb6add232c618a319e82d61e6330a02"
+                "url": "https://github.com/devarts/plausible-php.git",
+                "reference": "7cdd84ae0e04b38dbbbc1cb923cc939c4703b890"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/plausible-php/zipball/208b0b39bcb6add232c618a319e82d61e6330a02",
-                "reference": "208b0b39bcb6add232c618a319e82d61e6330a02",
+                "url": "https://api.github.com/repos/devarts/plausible-php/zipball/7cdd84ae0e04b38dbbbc1cb923cc939c4703b890",
+                "reference": "7cdd84ae0e04b38dbbbc1cb923cc939c4703b890",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^6.3|^7.0",
-                "php": "^7.4|^8.0",
-                "psr/log": "^1.0|^2.0|^3.0"
+                "php": "^7.4|^8.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^8.0|^9.0"
@@ -252,11 +251,7 @@
                     "Devarts\\PlausiblePHP\\": "src"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "Devarts\\PlausiblePHP\\Test\\": "tests"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -278,9 +273,10 @@
                 "wrapper"
             ],
             "support": {
-                "source": "https://github.com/ramsey/plausible-php/tree/feature/events-debugging"
+                "issues": "https://github.com/devarts/plausible-php/issues",
+                "source": "https://github.com/devarts/plausible-php/tree/v3.3.0"
             },
-            "time": "2024-06-30T21:54:19+00:00"
+            "time": "2024-07-13T17:24:27+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -17343,28 +17339,20 @@
             "time": "2024-03-03T12:36:25+00:00"
         }
     ],
-    "aliases": [
-        {
-            "package": "devarts/plausible-php",
-            "version": "dev-feature/events-debugging",
-            "alias": "3.x-dev",
-            "alias_normalized": "3.9999999.9999999.9999999-dev"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "devarts/plausible-php": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.3",
+        "php": "~8.3.0",
         "ext-ctype": "*",
         "ext-gmp": "*",
         "ext-iconv": "*",
         "ext-intl": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
