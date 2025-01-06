@@ -22,7 +22,7 @@
         "ext-gmp": "*",
         "ext-iconv": "*",
         "ext-intl": "*",
-        "devarts/plausible-php": "^3.3",
+        "devarts/plausible-php": "^4.0",
         "doctrine/dbal": "^4",
         "doctrine/doctrine-bundle": "^2.12",
         "doctrine/doctrine-migrations-bundle": "^3.3",
