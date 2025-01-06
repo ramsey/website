@@ -42,7 +42,7 @@
         "psr/http-message": "^2.0",
         "ramsey/uuid-doctrine": "^2.1",
         "scienta/doctrine-json-functions": "^6.1",
-        "symfony/asset": "~7.1.0",
+        "symfony/asset": "~7.2.0",
         "symfony/asset-mapper": "~7.1.0",
         "symfony/clock": "~7.1.0",
         "symfony/console": "~7.1.0",
