@@ -53,7 +53,7 @@
         "symfony/finder": "~7.1.0",
         "symfony/flex": "^2",
         "symfony/form": "~7.1.0",
-        "symfony/framework-bundle": "~7.1.0",
+        "symfony/framework-bundle": "~7.2.2",
         "symfony/http-client": "~7.1.0",
         "symfony/intl": "~7.1.0",
         "symfony/mailer": "~7.1.0",
