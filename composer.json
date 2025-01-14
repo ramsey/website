@@ -17,7 +17,7 @@
     ],
     "homepage": "https://ben.ramsey.dev",
     "require": {
-        "php": "~8.3.0",
+        "php": "~8.4.0",
         "ext-ctype": "*",
         "ext-gmp": "*",
         "ext-iconv": "*",
