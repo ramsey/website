@@ -7,6 +7,7 @@ namespace App\Tests\Controller;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class KeybaseControllerTest extends WebTestCase
 {
@@ -32,7 +33,10 @@ class KeybaseControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('GET', "https://{$host}/.well-known/keybase.txt");
 
-        $content = (string) $client->getResponse()->getContent();
+        /** @var Response $response */
+        $response = $client->getResponse();
+
+        $content = (string) $response->getContent();
 
         $this->assertStringContainsString($testContent, $content);
         $this->assertResponseIsSuccessful();

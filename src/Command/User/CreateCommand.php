@@ -33,7 +33,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+use function assert;
 use function sprintf;
+use function strlen;
 
 /**
  * Creates a user entity and persists it to the database
@@ -70,6 +72,7 @@ final class CreateCommand extends Command
 
         /** @var string $email */
         $email = $input->getArgument('email');
+        assert(strlen($email) > 0);
 
         /** @var string $plaintextPassword */
         $plaintextPassword = $this->getStyle()->askHidden('Password: ');

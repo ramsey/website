@@ -6,6 +6,7 @@ namespace App\Tests\Controller;
 
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class FeedsControllerTest extends WebTestCase
 {
@@ -14,6 +15,9 @@ class FeedsControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->request('GET', '/feeds/blog.xml');
+
+        /** @var Response $response */
+        $response = $client->getResponse();
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'text/xml; charset=utf-8');
@@ -24,7 +28,7 @@ class FeedsControllerTest extends WebTestCase
 
         $this->assertStringContainsString(
             'feed is licensed under a Creative Commons',
-            (string) $client->getResponse()->getContent(),
+            (string) $response->getContent(),
         );
     }
 
@@ -33,6 +37,9 @@ class FeedsControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->request('GET', '/sitemap.xml');
+
+        /** @var Response $response */
+        $response = $client->getResponse();
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'text/xml; charset=utf-8');
@@ -43,7 +50,7 @@ class FeedsControllerTest extends WebTestCase
 
         $this->assertStringContainsString(
             'www.sitemaps.org',
-            (string) $client->getResponse()->getContent(),
+            (string) $response->getContent(),
         );
     }
 }

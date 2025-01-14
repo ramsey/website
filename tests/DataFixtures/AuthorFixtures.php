@@ -33,8 +33,7 @@ final class AuthorFixtures extends Fixture implements DependentFixtureInterface
     {
         $faker = Factory::create();
 
-        /** @var User $user */
-        $user = $this->getReference(UserFixtures::USER);
+        $user = $this->getReference(UserFixtures::USER, User::class);
 
         $author1 = (new Author())
             ->setByline($faker->name())

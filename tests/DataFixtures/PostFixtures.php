@@ -45,23 +45,12 @@ final class PostFixtures extends Fixture implements DependentFixtureInterface
 
     public function load(ObjectManager $manager): void
     {
-        /** @var Author $author1 */
-        $author1 = $this->getReference(AuthorFixtures::AUTHOR1);
-
-        /** @var Author $author2 */
-        $author2 = $this->getReference(AuthorFixtures::AUTHOR2);
-
-        /** @var Author $author3 */
-        $author3 = $this->getReference(AuthorFixtures::AUTHOR3);
-
-        /** @var PostTag $tag1 */
-        $tag1 = $this->getReference(PostTagFixtures::TAG1);
-
-        /** @var PostTag $tag2 */
-        $tag2 = $this->getReference(PostTagFixtures::TAG2);
-
-        /** @var ShortUrl $shortUrl */
-        $shortUrl = $this->getReference(ShortUrlFixtures::SHORT_URL1);
+        $author1 = $this->getReference(AuthorFixtures::AUTHOR1, Author::class);
+        $author2 = $this->getReference(AuthorFixtures::AUTHOR2, Author::class);
+        $author3 = $this->getReference(AuthorFixtures::AUTHOR3, Author::class);
+        $tag1 = $this->getReference(PostTagFixtures::TAG1, PostTag::class);
+        $tag2 = $this->getReference(PostTagFixtures::TAG2, PostTag::class);
+        $shortUrl = $this->getReference(ShortUrlFixtures::SHORT_URL1, ShortUrl::class);
 
         $post1Id = Uuid::fromString('01913f38-fe0b-7220-bc2a-bea9e990d181');
         $post1 = (new Post())

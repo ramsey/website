@@ -55,6 +55,9 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     #[ORM\Column(length: 100)]
     private string $name;
 
+    /**
+     * @var non-empty-string
+     */
     #[ORM\Column(length: 180)]
     private string $email;
 
@@ -98,6 +101,8 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     /**
      * Returns the user's email address
+     *
+     * @return non-empty-string
      */
     public function getEmail(): string
     {
@@ -106,6 +111,8 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     /**
      * Sets the user's email address
+     *
+     * @param non-empty-string $email
      */
     public function setEmail(string $email): static
     {
@@ -116,6 +123,8 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     /**
      * Returns the unique identifier for the user (i.e., email address)
+     *
+     * @return non-empty-string
      */
     public function getUserIdentifier(): string
     {

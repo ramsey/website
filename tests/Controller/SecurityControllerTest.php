@@ -6,6 +6,7 @@ namespace App\Tests\Controller;
 
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class SecurityControllerTest extends WebTestCase
 {
@@ -22,9 +23,12 @@ class SecurityControllerTest extends WebTestCase
             'max-age=604800, public, stale-while-revalidate=86400',
         );
 
+        /** @var Response $response */
+        $response = $client->getResponse();
+
         $this->assertStringContainsString(
             'Canonical: https://ben.ramsey.dev/.well-known/security.txt',
-            (string) $client->getResponse()->getContent(),
+            (string) $response->getContent(),
         );
     }
 }

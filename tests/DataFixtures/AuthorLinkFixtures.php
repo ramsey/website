@@ -31,8 +31,7 @@ class AuthorLinkFixtures extends Fixture implements DependentFixtureInterface
         $faker = Factory::create();
         $uriFactory = new UriFactory();
 
-        /** @var Author $author1 */
-        $author1 = $this->getReference(AuthorFixtures::AUTHOR1);
+        $author1 = $this->getReference(AuthorFixtures::AUTHOR1, Author::class);
         $author1
             ->addLink(
                 (new AuthorLink())
@@ -47,8 +46,7 @@ class AuthorLinkFixtures extends Fixture implements DependentFixtureInterface
 
         $manager->persist($author1);
 
-        /** @var Author $author2 */
-        $author2 = $this->getReference(AuthorFixtures::AUTHOR2);
+        $author2 = $this->getReference(AuthorFixtures::AUTHOR2, Author::class);
         $author2
             ->addLink(
                 (new AuthorLink())

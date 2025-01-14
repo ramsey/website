@@ -6,6 +6,7 @@ namespace App\Tests\Controller;
 
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 #[TestDox('RobotsController')]
 class RobotsControllerTest extends WebTestCase
@@ -16,11 +17,14 @@ class RobotsControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('GET', '/robots.txt');
 
+        /** @var Response $response */
+        $response = $client->getResponse();
+
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'text/plain; charset=utf-8');
         $this->assertResponseHeaderSame('cache-control', 'max-age=86400, must-revalidate, public');
 
-        $this->assertStringContainsString('User-agent: *', (string) $client->getResponse()->getContent());
+        $this->assertStringContainsString('User-agent: *', (string) $response->getContent());
     }
 
     #[TestDox('responds successfully to /ads.txt request')]
@@ -28,6 +32,9 @@ class RobotsControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->request('GET', '/ads.txt');
+
+        /** @var Response $response */
+        $response = $client->getResponse();
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'text/plain; charset=utf-8');
@@ -38,7 +45,7 @@ class RobotsControllerTest extends WebTestCase
 
         $this->assertStringContainsString(
             'placeholder.example.com, placeholder, DIRECT, placeholder',
-            (string) $client->getResponse()->getContent(),
+            (string) $response->getContent(),
         );
     }
 
@@ -48,6 +55,9 @@ class RobotsControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request('GET', '/app-ads.txt');
 
+        /** @var Response $response */
+        $response = $client->getResponse();
+
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'text/plain; charset=utf-8');
         $this->assertResponseHeaderSame(
@@ -57,7 +67,7 @@ class RobotsControllerTest extends WebTestCase
 
         $this->assertStringContainsString(
             'placeholder.example.com, placeholder, DIRECT, placeholder',
-            (string) $client->getResponse()->getContent(),
+            (string) $response->getContent(),
         );
     }
 }

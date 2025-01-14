@@ -24,11 +24,6 @@ parameters:
             nofollow: ''
             noopener: 'external'
             noreferrer: ''
-    app.service.plausible.api_token: '%env(resolve:PLAUSIBLE_API_TOKEN)%'
-    app.service.plausible.base_uri: 'https://plausible.io/api/'
-    app.service.plausible.domains:
-        - 'ben.ramsey.dev'
-        - 'bram.se'
     app.shortener.base_url: 'https://bram.se/'
     app.shortener.hostname: 'bram.se'
 
@@ -53,10 +48,6 @@ services:
     App\Service\Analytics\AnalyticsService: '@App\Service\Analytics\NoOpProvider'
     App\Service\Blog\PostBodyConverter $markdownToHtmlConverter: '@App\Service\Blog\MarkdownToHtmlConverter'
     App\Service\Blog\PostBodyConverter $postBodyToHtmlConverter: '@App\Service\Blog\PostBodyToHtmlConverter'
-    Devarts\PlausiblePHP\PlausibleAPI:
-        arguments:
-            - '%app.service.plausible.api_token%'
-            - '%app.service.plausible.base_uri%'
     GeoIp2\ProviderInterface: '@geoip2.database.default_reader'
     Laminas\Diactoros\UriFactory: ~
     League\CommonMark\ConverterInterface: '@League\CommonMark\MarkdownConverter'
@@ -97,8 +88,6 @@ services:
 when@test: &services_test
     parameters:
         app.base_url: 'https://localhost/'
-        app.service.plausible.domains:
-            - 'not-a-domain-that-should-be-used-in-a-test.example.com'
         app.shortener.base_url: 'https://localhost/su/'
 
     services:
