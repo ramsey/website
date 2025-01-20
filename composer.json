@@ -85,7 +85,7 @@
         "captainhook/captainhook": "^5.23",
         "captainhook/plugin-composer": "^5.3",
         "dama/doctrine-test-bundle": "^8.2",
-        "doctrine/doctrine-fixtures-bundle": "^3.6",
+        "doctrine/doctrine-fixtures-bundle": "^4.0",
         "ergebnis/composer-normalize": "^2.42",
         "fakerphp/faker": "^1.23",
         "mockery/mockery": "^1.6",
