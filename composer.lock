@@ -2064,16 +2064,16 @@
         },
         {
             "name": "logtail/monolog-logtail",
-            "version": "v3.2.0",
+            "version": "v3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/logtail/monolog-logtail.git",
-                "reference": "6436570d9731172d76147247e04e57cccfcca1d3"
+                "reference": "db4716fc2b3bcaa54972f92450e3b78077877ed9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/logtail/monolog-logtail/zipball/6436570d9731172d76147247e04e57cccfcca1d3",
-                "reference": "6436570d9731172d76147247e04e57cccfcca1d3",
+                "url": "https://api.github.com/repos/logtail/monolog-logtail/zipball/db4716fc2b3bcaa54972f92450e3b78077877ed9",
+                "reference": "db4716fc2b3bcaa54972f92450e3b78077877ed9",
                 "shasum": ""
             },
             "require": {
@@ -2106,9 +2106,9 @@
             ],
             "support": {
                 "issues": "https://github.com/logtail/monolog-logtail/issues",
-                "source": "https://github.com/logtail/monolog-logtail/tree/v3.2.0"
+                "source": "https://github.com/logtail/monolog-logtail/tree/v3.3.0"
             },
-            "time": "2024-06-27T13:24:36+00:00"
+            "time": "2025-01-29T17:48:53+00:00"
         },
         {
             "name": "matomo/device-detector",
