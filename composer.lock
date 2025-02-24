@@ -9356,16 +9356,16 @@
         },
         {
             "name": "symfony/ux-turbo",
-            "version": "v2.22.1",
+            "version": "v2.23.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ux-turbo.git",
-                "reference": "97718ea4bca26f0db843c3c0de338d6900c5a002"
+                "reference": "db96cf04d70a8c820671ce55530e8bf641ada33f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/ux-turbo/zipball/97718ea4bca26f0db843c3c0de338d6900c5a002",
-                "reference": "97718ea4bca26f0db843c3c0de338d6900c5a002",
+                "url": "https://api.github.com/repos/symfony/ux-turbo/zipball/db96cf04d70a8c820671ce55530e8bf641ada33f",
+                "reference": "db96cf04d70a8c820671ce55530e8bf641ada33f",
                 "shasum": ""
             },
             "require": {
@@ -9434,7 +9434,7 @@
                 "turbo-stream"
             ],
             "support": {
-                "source": "https://github.com/symfony/ux-turbo/tree/v2.22.1"
+                "source": "https://github.com/symfony/ux-turbo/tree/v2.23.0"
             },
             "funding": [
                 {
@@ -9450,7 +9450,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-12-05T14:25:02+00:00"
+            "time": "2025-02-06T08:47:30+00:00"
         },
         {
             "name": "symfony/ux-twig-component",
