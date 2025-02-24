@@ -1509,16 +1509,16 @@
         },
         {
             "name": "easycorp/easyadmin-bundle",
-            "version": "v4.24.1",
+            "version": "v4.24.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EasyCorp/EasyAdminBundle.git",
-                "reference": "fb8728635620d716cc007c8ad7ae819b4d84a027"
+                "reference": "fd1b0e555655a5d8df67a0a48a28e07a1dd0d6f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/fb8728635620d716cc007c8ad7ae819b4d84a027",
-                "reference": "fb8728635620d716cc007c8ad7ae819b4d84a027",
+                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/fd1b0e555655a5d8df67a0a48a28e07a1dd0d6f8",
+                "reference": "fd1b0e555655a5d8df67a0a48a28e07a1dd0d6f8",
                 "shasum": ""
             },
             "require": {
@@ -1543,13 +1543,14 @@
                 "symfony/security-bundle": "^5.4|^6.0|^7.0",
                 "symfony/string": "^5.4|^6.0|^7.0",
                 "symfony/translation": "^5.4|^6.0|^7.0",
+                "symfony/twig-bridge": "^5.4.48|^6.4.16|^7.1.9",
                 "symfony/twig-bundle": "^5.4|^6.0|^7.0",
                 "symfony/uid": "^5.4|^6.0|^7.0",
                 "symfony/ux-twig-component": "^2.21",
                 "symfony/validator": "^5.4|^6.0|^7.0",
                 "twig/extra-bundle": "^3.17",
                 "twig/html-extra": "^3.17",
-                "twig/twig": "^3.15"
+                "twig/twig": "^3.20"
             },
             "require-dev": {
                 "doctrine/doctrine-fixtures-bundle": "^3.4|3.5.x-dev",
@@ -1598,7 +1599,7 @@
             ],
             "support": {
                 "issues": "https://github.com/EasyCorp/EasyAdminBundle/issues",
-                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v4.24.1"
+                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v4.24.4"
             },
             "funding": [
                 {
@@ -1606,7 +1607,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-02-06T18:39:58+00:00"
+            "time": "2025-02-19T19:52:22+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -10139,20 +10140,20 @@
         },
         {
             "name": "twig/html-extra",
-            "version": "v3.19.0",
+            "version": "v3.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/html-extra.git",
-                "reference": "c63b28e192c1b7c15bb60f81d2e48b140846239a"
+                "reference": "f7d54d4de1b64182af745cfb66777f699b599734"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/html-extra/zipball/c63b28e192c1b7c15bb60f81d2e48b140846239a",
-                "reference": "c63b28e192c1b7c15bb60f81d2e48b140846239a",
+                "url": "https://api.github.com/repos/twigphp/html-extra/zipball/f7d54d4de1b64182af745cfb66777f699b599734",
+                "reference": "f7d54d4de1b64182af745cfb66777f699b599734",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.0.2",
+                "php": ">=8.1.0",
                 "symfony/deprecation-contracts": "^2.5|^3",
                 "symfony/mime": "^5.4|^6.4|^7.0",
                 "twig/twig": "^3.13|^4.0"
@@ -10191,7 +10192,7 @@
                 "twig"
             ],
             "support": {
-                "source": "https://github.com/twigphp/html-extra/tree/v3.19.0"
+                "source": "https://github.com/twigphp/html-extra/tree/v3.20.0"
             },
             "funding": [
                 {
@@ -10203,7 +10204,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-12-29T10:29:59+00:00"
+            "time": "2025-01-31T20:45:36+00:00"
         },
         {
             "name": "twig/twig",
