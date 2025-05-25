@@ -61,7 +61,7 @@ final readonly class WebFingerAccountRepository implements ObjectRepository
     /**
      * @return WebFingerAccount[]
      */
-    public function findAll(): iterable
+    public function findAll(): array
     {
         $records = [];
 

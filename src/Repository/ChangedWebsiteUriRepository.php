@@ -73,7 +73,7 @@ final readonly class ChangedWebsiteUriRepository implements ObjectRepository
     /**
      * @return ChangedWebsiteUri[]
      */
-    public function findAll(): iterable
+    public function findAll(): array
     {
         $uris = [];
 

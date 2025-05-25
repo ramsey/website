@@ -48,7 +48,7 @@ final readonly class OpenPgpWebKeyRepository implements ObjectRepository
     /**
      * @inheritDoc
      */
-    public function findAll(): iterable
+    public function findAll(): array
     {
         $keys = [];
 
