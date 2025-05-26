@@ -37,7 +37,7 @@ jobs:
           coverage: "none"
 
       - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@3.1.0"
+        uses: "ramsey/composer-install@3.1.1"
 
       - name: "Check syntax (php-parallel-lint)"
         run: "composer lint:syntax"
@@ -61,7 +61,7 @@ jobs:
           ini-values: "memory_limit=-1"
 
       - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@3.1.0"
+        uses: "ramsey/composer-install@3.1.1"
 
       - name: "Statically analyze code (PHPStan)"
         run: "composer analyze:phpstan"
@@ -100,7 +100,7 @@ jobs:
           ini-values: "memory_limit=-1"
 
       - name: "Install dependencies (Composer)"
-        uses: "ramsey/composer-install@3.1.0"
+        uses: "ramsey/composer-install@3.1.1"
 
       - name: "Set up database for testing"
         run: |
