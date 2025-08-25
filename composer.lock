@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1b5095ceb81e39d75bac8d2b9e36d698",
+    "content-hash": "ca87ab5690dcb1a1d594325dc07d6ca8",
     "packages": [
         {
             "name": "brick/math",
@@ -5029,22 +5029,22 @@
         },
         {
             "name": "symfony/doctrine-messenger",
-            "version": "v7.2.5",
+            "version": "v7.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/doctrine-messenger.git",
-                "reference": "c353e6ee6b41748d8ea6faa2d0b84ac501e3ec0c"
+                "reference": "31ef09fa3185c8ef9a331170b7a9dd891047f5cb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/doctrine-messenger/zipball/c353e6ee6b41748d8ea6faa2d0b84ac501e3ec0c",
-                "reference": "c353e6ee6b41748d8ea6faa2d0b84ac501e3ec0c",
+                "url": "https://api.github.com/repos/symfony/doctrine-messenger/zipball/31ef09fa3185c8ef9a331170b7a9dd891047f5cb",
+                "reference": "31ef09fa3185c8ef9a331170b7a9dd891047f5cb",
                 "shasum": ""
             },
             "require": {
                 "doctrine/dbal": "^3.6|^4",
                 "php": ">=8.2",
-                "symfony/messenger": "^6.4|^7.0",
+                "symfony/messenger": "^7.2",
                 "symfony/service-contracts": "^2.5|^3"
             },
             "conflict": {
@@ -5081,7 +5081,7 @@
             "description": "Symfony Doctrine Messenger Bridge",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/doctrine-messenger/tree/v7.2.5"
+                "source": "https://github.com/symfony/doctrine-messenger/tree/v7.3.2"
             },
             "funding": [
                 {
@@ -5093,11 +5093,15 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-03-25T15:54:33+00:00"
+            "time": "2025-07-30T17:13:41+00:00"
         },
         {
             "name": "symfony/dotenv",
@@ -6481,16 +6485,16 @@
         },
         {
             "name": "symfony/messenger",
-            "version": "v7.2.6",
+            "version": "v7.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/messenger.git",
-                "reference": "7f71d9d08c7708b758477386e7eaaa8ac78063b5"
+                "reference": "f990f0d09deaa45955593be6aafbafe73b0682b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/messenger/zipball/7f71d9d08c7708b758477386e7eaaa8ac78063b5",
-                "reference": "7f71d9d08c7708b758477386e7eaaa8ac78063b5",
+                "url": "https://api.github.com/repos/symfony/messenger/zipball/f990f0d09deaa45955593be6aafbafe73b0682b9",
+                "reference": "f990f0d09deaa45955593be6aafbafe73b0682b9",
                 "shasum": ""
             },
             "require": {
@@ -6505,6 +6509,7 @@
                 "symfony/event-dispatcher-contracts": "<2.5",
                 "symfony/framework-bundle": "<6.4",
                 "symfony/http-kernel": "<6.4",
+                "symfony/lock": "<6.4",
                 "symfony/serializer": "<6.4"
             },
             "require-dev": {
@@ -6513,6 +6518,7 @@
                 "symfony/dependency-injection": "^6.4|^7.0",
                 "symfony/event-dispatcher": "^6.4|^7.0",
                 "symfony/http-kernel": "^6.4|^7.0",
+                "symfony/lock": "^6.4|^7.0",
                 "symfony/process": "^6.4|^7.0",
                 "symfony/property-access": "^6.4|^7.0",
                 "symfony/rate-limiter": "^6.4|^7.0",
@@ -6548,7 +6554,7 @@
             "description": "Helps applications send and receive messages to/from other applications or via message queues",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/messenger/tree/v7.2.6"
+                "source": "https://github.com/symfony/messenger/tree/v7.3.2"
             },
             "funding": [
                 {
@@ -6560,11 +6566,15 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-04-27T13:34:41+00:00"
+            "time": "2025-07-15T11:36:08+00:00"
         },
         {
             "name": "symfony/mime",
